@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:github/github.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 
 class DataService {
@@ -10,18 +11,17 @@ class DataService {
   final _gh =
       GitHub(auth: Authentication.withToken(dotenv.env['GITHUB_TOKEN']));
 
-  Future<void> uploadFileAnonymous(File file) async {
-    await _gh.repositories.createFile(
+  Future<String> uploadFileAnonymous(File file) async {
+    final uploadTime = DateFormat('dd-MM-yyyy hh:mm:ss').format(DateTime.now());
+    final _ghFile = await _gh.repositories.createFile(
       RepositorySlug(
           _env['GITHUB_USERNAME'] ?? '', _env['GITHUB_REPO_NAME'] ?? ''),
       CreateFile(
-        branch: _env['GITHUB_BRANCH_NAME'],
-        committer: CommitUser(
-            _env['GITHUB_COMMIT_USER_NAME'], _env['GITHUB_COMMIT_USER_EMAIL']),
         content: base64Encode(file.readAsBytesSync()),
-        message: "☄️ -> '${path.basename(file.path)}'",
+        message: "☄️ -> '${path.basename(file.path)}' | $uploadTime",
         path: path.basename(file.path),
       ),
     );
+    return _ghFile.content?.downloadUrl ?? '';
   }
 }

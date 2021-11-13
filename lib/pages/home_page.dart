@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
+import 'package:odin/services/data_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 
 const backgroundStartColor = Color(0x55121212);
@@ -13,8 +16,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<Uri> _list = [];
   bool _dragging = false;
+  bool _loading = false;
+  String? _fileLink;
+  final _ds = DataService();
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +36,14 @@ class _HomePageState extends State<HomePage> {
         child: Stack(
           children: [
             DropTarget(
-              onDragDone: (detail) {
+              onDragDone: (detail) async {
                 setState(() {
-                  _list.addAll(detail.urls);
+                  _loading = true;
+                });
+                _fileLink = await _ds
+                    .uploadFileAnonymous(File(detail.urls.first.toFilePath()));
+                setState(() {
+                  _loading = false;
                 });
               },
               onDragEntered: (detail) {
@@ -54,14 +64,20 @@ class _HomePageState extends State<HomePage> {
                       ? Colors.blue.withOpacity(0.2)
                       : Colors.transparent,
                   child: Center(
-                    child: Text(
-                      _list.isEmpty ? 'Drop a file to start' : _list.join("\n"),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w100,
-                        color: Colors.white.withOpacity(0.3),
-                      ),
-                    ),
+                    child: _loading
+                        ? CircularProgressIndicator(
+                            backgroundColor: Colors.white.withOpacity(0.3),
+                          )
+                        : Text(
+                            _fileLink == null
+                                ? 'Drop a file to start'
+                                : _fileLink.toString(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w100,
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                          ),
                   ),
                 ),
               ),

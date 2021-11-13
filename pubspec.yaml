@@ -40,6 +40,7 @@ dependencies:
   github: ^8.2.5
   path: ^1.8.0
   flutter_dotenv: ^5.0.2
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
