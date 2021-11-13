@@ -1,8 +1,15 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:odin/pages/home_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Window.initialize();
+  await Window.setEffect(
+    effect: WindowEffect.acrylic,
+    color: const Color(0xCC222222),
+  );
   runApp(const MyApp());
   doWhenWindowReady(() {
     final win = appWindow;
