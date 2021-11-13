@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:odin/services/data_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/widgets/window_top_bar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const backgroundStartColor = Color(0x55121212);
 const backgroundEndColor = Color(0x55202020);
@@ -69,14 +70,19 @@ class _HomePageState extends State<HomePage> {
                         ? CircularProgressIndicator(
                             backgroundColor: Colors.white.withOpacity(0.3),
                           )
-                        : Text(
-                            _fileLink == null
-                                ? 'Drop a file to start'
-                                : _fileLink.toString(),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w100,
-                              color: Colors.white.withOpacity(0.3),
+                        : GestureDetector(
+                            onTap: _fileLink != null
+                                ? () => launch(_fileLink ?? '')
+                                : null,
+                            child: Text(
+                              _fileLink == null
+                                  ? 'Drop a file to start'
+                                  : _fileLink.toString(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w100,
+                                color: Colors.white.withOpacity(0.3),
+                              ),
                             ),
                           ),
                   ),
