@@ -1,10 +1,12 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:odin/pages/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   await Window.initialize();
   await Window.setEffect(
     effect: WindowEffect.acrylic,
