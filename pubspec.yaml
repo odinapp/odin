@@ -41,6 +41,10 @@ dependencies:
   path: ^1.8.0
   flutter_dotenv: ^5.0.2
   intl: ^0.17.0
+  provider: ^6.0.1
+  get_it: ^7.2.0
+  logger: ^1.1.0
+  path_provider: ^2.0.6
 
 dev_dependencies:
   flutter_test:

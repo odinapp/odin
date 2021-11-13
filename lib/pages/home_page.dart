@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/services/data_service.dart';
+import 'package:odin/services/locator.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 
 const backgroundStartColor = Color(0x55121212);
@@ -19,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   bool _dragging = false;
   bool _loading = false;
   String? _fileLink;
-  final _ds = DataService();
+  final _ds = locator<DataService>();
 
   @override
   Widget build(BuildContext context) {
