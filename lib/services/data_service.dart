@@ -4,9 +4,12 @@ import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:github/github.dart';
 import 'package:intl/intl.dart';
+import 'package:odin/services/locator.dart';
+import 'package:odin/services/shortner_service.dart';
 import 'package:path/path.dart' as path;
 
 class DataService {
+  final ShortnerService _shortnerService = locator<ShortnerService>();
   final _env = dotenv.env;
   final _gh =
       GitHub(auth: Authentication.withToken(dotenv.env['GITHUB_TOKEN']));
@@ -22,6 +25,8 @@ class DataService {
         path: path.basename(file.path),
       ),
     );
-    return _ghFile.content?.downloadUrl ?? '';
+    final _downloadLink = await _shortnerService.shortUrl(
+        url: _ghFile.content?.downloadUrl ?? '');
+    return _downloadLink ?? '';
   }
 }
