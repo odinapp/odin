@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:github/github.dart';
@@ -13,6 +14,12 @@ class DataService {
   final _env = dotenv.env;
   final _gh =
       GitHub(auth: Authentication.withToken(dotenv.env['GITHUB_TOKEN']));
+  static const _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  final Random _rnd = Random();
+
+  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
   Future<String> uploadFileAnonymous(File file) async {
     final uploadTime = DateFormat('dd-MM-yyyy hh:mm:ss').format(DateTime.now());
@@ -22,7 +29,7 @@ class DataService {
       CreateFile(
         content: base64Encode(file.readAsBytesSync()),
         message: "☄️ -> '${path.basename(file.path)}' | $uploadTime",
-        path: path.basename(file.path),
+        path: "${getRandomString(15)}/${path.basename(file.path)}",
       ),
     );
     final _downloadLink = await _shortnerService.shortUrl(
