@@ -4,6 +4,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/services/data_service.dart';
+import 'package:odin/services/file_picker_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/zip_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
@@ -25,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   String? _fileLink;
   final _ds = locator<DataService>();
   final _zs = locator<ZipService>();
+  final _fps = locator<FilepickerService>();
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +76,14 @@ class _HomePageState extends State<HomePage> {
                 });
               },
               child: GestureDetector(
-                onTap: _fileLink != null ? () => launch(_fileLink ?? '') : null,
+                onTap: _fileLink != null
+                    ? () => launch(_fileLink ?? '')
+                    : () async {
+                        final linkFile = await _fps.getFiles();
+                        setState(() {
+                          _fileLink = linkFile;
+                        });
+                      },
                 child: SizedBox.expand(
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
