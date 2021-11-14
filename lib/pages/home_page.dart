@@ -42,8 +42,10 @@ class _HomePageState extends State<HomePage> {
                 setState(() {
                   _loading = true;
                 });
-                _fileLink = await _ds
-                    .uploadFileAnonymous(File(detail.urls.first.toFilePath()));
+                if (detail.urls.isNotEmpty) {
+                  _fileLink = await _ds.uploadFileAnonymous(
+                      File(detail.urls.first.toFilePath()));
+                }
                 setState(() {
                   _loading = false;
                 });
@@ -74,16 +76,23 @@ class _HomePageState extends State<HomePage> {
                             onTap: _fileLink != null
                                 ? () => launch(_fileLink ?? '')
                                 : null,
-                            child: Text(
-                              _fileLink == null
-                                  ? 'Drop a file to start'
-                                  : _fileLink.toString(),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w100,
-                                color: Colors.white.withOpacity(0.3),
-                              ),
-                            ),
+                            child: _fileLink == null
+                                ? Text(
+                                    'Drop a file to start',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w100,
+                                      color: Colors.white.withOpacity(0.3),
+                                    ),
+                                  )
+                                : SelectableText(
+                                    _fileLink.toString(),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w100,
+                                      color: Colors.white.withOpacity(0.3),
+                                    ),
+                                  ),
                           ),
                   ),
                 ),
