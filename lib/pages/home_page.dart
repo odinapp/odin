@@ -61,40 +61,38 @@ class _HomePageState extends State<HomePage> {
                   _dragging = false;
                 });
               },
-              child: SizedBox.expand(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
-                  color: _dragging
-                      ? Colors.blue.withOpacity(0.2)
-                      : Colors.transparent,
-                  child: Center(
-                    child: _loading
-                        ? CircularProgressIndicator(
-                            backgroundColor: Colors.white.withOpacity(0.3),
-                          )
-                        : GestureDetector(
-                            onTap: _fileLink != null
-                                ? () => launch(_fileLink ?? '')
-                                : null,
-                            child: _fileLink == null
-                                ? Text(
-                                    'Drop a file to start',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w100,
-                                      color: Colors.white.withOpacity(0.6),
-                                    ),
-                                  )
-                                : SelectableText(
-                                    _fileLink.toString(),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w100,
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
+              child: GestureDetector(
+                onTap: _fileLink != null ? () => launch(_fileLink ?? '') : null,
+                child: SizedBox.expand(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut,
+                    color: _dragging
+                        ? Colors.blue.withOpacity(0.2)
+                        : Colors.transparent,
+                    child: Center(
+                      child: _loading
+                          ? CircularProgressIndicator(
+                              backgroundColor: Colors.white.withOpacity(0.3),
+                            )
+                          : _fileLink == null
+                              ? Text(
+                                  'Drop a file to start',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w100,
+                                    color: Colors.white.withOpacity(0.6),
                                   ),
-                          ),
+                                )
+                              : SelectableText(
+                                  _fileLink.toString(),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w100,
+                                    color: Colors.white.withOpacity(0.3),
+                                  ),
+                                ),
+                    ),
                   ),
                 ),
               ),
