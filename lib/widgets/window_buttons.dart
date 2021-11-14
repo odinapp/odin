@@ -1,5 +1,6 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:odin/widgets/menu_window_button.dart';
 
 final buttonColors = WindowButtonColors(
   iconNormal: const Color(0xFF383838),
@@ -23,6 +24,10 @@ class WindowButtons extends StatelessWidget {
     return Row(
       children: [
         MinimizeWindowButton(
+          colors: buttonColors,
+          animate: true,
+        ),
+        MenuWindowButton(
           colors: buttonColors,
           animate: true,
         ),
