@@ -79,7 +79,8 @@ class _HomePageState extends State<HomePage>
             Align(
               alignment: Alignment.center,
               child: CustomPaint(
-                size: Size(150, (150 * 1).toDouble()),
+                size: Size(MediaQuery.of(context).size.width / 4.8,
+                    (MediaQuery.of(context).size.width / 4.8 * 1).toDouble()),
                 painter: OdinLogoCustomPainter(),
               ),
             ),
