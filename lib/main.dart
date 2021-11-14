@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:odin/pages/home_page.dart';
 import 'package:odin/services/locator.dart';
@@ -12,11 +11,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   await setupLocator();
-  await Window.initialize();
-  await Window.setEffect(
-    effect: WindowEffect.acrylic,
-    color: const Color(0xCC222222),
-  );
   runZonedGuarded(() {
     runApp(const MyApp());
   }, (obj, stacktrace) {
@@ -42,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Odin',
-      theme: ThemeData.dark(),
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
       home: const HomePage(),
     );
   }

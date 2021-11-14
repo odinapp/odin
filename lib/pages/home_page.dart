@@ -7,8 +7,8 @@ import 'package:odin/services/locator.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-const backgroundStartColor = Color(0x55121212);
-const backgroundEndColor = Color(0x55202020);
+const backgroundStartColor = Color(0xFF7D5DEC);
+const backgroundEndColor = Color(0xFF6148B9);
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -26,12 +26,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFF7D5DEC),
       body: Container(
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             colors: [backgroundStartColor, backgroundEndColor],
-            radius: 1.5,
+            radius: 2.5,
+            center: Alignment.topLeft,
             stops: [0.0, 1.0],
           ),
         ),
@@ -82,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w100,
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: Colors.white.withOpacity(0.6),
                                     ),
                                   )
                                 : SelectableText(
