@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage>
 
   bool _dragging = false;
   bool _loading = false;
+  bool glow = true;
   String? _fileLink;
   final _gs = locator<GithubService>();
   final _zs = locator<ZipService>();
@@ -48,7 +49,13 @@ class _HomePageState extends State<HomePage>
         curve: Curves.easeOut,
       ),
     )..addListener(() {
-        setState(() {});
+        setState(() {
+          if (controller.value >= 0.9) {
+            glow = false;
+          } else if (controller.value <= 0.1) {
+            glow = true;
+          }
+        });
       });
     // Starting ripple animation
     controller.repeat();
@@ -80,6 +87,25 @@ class _HomePageState extends State<HomePage>
               child: SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.transparent,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: glow ? 40 : 10,
+                        color: glow
+                            ? Colors.white.withOpacity(0.5)
+                            : Colors.white.withOpacity(0.2),
+                      )
+                    ]),
+                width: MediaQuery.of(context).size.width / 4.8,
+                height: MediaQuery.of(context).size.width / 4.8,
               ),
             ),
             // Odin logo painter
