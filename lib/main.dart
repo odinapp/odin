@@ -18,10 +18,9 @@ void main() async {
   });
   doWhenWindowReady(() {
     final win = appWindow;
-    const initialSize = Size(412, 192);
+    const initialSize = Size(720, 512);
     win.minSize = initialSize;
     win.size = initialSize;
-    win.maxSize = initialSize;
     win.alignment = Alignment.center;
     win.title = "Odin";
     win.show();

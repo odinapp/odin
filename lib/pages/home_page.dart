@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             colors: [backgroundStartColor, backgroundEndColor],
-            radius: 2.5,
+            radius: 2,
             center: Alignment.topLeft,
             stops: [0.0, 1.0],
           ),
