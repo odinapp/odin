@@ -4,7 +4,6 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/painters/ripple_painter.dart';
-import 'package:odin/services/data_service.dart';
 import 'package:odin/services/file_picker_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/locator.dart';
@@ -31,7 +30,6 @@ class _HomePageState extends State<HomePage>
   bool _dragging = false;
   bool _loading = false;
   String? _fileLink;
-  // final _ds = locator<DataService>();
   final _gs = locator<GithubService>();
   final _zs = locator<ZipService>();
   final _fps = locator<FilepickerService>();

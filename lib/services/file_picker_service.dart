@@ -1,13 +1,11 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:odin/services/data_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/zip_service.dart';
 
 class FilepickerService {
-  // final _dataService = locator<DataService>();
   final _githubService = locator<GithubService>();
   final _zipService = locator<ZipService>();
 
