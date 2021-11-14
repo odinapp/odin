@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
+import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/services/data_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/zip_service.dart';
@@ -86,23 +87,38 @@ class _HomePageState extends State<HomePage> {
                           ? CircularProgressIndicator(
                               backgroundColor: Colors.white.withOpacity(0.3),
                             )
-                          : _fileLink == null
-                              ? Text(
-                                  'Drop a file to start',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w100,
-                                    color: Colors.white.withOpacity(0.6),
-                                  ),
-                                )
-                              : SelectableText(
-                                  _fileLink.toString(),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w100,
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Spacer(flex: 4),
+                                CustomPaint(
+                                  size: Size(150, (150 * 1).toDouble()),
+                                  painter: OdinLogoCustomPainter(),
                                 ),
+                                if (_fileLink != null)
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: SelectableText(
+                                      _fileLink.toString(),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w100,
+                                        color: Colors.white.withOpacity(0.6),
+                                      ),
+                                    ),
+                                  ),
+                                const Spacer(flex: 3),
+                                Text(
+                                  "Files are saved  in an anonymous GitHub Repo, and will be deleted after 15 hours.",
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black.withOpacity(0.2)),
+                                ),
+                                const Spacer(flex: 1),
+                              ],
+                            ),
                     ),
                   ),
                 ),
