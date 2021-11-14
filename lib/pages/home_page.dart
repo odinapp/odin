@@ -6,6 +6,7 @@ import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/painters/ripple_painter.dart';
 import 'package:odin/services/data_service.dart';
 import 'package:odin/services/file_picker_service.dart';
+import 'package:odin/services/github_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/zip_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
@@ -30,7 +31,8 @@ class _HomePageState extends State<HomePage>
   bool _dragging = false;
   bool _loading = false;
   String? _fileLink;
-  final _ds = locator<DataService>();
+  // final _ds = locator<DataService>();
+  final _gs = locator<GithubService>();
   final _zs = locator<ZipService>();
   final _fps = locator<FilepickerService>();
   @override
@@ -96,9 +98,9 @@ class _HomePageState extends State<HomePage>
                         detail.urls.map((e) => File(e.toFilePath())).toList();
                     final zippedFile =
                         await _zs.zipFile(fileToZips: fileToZips);
-                    _fileLink = await _ds.uploadFileAnonymous(zippedFile);
+                    _fileLink = await _gs.uploadFileAnonymous(zippedFile);
                   } else {
-                    _fileLink = await _ds.uploadFileAnonymous(
+                    _fileLink = await _gs.uploadFileAnonymous(
                         File(detail.urls.first.toFilePath()));
                   }
                 }

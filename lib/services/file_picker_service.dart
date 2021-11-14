@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:odin/services/data_service.dart';
+import 'package:odin/services/github_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/zip_service.dart';
 
 class FilepickerService {
-  final _dataService = locator<DataService>();
+  // final _dataService = locator<DataService>();
+  final _githubService = locator<GithubService>();
   final _zipService = locator<ZipService>();
 
   Future<String?> getFiles() async {
@@ -18,9 +20,9 @@ class FilepickerService {
       final int length = files.length;
       if (length > 1) {
         final zippedFile = await _zipService.zipFile(fileToZips: files);
-        _path = await _dataService.uploadFileAnonymous(zippedFile);
+        _path = await _githubService.uploadFileAnonymous(zippedFile);
       } else {
-        _path = await _dataService.uploadFileAnonymous(files.first);
+        _path = await _githubService.uploadFileAnonymous(files.first);
       }
     } else {
       // User canceled the picker

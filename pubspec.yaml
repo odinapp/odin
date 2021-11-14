@@ -37,8 +37,9 @@ dependencies:
     sdk: flutter
   flutter_dotenv: ^5.0.2
   get_it: ^7.2.0
-  github: ^8.2.5
+  http: ^0.13.4
   intl: ^0.17.0
+  json_annotation: ^4.3.0
   logger: ^1.1.0
   path: ^1.8.0
   path_provider: ^2.0.6
@@ -46,9 +47,11 @@ dependencies:
   url_launcher: ^6.0.12
 
 dev_dependencies:
+  build_runner: ^2.1.5
   flutter_lints: ^1.0.0
   flutter_test:
     sdk: flutter
+  json_serializable: ^6.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

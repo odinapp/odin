@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:odin/services/data_service.dart';
 import 'package:odin/services/file_picker_service.dart';
+import 'package:odin/services/github_service.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:odin/services/shortner_service.dart';
 import 'package:odin/services/zip_service.dart';
@@ -12,7 +13,8 @@ GetIt locator = GetIt.instance;
 Future<void> setupLocator() async {
   Stopwatch stopwatch = Stopwatch()..start();
   // locator.registerFactory<CurrentDataNotifier>(() => CurrentDataNotifier());
-  locator.registerLazySingleton<DataService>(() => DataService());
+  // locator.registerLazySingleton<DataService>(() => DataService());
+  locator.registerLazySingleton<GithubService>(() => GithubService());
   locator.registerLazySingleton<ShortnerService>(() => ShortnerService());
   locator.registerLazySingleton<RandomService>(() => RandomService());
   locator.registerLazySingleton<ZipService>(() => ZipService());
