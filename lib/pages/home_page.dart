@@ -4,6 +4,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/services/data_service.dart';
 import 'package:odin/services/locator.dart';
+import 'package:odin/services/zip_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   bool _loading = false;
   String? _fileLink;
   final _ds = locator<DataService>();
+  final _zs = locator<ZipService>();
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +46,17 @@ class _HomePageState extends State<HomePage> {
                   _loading = true;
                 });
                 if (detail.urls.isNotEmpty) {
-                  _fileLink = await _ds.uploadFileAnonymous(
-                      File(detail.urls.first.toFilePath()));
+                  final int length = detail.urls.length;
+                  if (length > 1) {
+                    final List<File> fileToZips =
+                        detail.urls.map((e) => File(e.toFilePath())).toList();
+                    final zippedFile =
+                        await _zs.zipFile(fileToZips: fileToZips);
+                    _fileLink = await _ds.uploadFileAnonymous(zippedFile);
+                  } else {
+                    _fileLink = await _ds.uploadFileAnonymous(
+                        File(detail.urls.first.toFilePath()));
+                  }
                 }
                 setState(() {
                   _loading = false;
