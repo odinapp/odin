@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:clipboard/clipboard.dart';
 import 'package:desktop_drop/desktop_drop.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/painters/ripple_painter.dart';
@@ -9,7 +11,6 @@ import 'package:odin/services/github_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/zip_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 const backgroundStartColor = Color(0xFF7D5DEC);
 const backgroundEndColor = Color(0xFF6148B9);
@@ -23,6 +24,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
+  // Animation controller for ripple animation
   late Animation<double> animation;
   late AnimationController controller;
   final Tween<double> _sizeTween = Tween(begin: .4, end: 1);
@@ -33,6 +35,7 @@ class _HomePageState extends State<HomePage>
   final _gs = locator<GithubService>();
   final _zs = locator<ZipService>();
   final _fps = locator<FilepickerService>();
+
   @override
   void initState() {
     controller = AnimationController(
@@ -47,6 +50,7 @@ class _HomePageState extends State<HomePage>
     )..addListener(() {
         setState(() {});
       });
+    // Starting ripple animation
     controller.repeat();
     super.initState();
   }
@@ -56,6 +60,7 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       backgroundColor: const Color(0xFF7D5DEC),
       body: Container(
+        // Gradient background
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             colors: [backgroundStartColor, backgroundEndColor],
@@ -66,6 +71,7 @@ class _HomePageState extends State<HomePage>
         ),
         child: Stack(
           children: [
+            // Ripple animation painter
             CustomPaint(
               painter: RipplePainter(
                 color: Colors.white,
@@ -76,6 +82,8 @@ class _HomePageState extends State<HomePage>
                 height: MediaQuery.of(context).size.height,
               ),
             ),
+            // Odin logo painter
+            // TODO: Replace logo with plus and check for drag and finish states
             Align(
               alignment: Alignment.center,
               child: CustomPaint(
@@ -84,6 +92,7 @@ class _HomePageState extends State<HomePage>
                 painter: OdinLogoCustomPainter(),
               ),
             ),
+            // Drag & drop target
             DropTarget(
               onDragDone: (detail) async {
                 setState(() {
@@ -118,11 +127,15 @@ class _HomePageState extends State<HomePage>
               },
               child: GestureDetector(
                 onTap: _fileLink != null
-                    ? () => launch(_fileLink ?? '')
+                    ? () => FlutterClipboard.copy(_fileLink ?? '')
                     : () async {
+                        setState(() {
+                          _loading = true;
+                        });
                         final linkFile = await _fps.getFiles();
                         setState(() {
                           _fileLink = linkFile;
+                          _loading = false;
                         });
                       },
                 child: SizedBox.expand(
@@ -143,15 +156,42 @@ class _HomePageState extends State<HomePage>
                               children: [
                                 const Spacer(flex: 9),
                                 if (_fileLink != null)
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: SelectableText(
-                                      _fileLink.toString(),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w100,
-                                        color: Colors.white.withOpacity(0.6),
-                                      ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(6)),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        16, 10, 16, 10),
+                                    margin: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SelectableText(
+                                          _fileLink.toString(),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w300,
+                                            color:
+                                                Colors.white.withOpacity(0.6),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 4,
+                                        ),
+                                        SizedBox(
+                                          height: 24.0,
+                                          width: 24.0,
+                                          child: Icon(
+                                            Platform.isIOS || Platform.isMacOS
+                                                ? CupertinoIcons
+                                                    .square_on_square
+                                                : Icons.copy,
+                                            size: 16,
+                                            color:
+                                                Colors.white.withOpacity(0.6),
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 Text(
