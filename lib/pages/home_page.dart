@@ -146,64 +146,74 @@ class _HomePageState extends State<HomePage>
                         ? Colors.blue.withOpacity(0.2)
                         : Colors.transparent,
                     child: Center(
-                      child: _loading
-                          ? CircularProgressIndicator(
-                              backgroundColor: Colors.white.withOpacity(0.3),
-                            )
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                const Spacer(flex: 9),
-                                if (_fileLink != null)
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(6)),
-                                    padding: const EdgeInsets.fromLTRB(
-                                        16, 10, 16, 10),
-                                    margin: const EdgeInsets.all(16.0),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SelectableText(
-                                          _fileLink.toString(),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w300,
-                                            color:
-                                                Colors.white.withOpacity(0.6),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 4,
-                                        ),
-                                        SizedBox(
-                                          height: 24.0,
-                                          width: 24.0,
-                                          child: Icon(
-                                            Platform.isIOS || Platform.isMacOS
-                                                ? CupertinoIcons
-                                                    .square_on_square
-                                                : Icons.copy,
-                                            size: 16,
-                                            color:
-                                                Colors.white.withOpacity(0.6),
-                                          ),
-                                        )
-                                      ],
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Spacer(flex: 9),
+                          if (_loading)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 24.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(500),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.25,
+                                  child: LinearProgressIndicator(
+                                    backgroundColor:
+                                        Colors.white.withOpacity(0.1),
+                                    color: Colors.white,
+                                    minHeight: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (_fileLink != null)
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(6)),
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                              margin: const EdgeInsets.all(16.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SelectableText(
+                                    _fileLink.toString(),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.white.withOpacity(0.6),
                                     ),
                                   ),
-                                Text(
-                                  "Files are saved  in an anonymous GitHub Repo, and will be deleted after 15 hours.",
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black.withOpacity(0.2)),
-                                ),
-                                const Spacer(flex: 1),
-                              ],
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  SizedBox(
+                                    height: 24.0,
+                                    width: 24.0,
+                                    child: Icon(
+                                      Platform.isIOS || Platform.isMacOS
+                                          ? CupertinoIcons.square_on_square
+                                          : Icons.copy,
+                                      size: 16,
+                                      color: Colors.white.withOpacity(0.6),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
+                          Text(
+                            "Files are saved  in an anonymous GitHub Repo, and will be deleted after 15 hours.",
+                            style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black.withOpacity(0.2)),
+                          ),
+                          const Spacer(flex: 1),
+                        ],
+                      ),
                     ),
                   ),
                 ),
