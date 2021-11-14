@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
+import 'package:odin/painters/ripple_painter.dart';
 import 'package:odin/services/data_service.dart';
 import 'package:odin/services/file_picker_service.dart';
 import 'package:odin/services/locator.dart';
@@ -20,13 +21,35 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late Animation<double> animation;
+  late AnimationController controller;
+  final Tween<double> _sizeTween = Tween(begin: .4, end: 1);
+
   bool _dragging = false;
   bool _loading = false;
   String? _fileLink;
   final _ds = locator<DataService>();
   final _zs = locator<ZipService>();
   final _fps = locator<FilepickerService>();
+  @override
+  void initState() {
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+    animation = _sizeTween.animate(
+      CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeOut,
+      ),
+    )..addListener(() {
+        setState(() {});
+      });
+    controller.repeat();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +66,23 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Stack(
           children: [
+            CustomPaint(
+              painter: RipplePainter(
+                color: Colors.white,
+                animationValue: animation.value,
+              ),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: CustomPaint(
+                size: Size(150, (150 * 1).toDouble()),
+                painter: OdinLogoCustomPainter(),
+              ),
+            ),
             DropTarget(
               onDragDone: (detail) async {
                 setState(() {
@@ -100,11 +140,7 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                const Spacer(flex: 4),
-                                CustomPaint(
-                                  size: Size(150, (150 * 1).toDouble()),
-                                  painter: OdinLogoCustomPainter(),
-                                ),
+                                const Spacer(flex: 9),
                                 if (_fileLink != null)
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -117,7 +153,6 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   ),
-                                const Spacer(flex: 3),
                                 Text(
                                   "Files are saved  in an anonymous GitHub Repo, and will be deleted after 15 hours.",
                                   style: TextStyle(
