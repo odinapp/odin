@@ -12,8 +12,8 @@ import 'package:odin/painters/ripple_painter.dart';
 import 'package:odin/painters/tooltip_painter.dart';
 import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/services/locator.dart';
-import 'package:odin/services/toast_service.dart';
 import 'package:odin/services/preferences_service.dart';
+import 'package:odin/services/toast_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -87,16 +87,23 @@ class _HomePageState extends State<HomePage>
         child: Stack(
           children: [
             // Ripple animation painter
-            CustomPaint(
-              painter: RipplePainter(
-                color: Colors.white,
-                animationValue: animation.value,
-              ),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
+            Center(
+              child: CustomPaint(
+                painter: RipplePainter(
+                  color: Colors.white,
+                  animationValue: animation.value,
+                ),
+                child: SizedBox(
+                  width: (Platform.isWindows || Platform.isMacOS)
+                      ? MediaQuery.of(context).size.width
+                      : MediaQuery.of(context).size.width * 0.8,
+                  height: (Platform.isWindows || Platform.isMacOS)
+                      ? MediaQuery.of(context).size.height
+                      : MediaQuery.of(context).size.height * 0.8,
+                ),
               ),
             ),
+            // Glow painter
             Align(
               alignment: Alignment.center,
               child: AnimatedContainer(
@@ -112,16 +119,25 @@ class _HomePageState extends State<HomePage>
                             : Colors.white.withOpacity(0.2),
                       )
                     ]),
-                width: MediaQuery.of(context).size.width / 4.8,
-                height: MediaQuery.of(context).size.width / 4.8,
+                width: (Platform.isWindows || Platform.isMacOS)
+                    ? MediaQuery.of(context).size.width / 4.8
+                    : MediaQuery.of(context).size.width * 0.4,
+                height: (Platform.isWindows || Platform.isMacOS)
+                    ? MediaQuery.of(context).size.width / 4.8
+                    : MediaQuery.of(context).size.width * 0.4,
               ),
             ),
             // Odin logo painter
             Align(
               alignment: Alignment.center,
               child: CustomPaint(
-                size: Size(MediaQuery.of(context).size.width / 4.8,
-                    (MediaQuery.of(context).size.width / 4.8 * 1).toDouble()),
+                size: (Platform.isWindows || Platform.isMacOS)
+                    ? Size(
+                        MediaQuery.of(context).size.width / 4.8,
+                        (MediaQuery.of(context).size.width / 4.8 * 1)
+                            .toDouble())
+                    : Size(MediaQuery.of(context).size.width * 0.4,
+                        (MediaQuery.of(context).size.width * 0.4).toDouble()),
                 painter: _dragging || _hovering
                     ? DropIconCustomPainter()
                     : _fileNotifier.fileLink != null
@@ -136,9 +152,13 @@ class _HomePageState extends State<HomePage>
                 duration: const Duration(milliseconds: 1500),
                 curve: Curves.elasticOut,
                 margin: EdgeInsets.only(
-                    bottom: glow
-                        ? MediaQuery.of(context).size.width / 3
-                        : MediaQuery.of(context).size.width / 3.2),
+                    bottom: (Platform.isWindows || Platform.isMacOS)
+                        ? glow
+                            ? MediaQuery.of(context).size.width / 3
+                            : MediaQuery.of(context).size.width / 3.2
+                        : glow
+                            ? MediaQuery.of(context).size.width / 1.6
+                            : MediaQuery.of(context).size.width / 1.7),
                 width: _fileNotifier.processing
                     ? 160
                     : _fileNotifier.loading
@@ -156,7 +176,9 @@ class _HomePageState extends State<HomePage>
                             ? "Processing."
                             : _fileNotifier.loading
                                 ? "Uploading."
-                                : 'Drop files to start.',
+                                : (Platform.isWindows || Platform.isMacOS)
+                                    ? 'Drop files to start.'
+                                    : 'Tap to share files.',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
@@ -297,13 +319,19 @@ class _HomePageState extends State<HomePage>
                               ),
                             ],
                           ),
-                        Text(
-                          "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: -0.1,
-                            color: Colors.black.withOpacity(0.2),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                          child: Text(
+                            "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: (Platform.isWindows || Platform.isMacOS)
+                                  ? 10
+                                  : 12,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -0.1,
+                              color: Colors.black.withOpacity(0.2),
+                            ),
                           ),
                         ),
                         const Spacer(flex: 1),
@@ -387,8 +415,12 @@ class _HomePageState extends State<HomePage>
                           Container(
                             margin: const EdgeInsets.all(16),
                             padding: const EdgeInsets.all(8),
-                            width: MediaQuery.of(context).size.width / 2.4,
-                            height: MediaQuery.of(context).size.width / 2.4,
+                            width: (Platform.isWindows || Platform.isMacOS)
+                                ? MediaQuery.of(context).size.width / 2.4
+                                : MediaQuery.of(context).size.width * 0.8,
+                            height: (Platform.isWindows || Platform.isMacOS)
+                                ? MediaQuery.of(context).size.width / 2.4
+                                : MediaQuery.of(context).size.width * 0.8,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
@@ -396,7 +428,9 @@ class _HomePageState extends State<HomePage>
                             child: Center(
                               child: QrImage(
                                 data: _fileNotifier.fileLink!,
-                                size: MediaQuery.of(context).size.width / 2.6,
+                                size: (Platform.isWindows || Platform.isMacOS)
+                                    ? MediaQuery.of(context).size.width / 2.6
+                                    : MediaQuery.of(context).size.width * 0.7,
                               ),
                             ),
                           ),

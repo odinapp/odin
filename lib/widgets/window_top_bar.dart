@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/widgets/window_buttons.dart';
@@ -9,15 +11,17 @@ class WindowTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WindowTitleBarBox(
-      child: Row(
-        children: [
-          Expanded(
-            child: MoveWindow(),
-          ),
-          const WindowButtons()
-        ],
-      ),
-    );
+    return (Platform.isWindows || Platform.isMacOS)
+        ? WindowTitleBarBox(
+            child: Row(
+              children: [
+                Expanded(
+                  child: MoveWindow(),
+                ),
+                const WindowButtons()
+              ],
+            ),
+          )
+        : Container();
   }
 }

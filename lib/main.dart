@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
@@ -26,15 +27,17 @@ void main() async {
   }, (obj, stacktrace) {
     logger.e(obj, obj, stacktrace);
   });
-  doWhenWindowReady(() {
-    final win = appWindow;
-    const initialSize = Size(720, 512);
-    win.minSize = initialSize;
-    win.size = initialSize;
-    win.alignment = Alignment.center;
-    win.title = "Odin";
-    win.show();
-  });
+  if (Platform.isWindows || Platform.isMacOS) {
+    doWhenWindowReady(() {
+      final win = appWindow;
+      const initialSize = Size(720, 512);
+      win.minSize = initialSize;
+      win.size = initialSize;
+      win.alignment = Alignment.center;
+      win.title = "Odin";
+      win.show();
+    });
+  }
 }
 
 class MyApp extends StatelessWidget {
