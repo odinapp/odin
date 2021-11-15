@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage>
   final Tween<double> _sizeTween = Tween(begin: .4, end: 1);
 
   bool _dragging = false;
+  bool _hovering = false;
   bool glow = true;
 
   @override
@@ -114,7 +115,7 @@ class _HomePageState extends State<HomePage>
                     (MediaQuery.of(context).size.width / 4.8 * 1).toDouble()),
                 painter: _fileNotifier.fileLink != null
                     ? DoneIconCustomPainter()
-                    : _dragging
+                    : _dragging || _hovering
                         ? DropIconCustomPainter()
                         : OdinLogoCustomPainter(),
               ),
@@ -259,6 +260,33 @@ class _HomePageState extends State<HomePage>
                           const Spacer(flex: 1),
                         ],
                       ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 4.8,
+                height: MediaQuery.of(context).size.width / 4.8,
+                child: MouseRegion(
+                  onEnter: (event) {
+                    setState(() {
+                      _hovering = true;
+                    });
+                  },
+                  onExit: (event) {
+                    setState(() {
+                      _hovering = false;
+                    });
+                  },
+                  cursor: SystemMouseCursors.click,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: GestureDetector(
+                      onTap: () async {
+                        await _fileNotifier.getLinkFromFilePicker();
+                      },
                     ),
                   ),
                 ),
