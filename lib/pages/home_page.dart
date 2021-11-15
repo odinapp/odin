@@ -365,20 +365,53 @@ class _HomePageState extends State<HomePage>
                       : null,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                      BoxShadow(
-                        blurRadius: glow ? 40 : 10,
-                        color: glow
-                            ? Colors.white.withOpacity(0.5)
-                            : Colors.white.withOpacity(0.2),
-                      )
-                    ]),
-                    width: MediaQuery.of(context).size.width / 2.4,
-                    height: MediaQuery.of(context).size.width / 2.4,
-                    child: Center(
-                      child: QrImage(
-                        data: _fileNotifier.fileLink!,
-                        size: MediaQuery.of(context).size.width / 2.6,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: glow ? 40 : 10,
+                          color: glow
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.white.withOpacity(0.0),
+                        )
+                      ],
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF7D5DEC),
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(8),
+                            width: MediaQuery.of(context).size.width / 2.4,
+                            height: MediaQuery.of(context).size.width / 2.4,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Center(
+                              child: QrImage(
+                                data: _fileNotifier.fileLink!,
+                                size: MediaQuery.of(context).size.width / 2.6,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            _fileNotifier.fileLink.toString(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black.withOpacity(0.9),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                        ],
                       ),
                     ),
                   ),
