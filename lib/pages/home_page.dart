@@ -11,6 +11,8 @@ import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/painters/ripple_painter.dart';
 import 'package:odin/painters/tooltip_painter.dart';
 import 'package:odin/providers/file_notifier.dart';
+import 'package:odin/services/locator.dart';
+import 'package:odin/services/toast_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -36,6 +38,7 @@ class _HomePageState extends State<HomePage>
   bool _hovering = false;
   bool glow = true;
   bool _qrVisible = false;
+  final _toast = locator<ToastService>();
 
   @override
   void initState() {
@@ -57,6 +60,7 @@ class _HomePageState extends State<HomePage>
           }
         });
       });
+    _toast.init(context);
     // Starting ripple animation
     controller.repeat();
     super.initState();
@@ -180,6 +184,11 @@ class _HomePageState extends State<HomePage>
               child: GestureDetector(
                 onTap: _fileNotifier.fileLink != null
                     ? () => FlutterClipboard.copy(_fileNotifier.fileLink ?? '')
+                        .then((value) => _toast.showToast(
+                            Platform.isIOS || Platform.isMacOS
+                                ? CupertinoIcons.check_mark
+                                : Icons.check,
+                            "Link copied to clipboard."))
                     : () async {
                         await _fileNotifier.getLinkFromFilePicker();
                       },

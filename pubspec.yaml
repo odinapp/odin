@@ -37,6 +37,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.0.2
+  fluttertoast: ^8.0.8
   get_it: ^7.2.0
   google_fonts: ^2.1.0
   http: ^0.13.4

@@ -3,6 +3,7 @@ import 'package:odin/services/file_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:odin/services/shortner_service.dart';
+import 'package:odin/services/toast_service.dart';
 import 'package:odin/services/zip_service.dart';
 
 import 'logger.dart';
@@ -17,6 +18,7 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<RandomService>(() => RandomService());
   locator.registerLazySingleton<ZipService>(() => ZipService());
   locator.registerLazySingleton<FileService>(() => FileService());
+  locator.registerLazySingleton<ToastService>(() => ToastService());
   logger.d('Locator setup in ${stopwatch.elapsed}');
   stopwatch.stop();
 }
