@@ -184,52 +184,48 @@ class _HomePageState extends State<HomePage>
                   _dragging = false;
                 });
               },
-              child: GestureDetector(
-                onTap: _fileNotifier.fileLink != null
-                    ? () => FlutterClipboard.copy(_fileNotifier.fileLink ?? '')
-                        .then((value) => _toast.showToast(
-                            Platform.isIOS || Platform.isMacOS
-                                ? CupertinoIcons.check_mark
-                                : Icons.check,
-                            "Link copied to clipboard."))
-                    : () async {
-                        await _fileNotifier.getLinkFromFilePicker();
-                      },
-                child: SizedBox.expand(
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOut,
-                    color: _dragging
-                        ? Colors.blue.withOpacity(0.2)
-                        : Colors.transparent,
-                    child: Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Spacer(flex: 9),
-                          if (_fileNotifier.loading)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 24.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(500),
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.25,
-                                  child: LinearProgressIndicator(
-                                    backgroundColor:
-                                        Colors.white.withOpacity(0.1),
-                                    color: Colors.white,
-                                    minHeight: 2,
-                                  ),
+              child: SizedBox.expand(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut,
+                  color: _dragging
+                      ? Colors.blue.withOpacity(0.2)
+                      : Colors.transparent,
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Spacer(flex: 9),
+                        if (_fileNotifier.loading)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 24.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(500),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.25,
+                                child: LinearProgressIndicator(
+                                  backgroundColor:
+                                      Colors.white.withOpacity(0.1),
+                                  color: Colors.white,
+                                  minHeight: 2,
                                 ),
                               ),
                             ),
-                          if (_fileNotifier.fileLink != null)
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
+                          ),
+                        if (_fileNotifier.fileLink != null)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              InkWell(
+                                onTap: () => FlutterClipboard.copy(
+                                        _fileNotifier.fileLink ?? '')
+                                    .then((value) => _toast.showToast(
+                                        Platform.isIOS || Platform.isMacOS
+                                            ? CupertinoIcons.check_mark
+                                            : Icons.check,
+                                        "Link copied to clipboard.")),
+                                child: Container(
                                   decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(6)),
@@ -240,7 +236,7 @@ class _HomePageState extends State<HomePage>
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      SelectableText(
+                                      Text(
                                         _fileNotifier.fileLink.toString(),
                                         style: GoogleFonts.poppins(
                                           fontSize: 12,
@@ -266,56 +262,52 @@ class _HomePageState extends State<HomePage>
                                     ],
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: _fileNotifier.fileLink != null
-                                      ? () => setState(() {
-                                            _qrVisible = !_qrVisible;
-                                          })
-                                      : () async {
-                                          await _fileNotifier
-                                              .getLinkFromFilePicker();
-                                        },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(6)),
-                                    padding: const EdgeInsets.fromLTRB(
-                                        10, 10, 10, 10),
-                                    margin: const EdgeInsets.fromLTRB(
-                                        8, 16, 16, 16),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(
-                                          height: 24.0,
-                                          width: 24.0,
-                                          child: Icon(
-                                            Platform.isIOS || Platform.isMacOS
-                                                ? CupertinoIcons.qrcode
-                                                : Icons.qr_code,
-                                            size: 16,
-                                            color:
-                                                Colors.white.withOpacity(0.6),
-                                          ),
-                                        )
-                                      ],
-                                    ),
+                              ),
+                              InkWell(
+                                onTap: _fileNotifier.fileLink != null
+                                    ? () => setState(() {
+                                          _qrVisible = !_qrVisible;
+                                        })
+                                    : null,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(6)),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                  margin:
+                                      const EdgeInsets.fromLTRB(8, 16, 16, 16),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        height: 24.0,
+                                        width: 24.0,
+                                        child: Icon(
+                                          Platform.isIOS || Platform.isMacOS
+                                              ? CupertinoIcons.qrcode
+                                              : Icons.qr_code,
+                                          size: 16,
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          Text(
-                            "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
-                            style: GoogleFonts.poppins(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: -0.1,
-                              color: Colors.black.withOpacity(0.2),
-                            ),
+                              ),
+                            ],
                           ),
-                          const Spacer(flex: 1),
-                        ],
-                      ),
+                        Text(
+                          "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.1,
+                            color: Colors.black.withOpacity(0.2),
+                          ),
+                        ),
+                        const Spacer(flex: 1),
+                      ],
                     ),
                   ),
                 ),
@@ -355,9 +347,7 @@ class _HomePageState extends State<HomePage>
                     ? () => setState(() {
                           _qrVisible = !_qrVisible;
                         })
-                    : () async {
-                        await _fileNotifier.getLinkFromFilePicker();
-                      },
+                    : null,
                 child: SizedBox.expand(
                   child: Container(
                     color: Colors.black38,
@@ -372,9 +362,7 @@ class _HomePageState extends State<HomePage>
                       ? () => setState(() {
                             _qrVisible = !_qrVisible;
                           })
-                      : () async {
-                          await _fileNotifier.getLinkFromFilePicker();
-                        },
+                      : null,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     decoration: BoxDecoration(color: Colors.white, boxShadow: [
