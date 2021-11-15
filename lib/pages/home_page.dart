@@ -8,9 +8,9 @@ import 'package:odin/painters/done_icon_painter.dart';
 import 'package:odin/painters/drop_icon_painter.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/painters/ripple_painter.dart';
-import 'package:odin/services/file_service.dart';
-import 'package:odin/services/locator.dart';
+import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/widgets/window_top_bar.dart';
+import 'package:provider/provider.dart';
 
 const backgroundStartColor = Color(0xFF7D5DEC);
 const backgroundEndColor = Color(0xFF6148B9);
@@ -30,10 +30,7 @@ class _HomePageState extends State<HomePage>
   final Tween<double> _sizeTween = Tween(begin: .4, end: 1);
 
   bool _dragging = false;
-  bool _loading = false;
   bool glow = true;
-  String? _fileLink;
-  final _fs = locator<FileService>();
 
   @override
   void initState() {
@@ -62,6 +59,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    final _fileNotifier = context.watch<FileNotifier>();
     return Scaffold(
       backgroundColor: const Color(0xFF7D5DEC),
       body: Container(
@@ -112,7 +110,7 @@ class _HomePageState extends State<HomePage>
               child: CustomPaint(
                 size: Size(MediaQuery.of(context).size.width / 4.8,
                     (MediaQuery.of(context).size.width / 4.8 * 1).toDouble()),
-                painter: _fileLink != null
+                painter: _fileNotifier.fileLink != null
                     ? DoneIconCustomPainter()
                     : _dragging
                         ? DropIconCustomPainter()
@@ -122,13 +120,7 @@ class _HomePageState extends State<HomePage>
             // Drag & drop target
             DropTarget(
               onDragDone: (detail) async {
-                setState(() {
-                  _loading = true;
-                });
-                _fileLink = await _fs.getLinkFromDroppedFiles(detail.urls);
-                setState(() {
-                  _loading = false;
-                });
+                await _fileNotifier.getLinkFromDroppedFiles(detail.urls);
               },
               onDragEntered: (detail) {
                 setState(() {
@@ -141,16 +133,10 @@ class _HomePageState extends State<HomePage>
                 });
               },
               child: GestureDetector(
-                onTap: _fileLink != null
-                    ? () => FlutterClipboard.copy(_fileLink ?? '')
+                onTap: _fileNotifier.fileLink != null
+                    ? () => FlutterClipboard.copy(_fileNotifier.fileLink ?? '')
                     : () async {
-                        setState(() {
-                          _loading = true;
-                        });
-                        _fileLink = await _fs.getLinkFromFilePicker();
-                        setState(() {
-                          _loading = false;
-                        });
+                        await _fileNotifier.getLinkFromFilePicker();
                       },
                 child: SizedBox.expand(
                   child: AnimatedContainer(
@@ -165,7 +151,7 @@ class _HomePageState extends State<HomePage>
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const Spacer(flex: 9),
-                          if (_loading)
+                          if (_fileNotifier.loading)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 24.0),
                               child: ClipRRect(
@@ -182,7 +168,7 @@ class _HomePageState extends State<HomePage>
                                 ),
                               ),
                             ),
-                          if (_fileLink != null)
+                          if (_fileNotifier.fileLink != null)
                             Container(
                               decoration: BoxDecoration(
                                   color: Colors.black.withOpacity(0.2),
@@ -194,7 +180,7 @@ class _HomePageState extends State<HomePage>
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   SelectableText(
-                                    _fileLink.toString(),
+                                    _fileNotifier.fileLink.toString(),
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w300,

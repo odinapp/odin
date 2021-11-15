@@ -4,15 +4,24 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:odin/pages/home_page.dart';
+import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   await setupLocator();
   runZonedGuarded(() {
-    runApp(const MyApp());
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<FileNotifier>(create: (_) => FileNotifier()),
+        ],
+        child: const MyApp(),
+      ),
+    );
   }, (obj, stacktrace) {
     logger.e(obj, obj, stacktrace);
   });

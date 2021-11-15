@@ -9,8 +9,9 @@ class FileService {
   final _githubService = locator<GithubService>();
   final _zipService = locator<ZipService>();
   bool loading = false;
+  String? fileLink;
 
-  Future<String?> getLinkFromFilePicker() async {
+  Future<void> getLinkFromFilePicker() async {
     FilePickerResult? result =
         await FilePicker.platform.pickFiles(allowMultiple: true);
     final String? _path;
@@ -24,10 +25,10 @@ class FileService {
       // User canceled the picker
       _path = null;
     }
-    return _path;
+    fileLink = _path;
   }
 
-  Future<String?> getLinkFromDroppedFiles(List<Uri> urls) async {
+  Future<void> getLinkFromDroppedFiles(List<Uri> urls) async {
     final String? _path;
     if (urls.isNotEmpty) {
       loading = true;
@@ -39,6 +40,6 @@ class FileService {
     } else {
       _path = null;
     }
-    return _path;
+    fileLink = _path;
   }
 }
