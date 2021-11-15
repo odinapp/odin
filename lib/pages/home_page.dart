@@ -13,6 +13,7 @@ import 'package:odin/painters/tooltip_painter.dart';
 import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/toast_service.dart';
+import 'package:odin/services/preferences_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -39,9 +40,11 @@ class _HomePageState extends State<HomePage>
   bool glow = true;
   bool _qrVisible = false;
   final _toast = locator<ToastService>();
+  final PreferencesService _preferencesService = locator<PreferencesService>();
 
   @override
   void initState() {
+    _preferencesService.init();
     controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
