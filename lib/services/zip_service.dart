@@ -18,8 +18,8 @@ class ZipService {
     final Directory zipFileSaveDirectory = await getTemporaryDirectory();
     final zipFileSavePath = zipFileSaveDirectory.path;
     // Manually create a zip at the zipFilePath
-    final String zipFilePath =
-        join(zipFileSavePath, "${_randomService.getRandomString(15)}.zip");
+    final String zipFilePath = join(zipFileSavePath,
+        "${basename(fileToZips.first.path).replaceAll('.', '_')}_${_randomService.getRandomString(15)}.zip");
     encoder.create(zipFilePath);
     // Add all the files to the zip file
     for (final File fileToZip in fileToZips) {
