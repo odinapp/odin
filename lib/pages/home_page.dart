@@ -9,6 +9,7 @@ import 'package:odin/painters/done_icon_painter.dart';
 import 'package:odin/painters/drop_icon_painter.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/painters/ripple_painter.dart';
+import 'package:odin/painters/tooltip_painter.dart';
 import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:provider/provider.dart';
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage>
       ),
     )..addListener(() {
         setState(() {
-          if (controller.value >= 0.9) {
+          if (controller.value >= 0.7) {
             glow = false;
           } else if (controller.value <= 0.1) {
             glow = true;
@@ -116,6 +117,46 @@ class _HomePageState extends State<HomePage>
                     : _dragging
                         ? DropIconCustomPainter()
                         : OdinLogoCustomPainter(),
+              ),
+            ),
+            // Tooltip painter
+            Align(
+              alignment: Alignment.center,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 1500),
+                curve: Curves.elasticOut,
+                margin: EdgeInsets.only(
+                    bottom: glow
+                        ? MediaQuery.of(context).size.width / 3
+                        : MediaQuery.of(context).size.width / 3.2),
+                width: _fileNotifier.processing
+                    ? 160
+                    : _fileNotifier.loading
+                        ? 160
+                        : 220,
+                height: 55,
+                child: CustomPaint(
+                  size: Size(220, (55 * 1).toDouble()),
+                  painter: TooltipCustomPainter(),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 6.0),
+                      child: Text(
+                        _fileNotifier.processing
+                            ? "Processing."
+                            : _fileNotifier.loading
+                                ? "Uploading."
+                                : 'Drop files to start.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF7D5DEC),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
             // Drag & drop target
