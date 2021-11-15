@@ -133,7 +133,7 @@ class OdinLogoCustomPainter extends CustomPainter {
     path_1.close();
 
     Paint paint1Fill = Paint()..style = PaintingStyle.fill;
-    paint1Fill.color = Color(0xff7D5DEB).withOpacity(1.0);
+    paint1Fill.color = const Color(0xff7D5DEB).withOpacity(1.0);
     canvas.drawPath(path_1, paint1Fill);
   }
 

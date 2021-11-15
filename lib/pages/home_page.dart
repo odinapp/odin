@@ -4,6 +4,8 @@ import 'package:clipboard/clipboard.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:odin/painters/done_icon_painter.dart';
+import 'package:odin/painters/drop_icon_painter.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/painters/ripple_painter.dart';
 import 'package:odin/services/file_picker_service.dart';
@@ -109,13 +111,16 @@ class _HomePageState extends State<HomePage>
               ),
             ),
             // Odin logo painter
-            // TODO: Replace logo with plus and check for drag and finish states
             Align(
               alignment: Alignment.center,
               child: CustomPaint(
                 size: Size(MediaQuery.of(context).size.width / 4.8,
                     (MediaQuery.of(context).size.width / 4.8 * 1).toDouble()),
-                painter: OdinLogoCustomPainter(),
+                painter: _fileLink != null
+                    ? DoneIconCustomPainter()
+                    : _dragging
+                        ? DropIconCustomPainter()
+                        : OdinLogoCustomPainter(),
               ),
             ),
             // Drag & drop target
