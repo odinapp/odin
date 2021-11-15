@@ -13,6 +13,7 @@ import 'package:odin/painters/tooltip_painter.dart';
 import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 const backgroundStartColor = Color(0xFF7D5DEC);
 const backgroundEndColor = Color(0xFF6148B9);
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage>
   bool _dragging = false;
   bool _hovering = false;
   bool glow = true;
+  bool _qrVisible = false;
 
   @override
   void initState() {
@@ -212,41 +214,83 @@ class _HomePageState extends State<HomePage>
                               ),
                             ),
                           if (_fileNotifier.fileLink != null)
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(6)),
-                              padding:
-                                  const EdgeInsets.fromLTRB(16, 10, 16, 10),
-                              margin: const EdgeInsets.all(16.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SelectableText(
-                                    _fileNotifier.fileLink.toString(),
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w200,
-                                      letterSpacing: 0.5,
-                                      color: Colors.white.withOpacity(0.6),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(6)),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 10, 10, 10),
+                                  margin:
+                                      const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SelectableText(
+                                        _fileNotifier.fileLink.toString(),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w200,
+                                          letterSpacing: 0.5,
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      SizedBox(
+                                        height: 24.0,
+                                        width: 24.0,
+                                        child: Icon(
+                                          Platform.isIOS || Platform.isMacOS
+                                              ? CupertinoIcons.square_on_square
+                                              : Icons.copy,
+                                          size: 16,
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: _fileNotifier.fileLink != null
+                                      ? () => setState(() {
+                                            _qrVisible = !_qrVisible;
+                                          })
+                                      : () async {
+                                          await _fileNotifier
+                                              .getLinkFromFilePicker();
+                                        },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(6)),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        10, 10, 10, 10),
+                                    margin: const EdgeInsets.fromLTRB(
+                                        8, 16, 16, 16),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                          height: 24.0,
+                                          width: 24.0,
+                                          child: Icon(
+                                            Platform.isIOS || Platform.isMacOS
+                                                ? CupertinoIcons.qrcode
+                                                : Icons.qr_code,
+                                            size: 16,
+                                            color:
+                                                Colors.white.withOpacity(0.6),
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 4,
-                                  ),
-                                  SizedBox(
-                                    height: 24.0,
-                                    width: 24.0,
-                                    child: Icon(
-                                      Platform.isIOS || Platform.isMacOS
-                                          ? CupertinoIcons.square_on_square
-                                          : Icons.copy,
-                                      size: 16,
-                                      color: Colors.white.withOpacity(0.6),
-                                    ),
-                                  )
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           Text(
                             "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
@@ -292,6 +336,55 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
             ),
+            // QR code
+            if (_qrVisible && _fileNotifier.fileLink != null)
+              GestureDetector(
+                onTap: _fileNotifier.fileLink != null
+                    ? () => setState(() {
+                          _qrVisible = !_qrVisible;
+                        })
+                    : () async {
+                        await _fileNotifier.getLinkFromFilePicker();
+                      },
+                child: SizedBox.expand(
+                  child: Container(
+                    color: Colors.black38,
+                  ),
+                ),
+              ),
+            if (_qrVisible && _fileNotifier.fileLink != null)
+              Align(
+                alignment: Alignment.center,
+                child: GestureDetector(
+                  onTap: _fileNotifier.fileLink != null
+                      ? () => setState(() {
+                            _qrVisible = !_qrVisible;
+                          })
+                      : () async {
+                          await _fileNotifier.getLinkFromFilePicker();
+                        },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                      BoxShadow(
+                        blurRadius: glow ? 40 : 10,
+                        color: glow
+                            ? Colors.white.withOpacity(0.5)
+                            : Colors.white.withOpacity(0.2),
+                      )
+                    ]),
+                    width: MediaQuery.of(context).size.width / 2.4,
+                    height: MediaQuery.of(context).size.width / 2.4,
+                    child: Center(
+                      child: QrImage(
+                        data: _fileNotifier.fileLink!,
+                        size: MediaQuery.of(context).size.width / 2.6,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
             const WindowTopBar(),
           ],
         ),
