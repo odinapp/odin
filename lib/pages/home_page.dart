@@ -4,6 +4,7 @@ import 'package:clipboard/clipboard.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:odin/painters/done_icon_painter.dart';
 import 'package:odin/painters/drop_icon_painter.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
@@ -181,9 +182,10 @@ class _HomePageState extends State<HomePage>
                                 children: [
                                   SelectableText(
                                     _fileNotifier.fileLink.toString(),
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.w300,
+                                      fontWeight: FontWeight.w200,
+                                      letterSpacing: 0.5,
                                       color: Colors.white.withOpacity(0.6),
                                     ),
                                   ),
@@ -205,11 +207,13 @@ class _HomePageState extends State<HomePage>
                               ),
                             ),
                           Text(
-                            "Files are saved  in an anonymous GitHub Repo, and will be deleted after 15 hours.",
-                            style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black.withOpacity(0.2)),
+                            "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -0.1,
+                              color: Colors.black.withOpacity(0.2),
+                            ),
                           ),
                           const Spacer(flex: 1),
                         ],
