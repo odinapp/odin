@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:odin/model/create_file.dart';
 import 'package:odin/model/github_error.dart';
@@ -9,7 +10,6 @@ import 'package:odin/model/github_json.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:odin/services/shortner_service.dart';
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
 class GithubService {
@@ -30,7 +30,7 @@ class GithubService {
       body: GitHubJson.encode(createFile),
     );
 
-    final _downloadLink = await _shortnerService.shortUrl(
+    final _downloadLink = await _shortnerService.getShortUrl(
         url: jsonDecode(response.body)["content"]["download_url"] ?? '');
     return _downloadLink ?? '';
   }

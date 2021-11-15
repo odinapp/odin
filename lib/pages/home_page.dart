@@ -8,10 +8,8 @@ import 'package:odin/painters/done_icon_painter.dart';
 import 'package:odin/painters/drop_icon_painter.dart';
 import 'package:odin/painters/odin_logo_painter.dart';
 import 'package:odin/painters/ripple_painter.dart';
-import 'package:odin/services/file_picker_service.dart';
-import 'package:odin/services/github_service.dart';
+import 'package:odin/services/file_service.dart';
 import 'package:odin/services/locator.dart';
-import 'package:odin/services/zip_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 
 const backgroundStartColor = Color(0xFF7D5DEC);
@@ -35,9 +33,7 @@ class _HomePageState extends State<HomePage>
   bool _loading = false;
   bool glow = true;
   String? _fileLink;
-  final _gs = locator<GithubService>();
-  final _zs = locator<ZipService>();
-  final _fps = locator<FilepickerService>();
+  final _fs = locator<FileService>();
 
   @override
   void initState() {
@@ -129,19 +125,7 @@ class _HomePageState extends State<HomePage>
                 setState(() {
                   _loading = true;
                 });
-                if (detail.urls.isNotEmpty) {
-                  final int length = detail.urls.length;
-                  if (length > 1) {
-                    final List<File> fileToZips =
-                        detail.urls.map((e) => File(e.toFilePath())).toList();
-                    final zippedFile =
-                        await _zs.zipFile(fileToZips: fileToZips);
-                    _fileLink = await _gs.uploadFileAnonymous(zippedFile);
-                  } else {
-                    _fileLink = await _gs.uploadFileAnonymous(
-                        File(detail.urls.first.toFilePath()));
-                  }
-                }
+                _fileLink = await _fs.getLinkFromDroppedFiles(detail.urls);
                 setState(() {
                   _loading = false;
                 });
@@ -163,9 +147,8 @@ class _HomePageState extends State<HomePage>
                         setState(() {
                           _loading = true;
                         });
-                        final linkFile = await _fps.getFiles();
+                        _fileLink = await _fs.getLinkFromFilePicker();
                         setState(() {
-                          _fileLink = linkFile;
                           _loading = false;
                         });
                       },

@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:odin/services/file_picker_service.dart';
+import 'package:odin/services/file_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:odin/services/shortner_service.dart';
@@ -16,7 +16,7 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<ShortnerService>(() => ShortnerService());
   locator.registerLazySingleton<RandomService>(() => RandomService());
   locator.registerLazySingleton<ZipService>(() => ZipService());
-  locator.registerLazySingleton<FilepickerService>(() => FilepickerService());
+  locator.registerLazySingleton<FileService>(() => FileService());
   logger.d('Locator setup in ${stopwatch.elapsed}');
   stopwatch.stop();
 }
