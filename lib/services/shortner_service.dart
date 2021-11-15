@@ -24,7 +24,7 @@ class ShortnerService {
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
       logger.d("Request : ${response.realUri}");
-      if (response.statusCode != 200) {
+      if (response.statusCode != 201) {
         throw HttpException(response.statusCode.toString());
       }
       return response;
@@ -50,7 +50,7 @@ class ShortnerService {
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
       logger.d("Request : ${response.realUri}");
-      if (response.statusCode != 200) {
+      if (response.statusCode != 201) {
         throw HttpException(response.statusCode.toString());
       }
       return response;
