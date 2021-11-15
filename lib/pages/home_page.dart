@@ -113,10 +113,10 @@ class _HomePageState extends State<HomePage>
               child: CustomPaint(
                 size: Size(MediaQuery.of(context).size.width / 4.8,
                     (MediaQuery.of(context).size.width / 4.8 * 1).toDouble()),
-                painter: _fileNotifier.fileLink != null
-                    ? DoneIconCustomPainter()
-                    : _dragging || _hovering
-                        ? DropIconCustomPainter()
+                painter: _dragging || _hovering
+                    ? DropIconCustomPainter()
+                    : _fileNotifier.fileLink != null
+                        ? DoneIconCustomPainter()
                         : OdinLogoCustomPainter(),
               ),
             ),
