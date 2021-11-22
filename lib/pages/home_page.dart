@@ -226,8 +226,10 @@ class _HomePageState extends State<HomePage>
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(500),
                                 child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.25,
+                                  width: (Platform.isWindows ||
+                                          Platform.isMacOS)
+                                      ? MediaQuery.of(context).size.width * 0.25
+                                      : MediaQuery.of(context).size.width * 0.4,
                                   child: LinearProgressIndicator(
                                     backgroundColor:
                                         Colors.white.withOpacity(0.1),
@@ -241,7 +243,9 @@ class _HomePageState extends State<HomePage>
                             Container(
                               padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
                               margin: const EdgeInsets.only(bottom: 24.0),
-                              width: MediaQuery.of(context).size.width * 0.25,
+                              width: (Platform.isWindows || Platform.isMacOS)
+                                  ? MediaQuery.of(context).size.width * 0.25
+                                  : MediaQuery.of(context).size.width * 0.4,
                               height: 48,
                               decoration: BoxDecoration(
                                 color: Colors.white12,
@@ -283,10 +287,16 @@ class _HomePageState extends State<HomePage>
                                           MainAxisAlignment.center,
                                       children: [
                                         SizedBox(
-                                          width: (MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.25) -
+                                          width: ((Platform.isWindows ||
+                                                      Platform.isMacOS)
+                                                  ? MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.25
+                                                  : MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.4) -
                                               24 -
                                               38,
                                           child: Text(
@@ -305,10 +315,16 @@ class _HomePageState extends State<HomePage>
                                           borderRadius:
                                               BorderRadius.circular(500),
                                           child: SizedBox(
-                                            width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.25) -
+                                            width: ((Platform.isWindows ||
+                                                        Platform.isMacOS)
+                                                    ? MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.25
+                                                    : MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.4) -
                                                 24 -
                                                 38,
                                             child: LinearProgressIndicator(
