@@ -7,6 +7,7 @@ class FileNotifier with ChangeNotifier {
   bool get loading => _fileService.loading;
   bool get processing => _fileService.processing;
   String? get fileLink => _fileService.fileLink;
+  String get zipfileName => _fileService.zipfileName;
 
   Future<void> getLinkFromFilePicker() async {
     await _fileService.getLinkFromFilePicker();

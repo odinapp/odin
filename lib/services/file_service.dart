@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/zip_service.dart';
+import 'package:path/path.dart';
 
 class FileService {
   final _githubService = locator<GithubService>();
@@ -11,6 +12,7 @@ class FileService {
   bool loading = false;
   bool processing = false;
   String? fileLink;
+  String zipfileName = '';
 
   Future<void> getLinkFromFilePicker() async {
     fileLink = null;
@@ -18,10 +20,12 @@ class FileService {
         await FilePicker.platform.pickFiles(allowMultiple: true);
     final String? _path;
     if (result != null) {
+      zipfileName = '';
       loading = true;
       processing = true;
       List<File> files = result.paths.map((path) => File(path!)).toList();
       final zippedFile = await _zipService.zipFile(fileToZips: files);
+      zipfileName = basename(zippedFile.path);
       processing = false;
       _path = await _githubService.uploadFileAnonymous(zippedFile);
       loading = false;
@@ -36,11 +40,13 @@ class FileService {
     fileLink = null;
     final String? _path;
     if (urls.isNotEmpty) {
+      zipfileName = '';
       loading = true;
       processing = true;
       final List<File> fileToZips =
           urls.map((e) => File(e.toFilePath())).toList();
       final zippedFile = await _zipService.zipFile(fileToZips: fileToZips);
+      zipfileName = basename(zippedFile.path);
       processing = false;
       _path = await _githubService.uploadFileAnonymous(zippedFile);
       loading = false;

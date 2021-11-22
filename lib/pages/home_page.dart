@@ -220,21 +220,109 @@ class _HomePageState extends State<HomePage>
                       children: [
                         const Spacer(flex: 9),
                         if (_fileNotifier.loading)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 24.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(500),
-                              child: SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.25,
-                                child: LinearProgressIndicator(
-                                  backgroundColor:
-                                      Colors.white.withOpacity(0.1),
-                                  color: Colors.white,
-                                  minHeight: 2,
+                          if (_fileNotifier.zipfileName == '')
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 24.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(500),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.25,
+                                  child: LinearProgressIndicator(
+                                    backgroundColor:
+                                        Colors.white.withOpacity(0.1),
+                                    color: Colors.white,
+                                    minHeight: 2,
+                                  ),
                                 ),
                               ),
+                            )
+                          else
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+                              margin: const EdgeInsets.only(bottom: 24.0),
+                              width: MediaQuery.of(context).size.width * 0.25,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Colors.white12,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.05),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white12,
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.05),
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        _fileNotifier.zipfileName[0],
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.25) -
+                                              24 -
+                                              38,
+                                          child: Text(
+                                            _fileNotifier.zipfileName,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.normal,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(500),
+                                          child: SizedBox(
+                                            width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.25) -
+                                                24 -
+                                                38,
+                                            child: LinearProgressIndicator(
+                                              backgroundColor:
+                                                  Colors.white.withOpacity(0.1),
+                                              color: Colors.white,
+                                              minHeight: 3,
+                                            ),
+                                          ),
+                                        ),
+                                      ])
+                                ],
+                              ),
                             ),
-                          ),
                         if (_fileNotifier.fileLink != null)
                           Row(
                             mainAxisSize: MainAxisSize.min,
