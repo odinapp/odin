@@ -337,8 +337,13 @@ class _HomePageState extends State<HomePage>
                                         "Link copied to clipboard.")),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(6)),
+                                    color: Colors.white12,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.05),
+                                      width: 0.5,
+                                    ),
+                                  ),
                                   padding:
                                       const EdgeInsets.fromLTRB(16, 10, 10, 10),
                                   margin:
@@ -352,7 +357,7 @@ class _HomePageState extends State<HomePage>
                                           fontSize: 12,
                                           fontWeight: FontWeight.w200,
                                           letterSpacing: 0.5,
-                                          color: Colors.white.withOpacity(0.6),
+                                          color: Colors.white.withOpacity(0.8),
                                         ),
                                       ),
                                       const SizedBox(
@@ -366,7 +371,7 @@ class _HomePageState extends State<HomePage>
                                               ? CupertinoIcons.square_on_square
                                               : Icons.copy,
                                           size: 16,
-                                          color: Colors.white.withOpacity(0.6),
+                                          color: Colors.white.withOpacity(0.8),
                                         ),
                                       ),
                                     ],
@@ -381,8 +386,13 @@ class _HomePageState extends State<HomePage>
                                     : null,
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Colors.black.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(6)),
+                                    color: Colors.white12,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.05),
+                                      width: 0.5,
+                                    ),
+                                  ),
                                   padding:
                                       const EdgeInsets.fromLTRB(10, 10, 10, 10),
                                   margin:
@@ -398,7 +408,7 @@ class _HomePageState extends State<HomePage>
                                               ? CupertinoIcons.qrcode
                                               : Icons.qr_code,
                                           size: 16,
-                                          color: Colors.white.withOpacity(0.6),
+                                          color: Colors.white.withOpacity(0.8),
                                         ),
                                       )
                                     ],
@@ -416,9 +426,9 @@ class _HomePageState extends State<HomePage>
                               fontSize: (Platform.isWindows || Platform.isMacOS)
                                   ? 10
                                   : 12,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.normal,
                               letterSpacing: -0.1,
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.white.withOpacity(0.2),
                             ),
                           ),
                         ),
@@ -510,11 +520,13 @@ class _HomePageState extends State<HomePage>
                                 ? MediaQuery.of(context).size.width / 2.4
                                 : MediaQuery.of(context).size.width * 0.8,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.black12,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Center(
                               child: QrImage(
+                                // backgroundColor: Colors.white12,
+                                foregroundColor: Colors.white,
                                 data: _fileNotifier.fileLink!,
                                 size: (Platform.isWindows || Platform.isMacOS)
                                     ? MediaQuery.of(context).size.width / 2.6
@@ -527,7 +539,7 @@ class _HomePageState extends State<HomePage>
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               fontWeight: FontWeight.normal,
-                              color: Colors.black.withOpacity(0.9),
+                              color: Colors.white.withOpacity(0.9),
                             ),
                           ),
                           const SizedBox(
