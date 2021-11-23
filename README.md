@@ -22,9 +22,9 @@ Cross-platform hassle-free file sharing with AES-256 encryption made with Flutte
 
 
 <p align="center">
-    <a href="#Getting Started"><b>Getting Started</b></a> •
-    <a href="#Roadmap"><b>Roadmap</b></a> •
-    <a href="#Releases"><b>Releases</b></a>
+    <a href="#getting-started"><b>Getting Started</b></a> •
+    <a href="#roadmap"><b>Roadmap</b></a> •
+    <a href="#releases"><b>Releases</b></a>
     
     
 
@@ -134,7 +134,7 @@ We wanted to develop and prototype the project as quickly as possible. The resul
 
 ## License
 
-Distributed under the AGPLv3 License. See `LICENSE.md` for more information.
+Distributed under the GPL-3.0 License. See `LICENSE` for more information.
 
 ## Contributers
 
