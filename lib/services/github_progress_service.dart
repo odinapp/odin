@@ -10,7 +10,7 @@ import 'package:odin/model/github_json.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/services/random_service.dart';
-import 'package:odin/services/shortner_service.dart';
+import 'package:odin/services/shortener_service.dart';
 // import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -18,7 +18,7 @@ import 'package:path_provider/path_provider.dart';
 typedef OnUploadProgressCallback = void Function(int sentBytes, int totalBytes);
 
 class GithubService {
-  final ShortnerService _shortnerService = locator<ShortnerService>();
+  final ShortenerService _shortenerService = locator<ShortenerService>();
   final RandomService _randomService = locator<RandomService>();
   final _env = dotenv.env;
 

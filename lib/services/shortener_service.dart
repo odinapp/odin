@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:odin/services/logger.dart';
 
-class ShortnerService {
+class ShortenerService {
   final _dio = Dio(BaseOptions(
     baseUrl: 'https://api.shrtco.de/v2/',
   ));

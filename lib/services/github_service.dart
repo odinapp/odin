@@ -9,11 +9,11 @@ import 'package:odin/model/github_error.dart';
 import 'package:odin/model/github_json.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/random_service.dart';
-import 'package:odin/services/shortner_service.dart';
+import 'package:odin/services/shortener_service.dart';
 import 'package:path/path.dart' as path;
 
 class GithubService {
-  final ShortnerService _shortnerService = locator<ShortnerService>();
+  final ShortenerService _shortenerService = locator<ShortenerService>();
   final RandomService _randomService = locator<RandomService>();
   final _env = dotenv.env;
 
@@ -30,7 +30,7 @@ class GithubService {
       body: GitHubJson.encode(createFile),
     );
 
-    final _downloadLink = await _shortnerService.getShortUrl(
+    final _downloadLink = await _shortenerService.getShortUrl(
         url: jsonDecode(response.body)["content"]["download_url"] ?? '');
     return _downloadLink ?? '';
   }

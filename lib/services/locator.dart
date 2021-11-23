@@ -3,7 +3,7 @@ import 'package:odin/services/file_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/preferences_service.dart';
 import 'package:odin/services/random_service.dart';
-import 'package:odin/services/shortner_service.dart';
+import 'package:odin/services/shortener_service.dart';
 import 'package:odin/services/toast_service.dart';
 import 'package:odin/services/zip_service.dart';
 
@@ -15,7 +15,7 @@ Future<void> setupLocator() async {
   Stopwatch stopwatch = Stopwatch()..start();
   // locator.registerFactory<CurrentDataNotifier>(() => CurrentDataNotifier());
   locator.registerLazySingleton<GithubService>(() => GithubService());
-  locator.registerLazySingleton<ShortnerService>(() => ShortnerService());
+  locator.registerLazySingleton<ShortenerService>(() => ShortenerService());
   locator.registerLazySingleton<RandomService>(() => RandomService());
   locator.registerLazySingleton<ZipService>(() => ZipService());
   locator.registerLazySingleton<FileService>(() => FileService());
