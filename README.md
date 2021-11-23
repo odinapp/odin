@@ -33,7 +33,12 @@ Cross-platform hassle-free file sharing with AES-256 encryption made with Flutte
 
 <p align="center"><img src="assets/header.png" alt="Open source easy file sharing for everyone." width="1000px" /></p>
 
+<details><summary><strong>Demo</strong></summary>
+    
+https://user-images.githubusercontent.com/42910433/143038817-cb935815-aea7-41c1-8b56-131cb99b0a20.mp4
 
+</details>
+    
 
 ## Built With
 
