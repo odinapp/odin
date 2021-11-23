@@ -72,8 +72,6 @@ flutter_icons:
 flutter_native_splash:
   color: "#7D5DEC"
   color_dark: "#7D5DEC"
-  image: assets/appicon/ic_foreground.png
-  image_dark: assets/appicon/ic_foreground.png
   android: true
   ios: true
   web: false
