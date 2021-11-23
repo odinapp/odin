@@ -11,7 +11,7 @@ import 'logger.dart';
 
 GetIt locator = GetIt.instance;
 
-Future<void> setupLocator() async {
+void setupLocator() {
   Stopwatch stopwatch = Stopwatch()..start();
   // locator.registerFactory<CurrentDataNotifier>(() => CurrentDataNotifier());
   locator.registerLazySingleton<GithubService>(() => GithubService());
