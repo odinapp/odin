@@ -27,6 +27,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  aes_crypt_null_safe: ^2.0.1
   archive: ^3.1.6
   bitsdojo_window: ^0.1.1+1
   clipboard: ^0.1.3
