@@ -9,15 +9,15 @@ import 'package:path/path.dart';
 class EncryptionService {
   final RandomService _randomService = locator<RandomService>();
 
-  Future<File> encryptFile({
-    required File file,
-  }) async {
+  Future<File> encryptFile(File file) async {
     logger.d('Started Encryption');
     final crypt = AesCrypt();
-    crypt.setPassword(_randomService.getRandomString(16));
+    final password = _randomService.getRandomString(16);
+    crypt.setPassword(password);
+    logger.i('Password: $password');
     crypt.encryptFileSync(
         file.path, basenameWithoutExtension(file.path) + '.odin');
-    logger.d('Finished Zipping Files');
+    logger.d('Finished Encryption');
     return File(basenameWithoutExtension(file.path) + '.odin');
   }
 }
