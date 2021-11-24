@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:odin/services/encryption_service.dart';
 import 'package:odin/services/file_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/preferences_service.dart';
@@ -21,6 +22,7 @@ void setupLocator() {
   locator.registerLazySingleton<FileService>(() => FileService());
   locator.registerLazySingleton<ToastService>(() => ToastService());
   locator.registerLazySingleton<PreferencesService>(() => PreferencesService());
+  locator.registerLazySingleton<EncryptionService>(() => EncryptionService());
   logger.d('Locator setup in ${stopwatch.elapsed}');
   stopwatch.stop();
 }
