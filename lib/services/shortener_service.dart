@@ -60,10 +60,11 @@ class ShortenerService {
     }
   }
 
-  Future<String?> getShortUrl({required String url}) async {
+  Future<String?> getShortUrl(String url, String password) async {
     final Response? response = await post(uri: 'shorten?url=$url');
     if (response != null) {
-      return response.data["result"]["full_short_link"];
+      final shortLink = response.data["result"]["full_short_link"];
+      return shortLink + "?password=$password";
     } else {
       return null;
     }

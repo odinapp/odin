@@ -9,7 +9,7 @@ import 'package:path/path.dart';
 class EncryptionService {
   final RandomService _randomService = locator<RandomService>();
 
-  Future<File> encryptFile(File file) async {
+  Future<Map<String, dynamic>> encryptFile(File file) async {
     logger.d('Started Encryption');
     final crypt = AesCrypt();
     final password = _randomService.getRandomString(16);
@@ -17,8 +17,9 @@ class EncryptionService {
     final encryptedFilePath =
         join(file.parent.path, basenameWithoutExtension(file.path) + '.odin');
     crypt.encryptFileSync(file.path, encryptedFilePath);
+    file.deleteSync(); // Delete the original zip file
     logger.d('Finished Encryption');
-    return File(encryptedFilePath);
+    return {'file': File(encryptedFilePath), 'password': password};
   }
 
   Future<File> decryptFile(File file, String password) async {
@@ -29,6 +30,7 @@ class EncryptionService {
     final decryptedFilePath = crypt.decryptFileSync(file.path,
         join(file.parent.path, basenameWithoutExtension(file.path) + '.zip'));
     File decryptedFile = File(decryptedFilePath);
+    file.deleteSync(); // Delete the original AES file
     logger.d('Finished Decryption');
     return decryptedFile;
   }

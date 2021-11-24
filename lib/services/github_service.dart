@@ -17,7 +17,7 @@ class GithubService {
   final RandomService _randomService = locator<RandomService>();
   final _env = dotenv.env;
 
-  Future<String> uploadFileAnonymous(File file) async {
+  Future<String> uploadFileAnonymous(File file, String password) async {
     final uploadTime = DateFormat('dd-MM-yyyy hh:mm:ss').format(DateTime.now());
     final createFile = CreateFile(
       content: base64Encode(file.readAsBytesSync()),
@@ -31,7 +31,7 @@ class GithubService {
     );
 
     final _downloadLink = await _shortenerService.getShortUrl(
-        url: jsonDecode(response.body)["content"]["download_url"] ?? '');
+        jsonDecode(response.body)["content"]["download_url"] ?? '', password);
     return _downloadLink ?? '';
   }
 

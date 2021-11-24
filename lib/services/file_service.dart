@@ -27,10 +27,12 @@ class FileService {
       processing = true;
       List<File> files = result.paths.map((path) => File(path!)).toList();
       final zippedFile = await _zipService.zipFile(fileToZips: files);
-      final encryptedFile = await _encrytionService.encryptFile(zippedFile);
+      final encryptedFileDetails =
+          await _encrytionService.encryptFile(zippedFile);
       zipfileName = basename(zippedFile.path);
       processing = false;
-      _path = await _githubService.uploadFileAnonymous(encryptedFile);
+      _path = await _githubService.uploadFileAnonymous(
+          encryptedFileDetails['file'], encryptedFileDetails['password']);
       loading = false;
     } else {
       // User canceled the picker
@@ -49,10 +51,12 @@ class FileService {
       final List<File> fileToZips =
           urls.map((e) => File(e.toFilePath())).toList();
       final zippedFile = await _zipService.zipFile(fileToZips: fileToZips);
-      final encryptedFile = await _encrytionService.encryptFile(zippedFile);
+      final encryptedFileDetails =
+          await _encrytionService.encryptFile(zippedFile);
       zipfileName = basename(zippedFile.path);
       processing = false;
-      _path = await _githubService.uploadFileAnonymous(encryptedFile);
+      _path = await _githubService.uploadFileAnonymous(
+          encryptedFileDetails['file'], encryptedFileDetails['password']);
       loading = false;
     } else {
       _path = null;
