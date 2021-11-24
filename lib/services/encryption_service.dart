@@ -14,10 +14,22 @@ class EncryptionService {
     final crypt = AesCrypt();
     final password = _randomService.getRandomString(16);
     crypt.setPassword(password);
-    logger.i('Password: $password');
-    crypt.encryptFileSync(
-        file.path, basenameWithoutExtension(file.path) + '.odin');
+    final encryptedFilePath =
+        join(file.parent.path, basenameWithoutExtension(file.path) + '.odin');
+    crypt.encryptFileSync(file.path, encryptedFilePath);
     logger.d('Finished Encryption');
-    return File(basenameWithoutExtension(file.path) + '.odin');
+    return File(encryptedFilePath);
+  }
+
+  Future<File> decryptFile(File file, String password) async {
+    logger.d('Started Deryption');
+    final crypt = AesCrypt();
+    crypt.setPassword(password);
+    file = await file.rename(file.path.replaceAll('.odin', '.aes'));
+    final decryptedFilePath = crypt.decryptFileSync(file.path,
+        join(file.parent.path, basenameWithoutExtension(file.path) + '.zip'));
+    File decryptedFile = File(decryptedFilePath);
+    logger.d('Finished Decryption');
+    return decryptedFile;
   }
 }
