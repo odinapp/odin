@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.odin">
+    package="com.odin.odin">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="Odin"
