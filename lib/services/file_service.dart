@@ -8,7 +8,6 @@ import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/services/shortener_service.dart';
 import 'package:odin/services/zip_service.dart';
-import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
 
 class FileService {
@@ -77,7 +76,6 @@ class FileService {
     final file = await _downloadService.downloadFile(fileLink);
     final decryptedFile = await _encrytionService.decryptFile(file, password);
     // final unzippedFile = await _zipService.unzipFile(decryptedFile);
-    await OpenFile.open(decryptedFile.path);
     logger.d("decryptedFile path : ${decryptedFile.path}");
   }
 }
