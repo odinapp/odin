@@ -17,6 +17,7 @@ import 'package:odin/services/toast_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const backgroundStartColor = Color(0xFF7D5DEC);
 const backgroundEndColor = Color(0xFF6148B9);
@@ -569,6 +570,59 @@ class _HomePageState extends State<HomePage>
               ),
 
             const WindowTopBar(),
+            if (Platform.isAndroid || Platform.isIOS)
+              Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  height: kToolbarHeight + MediaQuery.of(context).padding.top,
+                  child: AppBar(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    actions: [
+                      // IconButton(
+                      //   onPressed: () {},
+                      //   icon: Icon(
+                      //     Platform.isIOS || Platform.isMacOS
+                      //         ? CupertinoIcons.qrcode_viewfinder
+                      //         : Icons.qr_code_scanner_rounded,
+                      //     color: Colors.white,
+                      //   ),
+                      // ),
+                      Theme(
+                        data: ThemeData.dark(),
+                        child: PopupMenuButton(
+                          onSelected: (value) {
+                            if (value == 1) {
+                              launch('https://github.com/odinapp/odin#readme');
+                            } else if (value == 2) {
+                              launch(
+                                  'https://www.buymeacoffee.com/HashStudios');
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              child: Text(
+                                "About",
+                                style: GoogleFonts.poppins(fontSize: 14),
+                              ),
+                              height: 40,
+                              value: 1,
+                            ),
+                            PopupMenuItem(
+                              child: Text(
+                                "Support us",
+                                style: GoogleFonts.poppins(fontSize: 14),
+                              ),
+                              value: 2,
+                              height: 40,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),

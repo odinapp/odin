@@ -38,40 +38,41 @@ class _WindowButtonsState extends State<WindowButtons> {
         Theme(
           data: ThemeData.dark(),
           child: PopupMenuButton(
-              key: _menuKey,
-              onSelected: (value) {
-                if (value == 1) {
-                  launch('https://github.com/odinapp/odin#readme');
-                } else if (value == 2) {
-                  launch('https://www.buymeacoffee.com/HashStudios');
-                }
+            key: _menuKey,
+            onSelected: (value) {
+              if (value == 1) {
+                launch('https://github.com/odinapp/odin#readme');
+              } else if (value == 2) {
+                launch('https://www.buymeacoffee.com/HashStudios');
+              }
+            },
+            child: MenuWindowButton(
+              colors: buttonColors,
+              animate: true,
+              onPressed: () {
+                dynamic state = _menuKey.currentState;
+                state.showButtonMenu();
               },
-              child: MenuWindowButton(
-                colors: buttonColors,
-                animate: true,
-                onPressed: () {
-                  dynamic state = _menuKey.currentState;
-                  state.showButtonMenu();
-                },
+            ),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Text(
+                  "About",
+                  style: GoogleFonts.poppins(fontSize: 12),
+                ),
+                height: 32,
+                value: 1,
               ),
-              itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: Text(
-                        "About",
-                        style: GoogleFonts.poppins(fontSize: 12),
-                      ),
-                      height: 32,
-                      value: 1,
-                    ),
-                    PopupMenuItem(
-                      child: Text(
-                        "Support",
-                        style: GoogleFonts.poppins(fontSize: 12),
-                      ),
-                      value: 2,
-                      height: 32,
-                    )
-                  ]),
+              PopupMenuItem(
+                child: Text(
+                  "Support us",
+                  style: GoogleFonts.poppins(fontSize: 12),
+                ),
+                value: 2,
+                height: 32,
+              ),
+            ],
+          ),
         ),
         CloseWindowButton(
           colors: closeButtonColors,
