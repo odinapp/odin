@@ -49,7 +49,7 @@ class ToastService {
       positionedToastBuilder: (context, child) {
         return Positioned(
           child: child,
-          top: 32.0,
+          top: 32.0 + MediaQuery.of(context).padding.top,
           left: MediaQuery.of(context).size.width / 2 - 125,
         );
       },
