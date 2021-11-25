@@ -14,6 +14,7 @@ import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/preferences_service.dart';
 import 'package:odin/services/toast_service.dart';
+import 'package:odin/widgets/mac_top_bar.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -568,8 +569,8 @@ class _HomePageState extends State<HomePage>
                   ),
                 ),
               ),
-
-            const WindowTopBar(),
+            if (Platform.isWindows) const WindowTopBar(),
+            if (Platform.isMacOS) const MacTopBar(),
             if (Platform.isAndroid || Platform.isIOS)
               Align(
                 alignment: Alignment.topCenter,
