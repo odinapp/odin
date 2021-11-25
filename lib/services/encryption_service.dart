@@ -26,7 +26,8 @@ class EncryptionService {
     logger.d('Started Deryption');
     final crypt = AesCrypt();
     crypt.setPassword(password);
-    file = await file.rename(file.path.replaceAll('.odin', '.aes'));
+    file = await file
+        .rename(file.path.substring(0, file.path.length - 5) + ".aes");
     final decryptedFilePath = crypt.decryptFileSync(file.path,
         join(file.parent.path, basenameWithoutExtension(file.path) + '.zip'));
     File decryptedFile = File(decryptedFilePath);
