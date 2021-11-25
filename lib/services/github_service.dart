@@ -31,8 +31,10 @@ class GithubService {
     );
 
     final _downloadLink = await _shortenerService.getShortUrl(
-        jsonDecode(response.body)["content"]["download_url"] ?? '', password);
-    return _downloadLink ?? '';
+        jsonDecode(response.body)["content"]["download_url"] ?? '');
+    final dynamicLink =
+        await _shortenerService.getDynamicLink(_downloadLink ?? '', password);
+    return dynamicLink;
   }
 
   Future<http.Response> request(

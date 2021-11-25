@@ -4,11 +4,14 @@ import 'package:archive/archive_io.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/services/random_service.dart';
+import 'package:odin/utilities/byte_formatter.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ZipService {
   final RandomService _randomService = locator<RandomService>();
+  String linkTitle = "";
+  String linkDesc = "";
 
   Future<File> zipFile({
     required List<File> fileToZips,
@@ -27,6 +30,16 @@ class ZipService {
     }
     encoder.close();
     logger.d('Finished Zipping Files');
+    if (fileToZips.length == 1) {
+      linkTitle = basename(fileToZips.first.path);
+    } else if (fileToZips.length == 2) {
+      linkTitle =
+          "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more file.";
+    } else {
+      linkTitle =
+          "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more files.";
+    }
+    linkDesc = formatBytes(File(zipFilePath).lengthSync(), 2);
     return File(zipFilePath);
   }
 }
