@@ -47,3 +47,10 @@ app.*.map.json
 
 # Environment Variables
 *.env
+
+# Coverage Report
+coverage/lcov.info
+
+# Secret Files
+odin-release-key.keystore
+android/app/google-services.json
