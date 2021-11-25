@@ -18,4 +18,9 @@ class FileNotifier with ChangeNotifier {
     await _fileService.getLinkFromDroppedFiles(urls);
     notifyListeners();
   }
+
+  Future<void> getFileFromToken(String token) async {
+    await _fileService.getFileFromToken(token);
+    notifyListeners();
+  }
 }

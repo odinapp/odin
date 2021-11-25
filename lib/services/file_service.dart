@@ -1,16 +1,22 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:odin/services/download_service.dart';
 import 'package:odin/services/encryption_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/locator.dart';
+import 'package:odin/services/logger.dart';
+import 'package:odin/services/shortener_service.dart';
 import 'package:odin/services/zip_service.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
 
 class FileService {
+  final _shortenerService = locator<ShortenerService>();
   final _githubService = locator<GithubService>();
   final _zipService = locator<ZipService>();
   final _encrytionService = locator<EncryptionService>();
+  final _downloadService = locator<DownloadService>();
   bool loading = false;
   bool processing = false;
   String? fileLink;
@@ -62,5 +68,16 @@ class FileService {
       _path = null;
     }
     fileLink = _path;
+  }
+
+  Future<void> getFileFromToken(String token) async {
+    final password = token.substring(token.length - 16);
+    final fileCode = token.replaceAll(password, "");
+    final fileLink = _shortenerService.getShortUrlFromFileCode(fileCode);
+    final file = await _downloadService.downloadFile(fileLink);
+    final decryptedFile = await _encrytionService.decryptFile(file, password);
+    // final unzippedFile = await _zipService.unzipFile(decryptedFile);
+    await OpenFile.open(decryptedFile.path);
+    logger.d("decryptedFile path : ${decryptedFile.path}");
   }
 }

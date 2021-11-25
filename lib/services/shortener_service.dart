@@ -69,6 +69,10 @@ class ShortenerService {
     }
   }
 
+  String getShortUrlFromFileCode(String fileCode) {
+    return "https://shrtco.de/$fileCode";
+  }
+
   Future<String> getDynamicLink(String shortUrl, String password) async {
     logger.d('Started building dynamic link');
     final initialLink = Uri.parse(

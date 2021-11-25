@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,8 +46,53 @@ void main() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  void initDynamicLinks() async {
+    final _fileNotifier = context.read<FileNotifier>();
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+      final Uri? deepLink = dynamicLink?.link;
+      if (deepLink != null) {
+        if (deepLink.pathSegments.isNotEmpty) {
+          if (deepLink.pathSegments[0] == "files") {
+            logger.i(deepLink.pathSegments.last);
+            final String token = deepLink.pathSegments.last;
+            _fileNotifier.getFileFromToken(token);
+          }
+        }
+      }
+    }, onError: (OnLinkErrorException e) async {
+      logger.e(e.message, e);
+    });
+    final PendingDynamicLinkData? data =
+        await FirebaseDynamicLinks.instance.getInitialLink();
+    final Uri? deepLink = data?.link;
+
+    if (deepLink != null) {
+      if (deepLink.pathSegments.isNotEmpty) {
+        if (deepLink.pathSegments[0] == "files") {
+          logger.i(deepLink.pathSegments.last);
+          final String token = deepLink.pathSegments.last;
+          _fileNotifier.getFileFromToken(token);
+        }
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isAndroid || Platform.isIOS) {
+      initDynamicLinks();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
