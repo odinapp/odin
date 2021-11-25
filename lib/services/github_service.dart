@@ -32,6 +32,9 @@ class GithubService {
 
     final _downloadLink = await _shortenerService.getShortUrl(
         jsonDecode(response.body)["content"]["download_url"] ?? '');
+    if (Platform.isMacOS || Platform.isWindows) {
+      return _downloadLink ?? '';
+    }
     final dynamicLink =
         await _shortenerService.getDynamicLink(_downloadLink ?? '', password);
     return dynamicLink;
