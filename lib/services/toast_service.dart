@@ -56,4 +56,14 @@ class ToastService {
       toastDuration: const Duration(seconds: 2),
     );
   }
+
+  void showMobileToast(String text) {
+    Fluttertoast.showToast(
+        msg: text,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
 }

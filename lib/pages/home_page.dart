@@ -513,6 +513,8 @@ class _HomePageState extends State<HomePage>
                                             Platform.isMacOS) {
                                           launch(_filePath);
                                         } else {
+                                          _toast.showMobileToast(
+                                              "Files saved in Downloads.");
                                           await OpenFile.open(_filePath);
                                         }
                                       }
