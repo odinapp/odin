@@ -16,7 +16,7 @@ class DownloadService {
 
   Dio dio = Dio();
   Future<String> _getFilePath() async {
-    final fileName = _randomService.getRandomString(10);
+    final fileName = "odin_" + _randomService.getRandomString(10);
     Directory? dir;
     if (Platform.isAndroid) {
       var status = await Permission.storage.status;
