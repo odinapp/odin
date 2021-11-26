@@ -13,6 +13,7 @@ import 'package:odin/painters/tooltip_painter.dart';
 import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/preferences_service.dart';
+import 'package:odin/services/shortener_service.dart';
 import 'package:odin/services/toast_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:open_file/open_file.dart';
@@ -74,6 +75,7 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     final _fileNotifier = context.watch<FileNotifier>();
+    final _shortenerService = locator<ShortenerService>();
     return Scaffold(
       backgroundColor: const Color(0xFF7D5DEC),
       body: Container(
@@ -352,7 +354,9 @@ class _HomePageState extends State<HomePage>
                                 onTap: () => FlutterClipboard.copy(_fileNotifier
                                                 .fileLink !=
                                             null
-                                        ? "Some files were shared with you.\nTo access them, download Odin from https://shrtco.de/odin and enter this unique token - ${_fileNotifier.fileLink}"
+                                        ? Platform.isAndroid || Platform.isIOS
+                                            ? "Some files were shared with you.\nTo access them, visit ${_fileNotifier.fileLink} from your mobile device. To access them on your PC, download Odin from https://shrtco.de/odin and enter this unique token - ${_shortenerService.token}"
+                                            : "Some files were shared with you.\nTo access them, download Odin from https://shrtco.de/odin and enter this unique token - ${_fileNotifier.fileLink}"
                                         : '')
                                     .then((value) => _toast.showToast(
                                         Platform.isIOS || Platform.isMacOS

@@ -7,6 +7,7 @@ import 'package:odin/services/logger.dart';
 import 'package:odin/services/zip_service.dart';
 
 class ShortenerService {
+  String token = "";
   final _zipService = locator<ZipService>();
   final _dio = Dio(BaseOptions(
     baseUrl: 'https://api.shrtco.de/v2/',
@@ -63,7 +64,8 @@ class ShortenerService {
     final Response? response = await post(uri: 'shorten?url=$url');
     if (response != null) {
       final shortLink = response.data["result"]["full_short_link"];
-      return shortLink.replaceAll("https://shrtco.de/", "") + password;
+      token = shortLink.replaceAll("https://shrtco.de/", "") + password;
+      return token;
     } else {
       return null;
     }
