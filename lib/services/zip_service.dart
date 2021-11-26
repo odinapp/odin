@@ -45,19 +45,19 @@ class ZipService {
 
   Future<String> unzipFile(File file) async {
     final archive = ZipDecoder().decodeBytes(file.readAsBytesSync());
-    final outDirectory = file.path.replaceAll('.zip', '') + '\\';
+    final outDirectory = file.path.replaceAll('.zip', '');
     for (final zfile in archive) {
       final filename = zfile.name;
       if (zfile.isFile) {
         final data = zfile.content as List<int>;
-        File(outDirectory + filename)
+        File(join(outDirectory, filename))
           ..createSync(recursive: true)
           ..writeAsBytesSync(data);
       } else {
-        Directory(outDirectory + filename).create(recursive: true);
+        Directory(join(outDirectory, filename)).create(recursive: true);
       }
     }
     file.deleteSync(); // Delete the original ZIP file
-    return outDirectory;
+    return Directory(outDirectory).path;
   }
 }

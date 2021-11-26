@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/services/random_service.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DownloadService {
@@ -22,7 +23,7 @@ class DownloadService {
     } else {
       dir = await getDownloadsDirectory();
     }
-    String path = '${dir?.path}\\$fileName.odin';
+    String path = join(dir?.path ?? '', fileName + ".odin");
     logger.d("File path : $path");
     return path;
   }
