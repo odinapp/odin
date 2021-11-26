@@ -58,12 +58,12 @@ class ShortenerService {
     }
   }
 
-  Future<String?> getShortUrl(String url) async {
+  Future<String?> getFileCode(String url, String password) async {
     logger.d('Fetching short link');
     final Response? response = await post(uri: 'shorten?url=$url');
     if (response != null) {
       final shortLink = response.data["result"]["full_short_link"];
-      return shortLink;
+      return shortLink.replaceAll("https://shrtco.de/", "") + password;
     } else {
       return null;
     }
@@ -73,10 +73,9 @@ class ShortenerService {
     return "https://shrtco.de/$fileCode";
   }
 
-  Future<String> getDynamicLink(String shortUrl, String password) async {
+  Future<String> getDynamicLink(String fileCode) async {
     logger.d('Started building dynamic link');
-    final initialLink = Uri.parse(
-        'https://getodin.com/files/${shortUrl.replaceAll("https://shrtco.de/", "")}$password');
+    final initialLink = Uri.parse('https://getodin.com/files/$fileCode');
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://getodin.page.link',
       link: initialLink,

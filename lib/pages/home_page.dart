@@ -344,13 +344,16 @@ class _HomePageState extends State<HomePage>
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               InkWell(
-                                onTap: () => FlutterClipboard.copy(
-                                        _fileNotifier.fileLink ?? '')
+                                onTap: () => FlutterClipboard.copy(_fileNotifier
+                                                .fileLink !=
+                                            null
+                                        ? "Some files were shared with you.\nTo access them, download Odin from https://shrtco.de/odin and enter this unique token - ${_fileNotifier.fileLink}"
+                                        : '')
                                     .then((value) => _toast.showToast(
                                         Platform.isIOS || Platform.isMacOS
                                             ? CupertinoIcons.check_mark
                                             : Icons.check,
-                                        "Link copied to clipboard.")),
+                                        "Token copied to clipboard.")),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white12,
@@ -436,7 +439,9 @@ class _HomePageState extends State<HomePage>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 32.0),
                           child: Text(
-                            "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
+                            _fileNotifier.fileLink != null
+                                ? "Share this token with your friends to access the files."
+                                : "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
                               fontSize: (Platform.isWindows || Platform.isMacOS)
@@ -551,7 +556,7 @@ class _HomePageState extends State<HomePage>
                             ),
                           ),
                           Text(
-                            _fileNotifier.fileLink.toString(),
+                            "Scan using the Odin app to access the files.",
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               fontWeight: FontWeight.normal,

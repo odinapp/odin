@@ -30,13 +30,12 @@ class GithubService {
       body: GitHubJson.encode(createFile),
     );
 
-    final _downloadLink = await _shortenerService.getShortUrl(
-        jsonDecode(response.body)["content"]["download_url"] ?? '');
+    final _fileCode = await _shortenerService.getFileCode(
+        jsonDecode(response.body)["content"]["download_url"] ?? '', password);
     if (Platform.isMacOS || Platform.isWindows) {
-      return _downloadLink ?? '';
+      return _fileCode ?? '';
     }
-    final dynamicLink =
-        await _shortenerService.getDynamicLink(_downloadLink ?? '', password);
+    final dynamicLink = await _shortenerService.getDynamicLink(_fileCode ?? '');
     return dynamicLink;
   }
 
