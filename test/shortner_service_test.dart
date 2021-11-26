@@ -6,7 +6,7 @@ void main() {
     test("Url should contain shrtco.de", () async {
       final ShortenerService _shortnerService = ShortenerService();
       const String url = "https://www.google.com";
-      final String? shortUrl = await _shortnerService.getShortUrl(url: url);
+      final String? shortUrl = await _shortnerService.getFileCode(url, "test");
       expect(shortUrl, stringContainsInOrder(["https://", "shrtco.de"]));
     });
   });
