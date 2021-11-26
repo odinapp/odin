@@ -54,3 +54,4 @@ coverage/lcov.info
 # Secret Files
 odin-release-key.keystore
 android/app/google-services.json
+android/app/build/*
