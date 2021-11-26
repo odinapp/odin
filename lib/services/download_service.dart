@@ -22,7 +22,7 @@ class DownloadService {
     } else {
       dir = await getDownloadsDirectory();
     }
-    String path = '${dir?.path}/$fileName.odin';
+    String path = '${dir?.path}\\$fileName.odin';
     logger.d("File path : $path");
     return path;
   }

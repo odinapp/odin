@@ -17,6 +17,7 @@ import 'package:odin/services/toast_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const backgroundStartColor = Color(0xFF7D5DEC);
 const backgroundEndColor = Color(0xFF6148B9);
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage>
   bool _qrVisible = false;
   final _toast = locator<ToastService>();
   final PreferencesService _preferencesService = locator<PreferencesService>();
-
+  final TextEditingController _tokenController = TextEditingController();
   @override
   void initState() {
     _preferencesService.init();
@@ -161,7 +162,7 @@ class _HomePageState extends State<HomePage>
                             : MediaQuery.of(context).size.width / 1.7),
                 width: _fileNotifier.processing
                     ? 160
-                    : _fileNotifier.loading
+                    : _fileNotifier.uploading || _fileNotifier.downloading
                         ? 160
                         : 220,
                 height: 55,
@@ -174,11 +175,13 @@ class _HomePageState extends State<HomePage>
                       child: Text(
                         _fileNotifier.processing
                             ? "Processing."
-                            : _fileNotifier.loading
+                            : _fileNotifier.uploading
                                 ? "Uploading."
-                                : (Platform.isWindows || Platform.isMacOS)
-                                    ? 'Drop files to start.'
-                                    : 'Tap to share files.',
+                                : _fileNotifier.downloading
+                                    ? "Downloading."
+                                    : (Platform.isWindows || Platform.isMacOS)
+                                        ? 'Drop files to start.'
+                                        : 'Tap to share files.',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
@@ -219,7 +222,8 @@ class _HomePageState extends State<HomePage>
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const Spacer(flex: 9),
-                        if (_fileNotifier.loading)
+                        if (_fileNotifier.uploading ||
+                            _fileNotifier.downloading)
                           if (_fileNotifier.zipfileName == '')
                             Padding(
                               padding: const EdgeInsets.only(bottom: 24.0),
@@ -426,6 +430,109 @@ class _HomePageState extends State<HomePage>
                                           Platform.isIOS || Platform.isMacOS
                                               ? CupertinoIcons.qrcode
                                               : Icons.qr_code,
+                                          size: 16,
+                                          color: Colors.white.withOpacity(0.8),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        if (!_fileNotifier.processing &&
+                            !_fileNotifier.uploading &&
+                            !_fileNotifier.downloading &&
+                            _fileNotifier.fileLink == null)
+                          Text(
+                            "or",
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w200,
+                              letterSpacing: 0.5,
+                              color: Colors.white.withOpacity(0.5),
+                            ),
+                          ),
+                        if (!_fileNotifier.processing &&
+                            !_fileNotifier.uploading &&
+                            !_fileNotifier.downloading &&
+                            _fileNotifier.fileLink == null)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white12,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.05),
+                                    width: 0.5,
+                                  ),
+                                ),
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                margin:
+                                    const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.2,
+                                  height: 44,
+                                  child: TextField(
+                                    controller: _tokenController,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w300,
+                                      letterSpacing: 0.5,
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                                    decoration: InputDecoration(
+                                      hintText: "Enter unique file token",
+                                      hintStyle: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w200,
+                                        letterSpacing: 0.5,
+                                        color: Colors.white.withOpacity(0.7),
+                                      ),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: _tokenController.text.isNotEmpty &&
+                                        _tokenController.text.length > 16
+                                    ? () async {
+                                        final _filePath = await _fileNotifier
+                                            .getFileFromToken(
+                                                _tokenController.text);
+                                        _tokenController.clear();
+                                        launch(_filePath);
+                                      }
+                                    : null,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white12,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.05),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                  margin:
+                                      const EdgeInsets.fromLTRB(8, 16, 16, 16),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        height: 24.0,
+                                        width: 24.0,
+                                        child: Icon(
+                                          Platform.isIOS || Platform.isMacOS
+                                              ? CupertinoIcons.qrcode
+                                              : Icons.adaptive
+                                                  .arrow_forward_rounded,
                                           size: 16,
                                           color: Colors.white.withOpacity(0.8),
                                         ),
