@@ -15,6 +15,7 @@ import 'package:odin/services/locator.dart';
 import 'package:odin/services/preferences_service.dart';
 import 'package:odin/services/toast_service.dart';
 import 'package:odin/widgets/window_top_bar.dart';
+import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -474,8 +475,10 @@ class _HomePageState extends State<HomePage>
                                 margin:
                                     const EdgeInsets.fromLTRB(16, 16, 8, 16),
                                 child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.2,
+                                  width: (Platform.isWindows ||
+                                          Platform.isMacOS)
+                                      ? MediaQuery.of(context).size.width * 0.2
+                                      : MediaQuery.of(context).size.width * 0.4,
                                   height: 44,
                                   child: TextField(
                                     controller: _tokenController,
@@ -504,9 +507,14 @@ class _HomePageState extends State<HomePage>
                                     ? () async {
                                         final _filePath = await _fileNotifier
                                             .getFileFromToken(
-                                                _tokenController.text);
+                                                _tokenController.text.trim());
                                         _tokenController.clear();
-                                        launch(_filePath);
+                                        if (Platform.isWindows ||
+                                            Platform.isMacOS) {
+                                          launch(_filePath);
+                                        } else {
+                                          await OpenFile.open(_filePath);
+                                        }
                                       }
                                     : null,
                                 child: Container(

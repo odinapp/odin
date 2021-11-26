@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:android_path_provider/android_path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DownloadService {
   final RandomService _randomService = locator<RandomService>();
@@ -17,7 +19,11 @@ class DownloadService {
     final fileName = _randomService.getRandomString(10);
     Directory? dir;
     if (Platform.isAndroid) {
-      dir = await getExternalStorageDirectory();
+      var status = await Permission.storage.status;
+      if (!status.isGranted) {
+        await Permission.storage.request();
+      }
+      dir = Directory(await AndroidPathProvider.downloadsPath);
     } else if (Platform.isIOS) {
       dir = await getTemporaryDirectory();
     } else {
