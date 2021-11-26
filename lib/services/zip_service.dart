@@ -42,4 +42,22 @@ class ZipService {
     linkDesc = formatBytes(File(zipFilePath).lengthSync(), 2);
     return File(zipFilePath);
   }
+
+  Future<String> unzipFile(File file) async {
+    final archive = ZipDecoder().decodeBytes(file.readAsBytesSync());
+    final outDirectory = file.path.replaceAll('.zip', '') + '\\';
+    for (final zfile in archive) {
+      final filename = zfile.name;
+      if (zfile.isFile) {
+        final data = zfile.content as List<int>;
+        File(outDirectory + filename)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(data);
+      } else {
+        Directory(outDirectory + filename).create(recursive: true);
+      }
+    }
+    file.deleteSync(); // Delete the original ZIP file
+    return outDirectory;
+  }
 }
