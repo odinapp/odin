@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -43,17 +45,36 @@ class ToastService {
           ),
         ));
     fToast.removeCustomToast();
+    if (Platform.isIOS || Platform.isAndroid) {
+      Fluttertoast.showToast(
+          msg: text,
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      fToast.showToast(
+        child: toast,
+        positionedToastBuilder: (context, child) {
+          return Positioned(
+            child: child,
+            top: 32.0 + MediaQuery.of(context).padding.top,
+            left: MediaQuery.of(context).size.width / 2 - 125,
+          );
+        },
+        toastDuration: const Duration(seconds: 2),
+      );
+    }
+  }
 
-    fToast.showToast(
-      child: toast,
-      positionedToastBuilder: (context, child) {
-        return Positioned(
-          child: child,
-          top: 32.0,
-          left: MediaQuery.of(context).size.width / 2 - 125,
-        );
-      },
-      toastDuration: const Duration(seconds: 2),
-    );
+  void showMobileToast(String text) {
+    Fluttertoast.showToast(
+        msg: text,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }

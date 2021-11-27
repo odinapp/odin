@@ -1,4 +1,4 @@
-package com.example.odin
+package com.odin.odin
 
 import io.flutter.embedding.android.FlutterActivity
 
