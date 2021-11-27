@@ -87,7 +87,7 @@ class ShortenerService {
       ),
       iosParameters: IosParameters(
         bundleId: 'com.odin.odin',
-        minimumVersion: '0.1.0',
+        minimumVersion: '0.2.0',
         appStoreId:
             '123456789', // Update this value with your app's App Store ID
       ),

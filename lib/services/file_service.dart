@@ -9,6 +9,7 @@ import 'package:odin/services/logger.dart';
 import 'package:odin/services/shortener_service.dart';
 import 'package:odin/services/zip_service.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 class FileService {
   final _shortenerService = locator<ShortenerService>();
@@ -32,7 +33,15 @@ class FileService {
       uploading = true;
       processing = true;
       List<File> files = result.paths.map((path) => File(path!)).toList();
-      final zippedFile = await _zipService.zipFile(fileToZips: files);
+      File zippedFile;
+      if (files.length > 1) {
+        zippedFile = await _zipService.zipFile(fileToZips: files);
+      } else {
+        final Directory cacheDir = await getTemporaryDirectory();
+        zippedFile = files[0];
+        zippedFile =
+            zippedFile.copySync(join(cacheDir.path, basename(files[0].path)));
+      }
       final encryptedFileDetails =
           await _encrytionService.encryptFile(zippedFile);
       zipfileName = basename(zippedFile.path);
@@ -54,9 +63,16 @@ class FileService {
       zipfileName = '';
       uploading = true;
       processing = true;
-      final List<File> fileToZips =
-          urls.map((e) => File(e.toFilePath())).toList();
-      final zippedFile = await _zipService.zipFile(fileToZips: fileToZips);
+      final List<File> files = urls.map((e) => File(e.toFilePath())).toList();
+      File zippedFile;
+      if (files.length > 1) {
+        zippedFile = await _zipService.zipFile(fileToZips: files);
+      } else {
+        final Directory cacheDir = await getTemporaryDirectory();
+        zippedFile = files[0];
+        zippedFile =
+            zippedFile.copySync(join(cacheDir.path, basename(files[0].path)));
+      }
       final encryptedFileDetails =
           await _encrytionService.encryptFile(zippedFile);
       zipfileName = basename(zippedFile.path);
@@ -81,10 +97,16 @@ class FileService {
     processing = true;
     final decryptedFile = await _encrytionService.decryptFile(file, password);
     logger.d("decryptedFile path : ${decryptedFile.path}");
-    final unzippedFilePath = await _zipService.unzipFile(decryptedFile);
-    processing = false;
-    downloading = false;
-    logger.d("unzippedFile path : $unzippedFilePath");
-    return unzippedFilePath;
+    if (decryptedFile.path.endsWith('.zip')) {
+      final unzippedFilePath = await _zipService.unzipFile(decryptedFile);
+      logger.d("unzippedFile path : $unzippedFilePath");
+      processing = false;
+      downloading = false;
+      return unzippedFilePath;
+    } else {
+      processing = false;
+      downloading = false;
+      return decryptedFile.parent.path;
+    }
   }
 }
