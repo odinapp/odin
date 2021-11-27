@@ -11,7 +11,10 @@ import 'package:odin/pages/home_page.dart';
 import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
+import 'package:odin/services/toast_service.dart';
+import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   if (Platform.environment.containsKey('FLUTTER_TEST')) {
@@ -55,6 +58,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   void initDynamicLinks() async {
+    final _toast = locator<ToastService>();
     final _fileNotifier = context.read<FileNotifier>();
     FirebaseDynamicLinks.instance.onLink(
         onSuccess: (PendingDynamicLinkData? dynamicLink) async {
@@ -64,7 +68,14 @@ class _MyAppState extends State<MyApp> {
           if (deepLink.pathSegments[0] == "files") {
             logger.i(deepLink.pathSegments.last);
             final String token = deepLink.pathSegments.last;
-            _fileNotifier.getFileFromToken(token);
+            final _filePath =
+                await _fileNotifier.getFileFromToken(token.trim());
+            if (Platform.isWindows || Platform.isMacOS) {
+              launch(_filePath);
+            } else {
+              _toast.showMobileToast("Files saved in Downloads.");
+              await OpenFile.open(_filePath);
+            }
           }
         }
       }
@@ -80,7 +91,13 @@ class _MyAppState extends State<MyApp> {
         if (deepLink.pathSegments[0] == "files") {
           logger.i(deepLink.pathSegments.last);
           final String token = deepLink.pathSegments.last;
-          _fileNotifier.getFileFromToken(token);
+          final _filePath = await _fileNotifier.getFileFromToken(token.trim());
+          if (Platform.isWindows || Platform.isMacOS) {
+            launch(_filePath);
+          } else {
+            _toast.showMobileToast("Files saved in Downloads.");
+            await OpenFile.open(_filePath);
+          }
         }
       }
     }
