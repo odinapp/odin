@@ -14,6 +14,7 @@ class EncryptionService {
     final crypt = AesCrypt();
     final password = _randomService.getRandomString(16);
     crypt.setPassword(password);
+    crypt.setOverwriteMode(AesCryptOwMode.rename);
     final encryptedFilePath =
         join(file.parent.path, basename(file.path) + '.odin');
     crypt.encryptFileSync(file.path, encryptedFilePath);
@@ -26,6 +27,7 @@ class EncryptionService {
     logger.d('Started Deryption');
     final crypt = AesCrypt();
     crypt.setPassword(password);
+    crypt.setOverwriteMode(AesCryptOwMode.rename);
     file = await file
         .rename(file.path.substring(0, file.path.length - 5) + ".aes");
     final decryptedFilePath = crypt.decryptFileSync(
