@@ -55,3 +55,4 @@ coverage/lcov.info
 odin-release-key.keystore
 android/app/google-services.json
 android/app/build/*
+macos/GoogleService-Info.plist
