@@ -363,7 +363,9 @@ class _HomePageState extends State<HomePage>
                                         Platform.isIOS || Platform.isMacOS
                                             ? CupertinoIcons.check_mark
                                             : Icons.check,
-                                        "Token copied to clipboard.")),
+                                        Platform.isIOS || Platform.isAndroid
+                                            ? "Link copied to clipboard."
+                                            : "Token copied to clipboard.")),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white12,
