@@ -2,21 +2,17 @@ import 'dart:io';
 
 import 'package:android_path_provider/android_path_provider.dart';
 import 'package:dio/dio.dart';
-import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
-import 'package:odin/services/random_service.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DownloadService {
-  final RandomService _randomService = locator<RandomService>();
   String progress = '0%';
   bool downloading = false;
 
   Dio dio = Dio();
-  Future<String> _getFilePath() async {
-    final fileName = "odin_" + _randomService.getRandomString(10);
+  Future<String> _getFilePath(String fileName) async {
     Directory? dir;
     if (Platform.isAndroid) {
       var status = await Permission.storage.status;
@@ -29,15 +25,24 @@ class DownloadService {
     } else {
       dir = await getDownloadsDirectory();
     }
-    String path = join(dir?.path ?? '', fileName + ".odin");
+    String path = join(dir?.path ?? '', fileName);
     logger.d("File path : $path");
     return path;
   }
 
   Future<File> downloadFile(String url) async {
-    final filePath = await _getFilePath();
     progress = '0%';
     downloading = true;
+    Response response = await Dio().get(
+      url,
+      options: Options(
+          followRedirects: false,
+          validateStatus: (status) {
+            return (status ?? 0) < 500;
+          }),
+    );
+    final filePath = await _getFilePath(
+        basename(response.headers.map["location"]?[0] ?? ''));
     await dio.download(
       url,
       filePath,
