@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -10,9 +12,11 @@ import 'package:odin/model/github_json.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:odin/services/shortener_service.dart';
+import 'package:odin/services/toast_service.dart';
 import 'package:path/path.dart' as path;
 
 class GithubService {
+  final _toast = locator<ToastService>();
   final ShortenerService _shortenerService = locator<ShortenerService>();
   final RandomService _randomService = locator<RandomService>();
   final _env = dotenv.env;
@@ -29,14 +33,24 @@ class GithubService {
       '/repos/${_env['GITHUB_USERNAME']}/${_env['GITHUB_REPO_NAME']}/contents/${createFile.path}',
       body: GitHubJson.encode(createFile),
     );
-
-    final _fileCode = await _shortenerService.getFileCode(
-        jsonDecode(response.body)["content"]["download_url"] ?? '', password);
-    if (Platform.isMacOS || Platform.isWindows) {
-      return _fileCode ?? '';
+    if (response.statusCode == 403) {
+      _toast.showToast(
+        Platform.isIOS || Platform.isMacOS
+            ? CupertinoIcons.multiply
+            : Icons.close,
+        "API rate limit exceeded",
+      );
+    } else {
+      final _fileCode = await _shortenerService.getFileCode(
+          jsonDecode(response.body)["content"]["download_url"] ?? '', password);
+      if (Platform.isMacOS || Platform.isWindows) {
+        return _fileCode ?? '';
+      }
+      final dynamicLink =
+          await _shortenerService.getDynamicLink(_fileCode ?? '');
+      return dynamicLink;
     }
-    final dynamicLink = await _shortenerService.getDynamicLink(_fileCode ?? '');
-    return dynamicLink;
+    return '';
   }
 
   Future<http.Response> request(
