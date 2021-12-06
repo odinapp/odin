@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Odin"
-#define MyAppVersion "0.1"
+#define MyAppVersion "0.2.0"
 #define MyAppPublisher "Odin Team"
 #define MyAppURL "https://www.hashstudios.dev/"
 #define MyAppExeName "odin.exe"

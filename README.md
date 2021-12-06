@@ -11,6 +11,7 @@
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/stars/odinapp/odin.svg?style=flat&logo=github&colorB=deeppink&label=stars"></a>
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/v/release/odinapp/odin.svg"></a>
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/license/odinapp/odin.svg" alt="License: AGPL"></a>
+<a href='https://t.me/odin_app'><img alt='Join us on Telegram' src='https://img.shields.io/badge/Telegram-Odin-blue?logo=telegram'/></a>
 
 </p>
 
