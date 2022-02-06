@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class OColor {
+  BuildContext? _context;
+
   // Light Theme Colors
   static const Color _lPrimary = Color(0xFF7D5DEC);
   static const Color _lPrimaryVariant = Color(0xFF6148B9);
@@ -26,6 +28,7 @@ class OColor {
   Color get lBackground => _lBackground;
   Color get lBackgroundVariant => _lBackgroundVariant;
   Color get lError => _lError;
+
   Color get dPrimary => _dPrimary;
   Color get dPrimaryVariant => _dPrimaryVariant;
   Color get dSecondary => _dSecondary;
@@ -33,4 +36,73 @@ class OColor {
   Color get dBackground => _dBackground;
   Color get dBackgroundVariant => _dBackgroundVariant;
   Color get dError => _dError;
+
+  Color get primary {
+    if (_context == null) {
+      return dPrimary;
+    }
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lPrimary
+        : dPrimary;
+  }
+
+  Color get primaryVariant {
+    if (_context == null) {
+      return dPrimaryVariant;
+    }
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lPrimaryVariant
+        : dPrimaryVariant;
+  }
+
+  Color get secondary {
+    if (_context == null) {
+      return dSecondary;
+    }
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lSecondary
+        : dSecondary;
+  }
+
+  Color get secondaryVariant {
+    if (_context == null) {
+      return dSecondaryVariant;
+    }
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lSecondaryVariant
+        : dSecondaryVariant;
+  }
+
+  Color get background {
+    if (_context == null) {
+      return dBackground;
+    }
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lBackground
+        : dBackground;
+  }
+
+  Color get backgroundVariant {
+    if (_context == null) {
+      return dBackgroundVariant;
+    }
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lBackgroundVariant
+        : dBackgroundVariant;
+  }
+
+  Color get error {
+    if (_context == null) {
+      return dError;
+    }
+    return Theme.of(_context!).brightness == Brightness.light ? lError : dError;
+  }
+
+  // Constructors
+
+  OColor();
+
+  OColor.withContext(BuildContext context) {
+    _context = context;
+  }
 }
