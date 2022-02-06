@@ -37,6 +37,7 @@ dependencies:
   dio: ^4.0.3
   file_picker: ^4.2.3
   firebase_dynamic_links: ^3.0.1
+  flex_color_scheme: ^4.2.0
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.0.2
