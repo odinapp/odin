@@ -45,6 +45,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.0.2
+  flutter_svg: ^1.1.4
   fluttertoast: ^8.0.9
   get_it: ^7.2.0
   google_fonts: ^3.0.1
@@ -102,6 +103,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - .env
+    - assets/png/
+    - assets/svg/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
