@@ -4,11 +4,11 @@ import 'dart:io';
 // import 'package:better_open_file/better_open_file.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:odin/constants/theme.dart';
 import 'package:odin/pages/home_page.dart';
 import 'package:odin/providers/file_notifier.dart';
+import 'package:odin/services/environment_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 // import 'package:odin/services/toast_service.dart';
@@ -22,8 +22,8 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
   }
   // Initialize the app
-  await dotenv.load();
   setupLocator();
+  await locator<EnvironmentService>().init();
 
   runZonedGuarded(() {
     runApp(
