@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:better_open_file/better_open_file.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +13,8 @@ import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/services/toast_service.dart';
-import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 void main() async {
   if (Platform.environment.containsKey('FLUTTER_TEST')) {
@@ -61,36 +61,34 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   void initDynamicLinks() async {
-    final _toast = locator<ToastService>();
-    final _fileNotifier = context.read<FileNotifier>();
+    final toast = locator<ToastService>();
+    final fileNotifier = context.read<FileNotifier>();
 
-    FirebaseDynamicLinks.instance.onLink(
-      onSuccess: (PendingDynamicLinkData? dynamicLink) async {
+    FirebaseDynamicLinks.instance.onLink.listen(
+      (PendingDynamicLinkData? dynamicLink) async {
         final Uri? deepLink = dynamicLink?.link;
         if (deepLink != null) {
           if (deepLink.pathSegments.isNotEmpty) {
             if (deepLink.pathSegments[0] == "files") {
               logger.i(deepLink.pathSegments.last);
               final String token = deepLink.pathSegments.last;
-              final _filePath =
-                  await _fileNotifier.getFileFromToken(token.trim());
+              final filePath = await fileNotifier.getFileFromToken(token.trim());
               if (Platform.isWindows || Platform.isMacOS) {
-                launch(_filePath);
+                launchUrlString(filePath);
               } else {
-                _toast.showMobileToast("Files saved in Downloads.");
-                await OpenFile.open(_filePath);
+                toast.showMobileToast("Files saved in Downloads.");
+                await OpenFile.open(filePath);
               }
             }
           }
         }
       },
-      onError: (OnLinkErrorException e) async {
+      onError: (e) async {
         logger.e(e.message, e);
       },
     );
 
-    final PendingDynamicLinkData? data =
-        await FirebaseDynamicLinks.instance.getInitialLink();
+    final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getInitialLink();
     final Uri? deepLink = data?.link;
 
     if (deepLink != null) {
@@ -98,12 +96,12 @@ class _MyAppState extends State<MyApp> {
         if (deepLink.pathSegments[0] == "files") {
           logger.i(deepLink.pathSegments.last);
           final String token = deepLink.pathSegments.last;
-          final _filePath = await _fileNotifier.getFileFromToken(token.trim());
+          final filePath = await fileNotifier.getFileFromToken(token.trim());
           if (Platform.isWindows || Platform.isMacOS) {
-            launch(_filePath);
+            launchUrlString(filePath);
           } else {
-            _toast.showMobileToast("Files saved in Downloads.");
-            await OpenFile.open(_filePath);
+            toast.showMobileToast("Files saved in Downloads.");
+            await OpenFile.open(filePath);
           }
         }
       }
@@ -120,13 +118,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final OTheme _theme = locator<OTheme>();
+    final OTheme theme = locator<OTheme>();
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Odin - Open-source easy file sharing for everyone.',
-      theme: _theme.lightTheme,
-      darkTheme: _theme.darkTheme,
+      theme: theme.lightTheme,
+      darkTheme: theme.darkTheme,
       themeMode: ThemeMode.dark,
       home: const HomePage(),
     );

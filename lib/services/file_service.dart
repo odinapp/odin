@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:odin/services/download_service.dart';
 import 'package:odin/services/encryption_service.dart';
@@ -25,9 +26,8 @@ class FileService {
 
   Future<void> getLinkFromFilePicker() async {
     fileLink = null;
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true);
-    final String? _path;
+    FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    final String? path;
     if (result != null) {
       zipfileName = '';
       uploading = true;
@@ -39,51 +39,45 @@ class FileService {
       } else {
         final Directory cacheDir = await getTemporaryDirectory();
         zippedFile = files[0];
-        zippedFile =
-            zippedFile.copySync(join(cacheDir.path, basename(files[0].path)));
+        zippedFile = zippedFile.copySync(join(cacheDir.path, basename(files[0].path)));
       }
-      final encryptedFileDetails =
-          await _encrytionService.encryptFile(zippedFile);
+      final encryptedFileDetails = await _encrytionService.encryptFile(zippedFile);
       zipfileName = basename(zippedFile.path);
       processing = false;
-      _path = await _githubService.uploadFileAnonymous(
-          encryptedFileDetails['file'], encryptedFileDetails['password']);
+      path = await _githubService.uploadFileAnonymous(encryptedFileDetails['file'], encryptedFileDetails['password']);
       uploading = false;
     } else {
       // User canceled the picker
-      _path = null;
+      path = null;
     }
-    fileLink = _path;
+    fileLink = path;
   }
 
-  Future<void> getLinkFromDroppedFiles(List<Uri> urls) async {
+  Future<void> getLinkFromDroppedFiles(List<XFile> xfiles) async {
     fileLink = null;
-    final String? _path;
-    if (urls.isNotEmpty) {
+    final String? path;
+    if (xfiles.isNotEmpty) {
       zipfileName = '';
       uploading = true;
       processing = true;
-      final List<File> files = urls.map((e) => File(e.toFilePath())).toList();
+      final List<File> files = xfiles.map((e) => File(e.path)).toList();
       File zippedFile;
       if (files.length > 1) {
         zippedFile = await _zipService.zipFile(fileToZips: files);
       } else {
         final Directory cacheDir = await getTemporaryDirectory();
         zippedFile = files[0];
-        zippedFile =
-            zippedFile.copySync(join(cacheDir.path, basename(files[0].path)));
+        zippedFile = zippedFile.copySync(join(cacheDir.path, basename(files[0].path)));
       }
-      final encryptedFileDetails =
-          await _encrytionService.encryptFile(zippedFile);
+      final encryptedFileDetails = await _encrytionService.encryptFile(zippedFile);
       zipfileName = basename(zippedFile.path);
       processing = false;
-      _path = await _githubService.uploadFileAnonymous(
-          encryptedFileDetails['file'], encryptedFileDetails['password']);
+      path = await _githubService.uploadFileAnonymous(encryptedFileDetails['file'], encryptedFileDetails['password']);
       uploading = false;
     } else {
-      _path = null;
+      path = null;
     }
-    fileLink = _path;
+    fileLink = path;
   }
 
   Future<String> getFileFromToken(String token) async {

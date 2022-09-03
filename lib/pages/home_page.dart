@@ -6,16 +6,16 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final OColor _color = OColor.withContext(context);
+    final OColor color = OColor.withContext(context);
 
     return Scaffold(
-      backgroundColor: _color.background,
+      backgroundColor: color.background,
       body:
           // Gradient background
           Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [_color.background, _color.backgroundVariant],
+            colors: [color.background, color.backgroundContainer],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

@@ -12,17 +12,11 @@ class RipplePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final double opacity = ((1 - animationValue)).clamp(0, 0.2);
-    canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2),
-        animationValue * size.height * 0.3,
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), animationValue * size.height * 0.3,
         Paint()..color = color.withOpacity(pow(opacity, 2).toDouble()));
-    canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2),
-        animationValue * size.height * 0.25,
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), animationValue * size.height * 0.25,
         Paint()..color = color.withOpacity(pow(opacity, 1.5).toDouble()));
-    canvas.drawCircle(
-        Offset(size.width / 2, size.height / 2),
-        animationValue * size.height * 0.2,
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), animationValue * size.height * 0.2,
         Paint()..color = color.withOpacity(opacity));
   }
 

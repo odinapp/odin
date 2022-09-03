@@ -5,8 +5,7 @@ class DoneIconCustomPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     Paint paint0Fill = Paint()..style = PaintingStyle.fill;
     paint0Fill.color = Colors.white.withOpacity(1.0);
-    canvas.drawCircle(Offset(size.width * 0.5000000, size.height * 0.5000000),
-        size.width * 0.4986500, paint0Fill);
+    canvas.drawCircle(Offset(size.width * 0.5000000, size.height * 0.5000000), size.width * 0.4986500, paint0Fill);
 
     Path path_1 = Path();
     path_1.moveTo(size.width * 0.3055567, size.height * 0.5277767);

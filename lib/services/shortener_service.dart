@@ -22,8 +22,7 @@ class ShortenerService {
       final Stopwatch stopwatch = Stopwatch()..start();
       final Map<String, dynamic> query = {};
       query.addAll(body ?? {});
-      final Response response = await _dio.get(uri,
-          queryParameters: query, options: Options(headers: headers));
+      final Response response = await _dio.get(uri, queryParameters: query, options: Options(headers: headers));
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
       if (response.statusCode != 201) {
@@ -45,8 +44,7 @@ class ShortenerService {
       final Stopwatch stopwatch = Stopwatch()..start();
       final Map<String, dynamic> query = {};
       query.addAll(body ?? {});
-      final Response response = await _dio.post(uri,
-          queryParameters: query, options: Options(headers: headers));
+      final Response response = await _dio.post(uri, queryParameters: query, options: Options(headers: headers));
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
       if (response.statusCode != 201) {
@@ -78,31 +76,26 @@ class ShortenerService {
   Future<String> getDynamicLink(String fileCode) async {
     logger.d('Started building dynamic link');
     final initialLink = Uri.parse('https://getodin.com/files/$fileCode');
+    final dynamicLinks = FirebaseDynamicLinks.instance;
     final DynamicLinkParameters parameters = DynamicLinkParameters(
       uriPrefix: 'https://getodin.page.link',
       link: initialLink,
-      androidParameters: AndroidParameters(
+      androidParameters: const AndroidParameters(
         packageName: 'com.odin.odin',
         minimumVersion: 1,
       ),
-      iosParameters: IosParameters(
+      iosParameters: const IOSParameters(
         bundleId: 'com.odin.odin',
         minimumVersion: '0.2.0',
-        appStoreId:
-            '123456789', // Update this value with your app's App Store ID
+        appStoreId: '123456789', // Update this value with your app's App Store ID
       ),
       socialMetaTagParameters: SocialMetaTagParameters(
         title: _zipService.linkTitle,
         description: _zipService.linkDesc,
       ),
     );
-    final Uri dynamicLink = await parameters.buildUrl();
     final ShortDynamicLink shortenedLink =
-        await DynamicLinkParameters.shortenUrl(
-      dynamicLink,
-      DynamicLinkParametersOptions(
-          shortDynamicLinkPathLength: ShortDynamicLinkPathLength.short),
-    );
+        await dynamicLinks.buildShortLink(parameters, shortLinkType: ShortDynamicLinkType.short);
     logger.d('Finished building dynamic link');
     return shortenedLink.shortUrl.toString();
   }

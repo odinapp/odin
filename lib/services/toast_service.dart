@@ -17,11 +17,8 @@ class ToastService {
         width: 250,
         child: Center(
           child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(500.0),
-                color: Colors.black54),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(500.0), color: Colors.black54),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -35,10 +32,7 @@ class ToastService {
                 ),
                 Text(
                   text,
-                  style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal),
+                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 12, fontWeight: FontWeight.normal),
                 ),
               ],
             ),
@@ -58,9 +52,9 @@ class ToastService {
         child: toast,
         positionedToastBuilder: (context, child) {
           return Positioned(
-            child: child,
             top: 32.0 + MediaQuery.of(context).padding.top,
             left: MediaQuery.of(context).size.width / 2 - 125,
+            child: child,
           );
         },
         toastDuration: const Duration(seconds: 2),

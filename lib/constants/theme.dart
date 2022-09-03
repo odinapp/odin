@@ -9,10 +9,10 @@ class OTheme {
   final lightTheme = FlexThemeData.light(
     colors: FlexSchemeColor(
       primary: _color.lPrimary,
-      primaryVariant: _color.lPrimaryVariant,
+      primaryContainer: _color.lPrimaryContainer,
       secondary: _color.lSecondary,
-      secondaryVariant: _color.lSecondaryVariant,
-      appBarColor: _color.lSecondaryVariant,
+      secondaryContainer: _color.lSecondaryContainer,
+      appBarColor: _color.lSecondaryContainer,
       error: _color.lError,
     ),
     surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
@@ -25,7 +25,6 @@ class OTheme {
     tooltipsMatchBackground: true,
     swapColors: false,
     lightIsWhite: true,
-    useSubThemes: true,
     visualDensity: FlexColorScheme.comfortablePlatformDensity,
     fontFamily: GoogleFonts.inter().fontFamily,
     subThemesData: const FlexSubThemesData(
@@ -36,7 +35,6 @@ class OTheme {
       bottomNavigationBarElevation: 1,
       bottomNavigationBarOpacity: 1,
       navigationBarOpacity: 1,
-      navigationBarMutedUnselectedText: true,
       navigationBarMutedUnselectedIcon: true,
       inputDecoratorIsFilled: true,
       inputDecoratorBorderType: FlexInputBorderType.outline,
@@ -51,10 +49,10 @@ class OTheme {
   final darkTheme = FlexThemeData.dark(
     colors: FlexSchemeColor(
       primary: _color.dPrimary,
-      primaryVariant: _color.dPrimaryVariant,
+      primaryContainer: _color.dPrimaryContainer,
       secondary: _color.dSecondary,
-      secondaryVariant: _color.dSecondaryVariant,
-      appBarColor: _color.dSecondaryVariant,
+      secondaryContainer: _color.dSecondaryContainer,
+      appBarColor: _color.dSecondaryContainer,
       error: _color.dError,
     ),
     surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
@@ -67,7 +65,6 @@ class OTheme {
     tooltipsMatchBackground: true,
     swapColors: false,
     darkIsTrueBlack: true,
-    useSubThemes: true,
     visualDensity: FlexColorScheme.comfortablePlatformDensity,
     fontFamily: GoogleFonts.inter().fontFamily,
     subThemesData: const FlexSubThemesData(
@@ -78,7 +75,6 @@ class OTheme {
       bottomNavigationBarElevation: 1,
       bottomNavigationBarOpacity: 1,
       navigationBarOpacity: 1,
-      navigationBarMutedUnselectedText: true,
       navigationBarMutedUnselectedIcon: true,
       inputDecoratorIsFilled: true,
       inputDecoratorBorderType: FlexInputBorderType.outline,

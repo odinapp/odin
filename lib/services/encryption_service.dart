@@ -15,8 +15,7 @@ class EncryptionService {
     final password = _randomService.getRandomString(16);
     crypt.setPassword(password);
     crypt.setOverwriteMode(AesCryptOwMode.rename);
-    final encryptedFilePath =
-        join(file.parent.path, basename(file.path) + '.odin');
+    final encryptedFilePath = join(file.parent.path, '${basename(file.path)}.odin');
     crypt.encryptFileSync(file.path, encryptedFilePath);
     file.deleteSync(); // Delete the original zip file
     logger.d('Finished Encryption');
@@ -28,10 +27,9 @@ class EncryptionService {
     final crypt = AesCrypt();
     crypt.setPassword(password);
     crypt.setOverwriteMode(AesCryptOwMode.rename);
-    file = await file
-        .rename(file.path.substring(0, file.path.length - 5) + ".aes");
-    final decryptedFilePath = crypt.decryptFileSync(
-        file.path, join(file.parent.path, basenameWithoutExtension(file.path)));
+    file = await file.rename("${file.path.substring(0, file.path.length - 5)}.aes");
+    final decryptedFilePath =
+        crypt.decryptFileSync(file.path, join(file.parent.path, basenameWithoutExtension(file.path)));
     File decryptedFile = File(decryptedFilePath);
     file.deleteSync(); // Delete the original AES file
     logger.d('Finished Decryption');

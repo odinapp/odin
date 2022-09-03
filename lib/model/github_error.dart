@@ -36,8 +36,7 @@ class RepositoryNotFound extends NotFound {
 
 /// Release not found
 class ReleaseNotFound extends NotFound {
-  const ReleaseNotFound.fromTagName(String? tagName)
-      : super('Release for tagName $tagName Not Found.');
+  const ReleaseNotFound.fromTagName(String? tagName) : super('Release for tagName $tagName Not Found.');
 }
 
 /// GitHub User was not found
@@ -47,8 +46,7 @@ class UserNotFound extends NotFound {
 
 /// GitHub Organization was not found
 class OrganizationNotFound extends NotFound {
-  const OrganizationNotFound(String? organization)
-      : super('Organization Not Found: $organization');
+  const OrganizationNotFound(String? organization) : super('Organization Not Found: $organization');
 }
 
 /// GitHub Team was not found
@@ -68,8 +66,7 @@ class RateLimitHit extends GitHubError {
 
 /// A GitHub Server Error
 class ServerError extends GitHubError {
-  ServerError(int statusCode, String? message)
-      : super('${message ?? 'Server Error'} ($statusCode)');
+  ServerError(int statusCode, String? message) : super('${message ?? 'Server Error'} ($statusCode)');
 }
 
 /// An Unknown Error
@@ -87,6 +84,5 @@ class InvalidJSON extends BadRequest {
 }
 
 class ValidationFailed extends GitHubError {
-  const ValidationFailed([String message = 'Validation Failed'])
-      : super(message);
+  const ValidationFailed([String message = 'Validation Failed']) : super(message);
 }

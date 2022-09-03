@@ -10,8 +10,7 @@ class CommitUser {
   final String? name;
   final String? email;
 
-  factory CommitUser.fromJson(Map<String, dynamic> input) =>
-      _$CommitUserFromJson(input);
+  factory CommitUser.fromJson(Map<String, dynamic> input) => _$CommitUserFromJson(input);
 
   Map<String, dynamic> toJson() => _$CommitUserToJson(this);
 }

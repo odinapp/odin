@@ -33,11 +33,9 @@ class ZipService {
     if (fileToZips.length == 1) {
       linkTitle = basename(fileToZips.first.path);
     } else if (fileToZips.length == 2) {
-      linkTitle =
-          "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more file.";
+      linkTitle = "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more file.";
     } else {
-      linkTitle =
-          "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more files.";
+      linkTitle = "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more files.";
     }
     linkDesc = formatBytes(File(zipFilePath).lengthSync(), 2);
     return File(zipFilePath);

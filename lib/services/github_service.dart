@@ -35,19 +35,16 @@ class GithubService {
     );
     if (response.statusCode == 403) {
       _toast.showToast(
-        Platform.isIOS || Platform.isMacOS
-            ? CupertinoIcons.multiply
-            : Icons.close,
+        Platform.isIOS || Platform.isMacOS ? CupertinoIcons.multiply : Icons.close,
         "API rate limit exceeded",
       );
     } else {
-      final _fileCode = await _shortenerService.getFileCode(
-          jsonDecode(response.body)["content"]["download_url"] ?? '', password);
+      final _fileCode =
+          await _shortenerService.getFileCode(jsonDecode(response.body)["content"]["download_url"] ?? '', password);
       if (Platform.isMacOS || Platform.isWindows) {
         return _fileCode ?? '';
       }
-      final dynamicLink =
-          await _shortenerService.getDynamicLink(_fileCode ?? '');
+      final dynamicLink = await _shortenerService.getDynamicLink(_fileCode ?? '');
       return dynamicLink;
     }
     return '';

@@ -6,8 +6,7 @@ class TooltipCustomPainter extends CustomPainter {
     Paint paint0Fill = Paint()..style = PaintingStyle.fill;
     paint0Fill.color = Colors.white.withOpacity(1.0);
     canvas.drawRRect(
-        RRect.fromRectAndCorners(
-            Rect.fromLTWH(0, 0, size.width, size.height * 0.8833333),
+        RRect.fromRectAndCorners(Rect.fromLTWH(0, 0, size.width, size.height * 0.8833333),
             bottomRight: Radius.circular(size.width * 0.05031447),
             bottomLeft: Radius.circular(size.width * 0.05031447),
             topLeft: Radius.circular(size.width * 0.05031447),

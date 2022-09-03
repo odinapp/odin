@@ -10,7 +10,7 @@ import 'package:odin/model/github_json.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/services/random_service.dart';
-import 'package:odin/services/shortener_service.dart';
+// import 'package:odin/services/shortener_service.dart';
 // import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -18,15 +18,14 @@ import 'package:path_provider/path_provider.dart';
 typedef OnUploadProgressCallback = void Function(int sentBytes, int totalBytes);
 
 class GithubService {
-  final ShortenerService _shortenerService = locator<ShortenerService>();
+  // final ShortenerService _shortenerService = locator<ShortenerService>();
   final RandomService _randomService = locator<RandomService>();
   final _env = dotenv.env;
 
   static HttpClient getHttpClient() {
     HttpClient httpClient = HttpClient()
       ..connectionTimeout = const Duration(seconds: 10)
-      ..badCertificateCallback =
-          ((X509Certificate cert, String host, int port) => true);
+      ..badCertificateCallback = ((X509Certificate cert, String host, int port) => true);
 
     return httpClient;
   }
@@ -41,8 +40,7 @@ class GithubService {
     final bodyString = GitHubJson.encode(createFile);
     final Directory tempFolder = await getTemporaryDirectory();
     final tempFileSavePath = tempFolder.path;
-    final String tempFilePath = path.join(
-        tempFileSavePath, "${_randomService.getRandomString(15)}.txt");
+    final String tempFilePath = path.join(tempFileSavePath, "${_randomService.getRandomString(15)}.txt");
     final File textFile = File(tempFilePath);
     textFile.writeAsStringSync(bodyString);
     final createFileSync = CreateFile(
@@ -62,8 +60,7 @@ class GithubService {
       //   },
       // ),
       onUploadProgress: (sentBytes, totalBytes) {
-        logger.d(
-            'Uploaded ${((sentBytes / totalBytes) * 100).toStringAsFixed(2)}%');
+        logger.d('Uploaded ${((sentBytes / totalBytes) * 100).toStringAsFixed(2)}%');
       },
     );
 
@@ -123,8 +120,7 @@ class GithubService {
       url.write(path);
       url.write(queryString);
     }
-    final HttpClientRequest request =
-        await client.postUrl(Uri.parse(url.toString()));
+    final HttpClientRequest request = await client.postUrl(Uri.parse(url.toString()));
     // final request = http.Request(method, Uri.parse(url.toString()));
     headers.forEach((key, value) {
       request.headers.add(key, value);

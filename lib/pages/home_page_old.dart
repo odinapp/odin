@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:better_open_file/better_open_file.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,10 +18,9 @@ import 'package:odin/services/shortener_service.dart';
 import 'package:odin/services/toast_service.dart';
 import 'package:odin/widgets/mac_top_bar.dart';
 import 'package:odin/widgets/window_top_bar.dart';
-import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 const backgroundStartColor = Color(0xFF7D5DEC);
 const backgroundEndColor = Color(0xFF6148B9);
@@ -32,8 +32,7 @@ class HomePageOld extends StatefulWidget {
   State<HomePageOld> createState() => _HomePageOldState();
 }
 
-class _HomePageOldState extends State<HomePageOld>
-    with SingleTickerProviderStateMixin {
+class _HomePageOldState extends State<HomePageOld> with SingleTickerProviderStateMixin {
   // Animation controller for ripple animation
   late Animation<double> animation;
   late AnimationController controller;
@@ -75,8 +74,8 @@ class _HomePageOldState extends State<HomePageOld>
 
   @override
   Widget build(BuildContext context) {
-    final _fileNotifier = context.watch<FileNotifier>();
-    final _shortenerService = locator<ShortenerService>();
+    final fileNotifier = context.watch<FileNotifier>();
+    final shortenerService = locator<ShortenerService>();
     return Scaffold(
       backgroundColor: const Color(0xFF7D5DEC),
       body: Container(
@@ -113,17 +112,12 @@ class _HomePageOldState extends State<HomePageOld>
               alignment: Alignment.center,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.transparent,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: glow ? 40 : 10,
-                        color: glow
-                            ? Colors.white.withOpacity(0.5)
-                            : Colors.white.withOpacity(0.2),
-                      )
-                    ]),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.transparent, boxShadow: [
+                  BoxShadow(
+                    blurRadius: glow ? 40 : 10,
+                    color: glow ? Colors.white.withOpacity(0.5) : Colors.white.withOpacity(0.2),
+                  )
+                ]),
                 width: (Platform.isWindows || Platform.isMacOS)
                     ? MediaQuery.of(context).size.width / 4.8
                     : MediaQuery.of(context).size.width * 0.4,
@@ -137,15 +131,13 @@ class _HomePageOldState extends State<HomePageOld>
               alignment: Alignment.center,
               child: CustomPaint(
                 size: (Platform.isWindows || Platform.isMacOS)
-                    ? Size(
-                        MediaQuery.of(context).size.width / 4.8,
-                        (MediaQuery.of(context).size.width / 4.8 * 1)
-                            .toDouble())
-                    : Size(MediaQuery.of(context).size.width * 0.4,
-                        (MediaQuery.of(context).size.width * 0.4).toDouble()),
+                    ? Size(MediaQuery.of(context).size.width / 4.8,
+                        (MediaQuery.of(context).size.width / 4.8 * 1).toDouble())
+                    : Size(
+                        MediaQuery.of(context).size.width * 0.4, (MediaQuery.of(context).size.width * 0.4).toDouble()),
                 painter: _dragging || _hovering
                     ? DropIconCustomPainter()
-                    : _fileNotifier.fileLink != null
+                    : fileNotifier.fileLink != null
                         ? DoneIconCustomPainter()
                         : OdinLogoCustomPainter(),
               ),
@@ -164,9 +156,9 @@ class _HomePageOldState extends State<HomePageOld>
                         : glow
                             ? MediaQuery.of(context).size.width / 1.6
                             : MediaQuery.of(context).size.width / 1.7),
-                width: _fileNotifier.processing
+                width: fileNotifier.processing
                     ? 160
-                    : _fileNotifier.uploading || _fileNotifier.downloading
+                    : fileNotifier.uploading || fileNotifier.downloading
                         ? 160
                         : 220,
                 height: 55,
@@ -177,11 +169,11 @@ class _HomePageOldState extends State<HomePageOld>
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 6.0),
                       child: Text(
-                        _fileNotifier.processing
+                        fileNotifier.processing
                             ? "Processing."
-                            : _fileNotifier.uploading
+                            : fileNotifier.uploading
                                 ? "Uploading."
-                                : _fileNotifier.downloading
+                                : fileNotifier.downloading
                                     ? "Downloading."
                                     : (Platform.isWindows || Platform.isMacOS)
                                         ? 'Drop files to start.'
@@ -201,7 +193,7 @@ class _HomePageOldState extends State<HomePageOld>
             // Drag & drop target
             DropTarget(
               onDragDone: (detail) async {
-                await _fileNotifier.getLinkFromDroppedFiles(detail.urls);
+                await fileNotifier.getLinkFromDroppedFiles(detail.files);
               },
               onDragEntered: (detail) {
                 setState(() {
@@ -217,30 +209,25 @@ class _HomePageOldState extends State<HomePageOld>
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeOut,
-                  color: _dragging
-                      ? Colors.blue.withOpacity(0.2)
-                      : Colors.transparent,
+                  color: _dragging ? Colors.blue.withOpacity(0.2) : Colors.transparent,
                   child: Center(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         const Spacer(flex: 9),
-                        if (_fileNotifier.uploading ||
-                            _fileNotifier.downloading)
-                          if (_fileNotifier.zipfileName == '')
+                        if (fileNotifier.uploading || fileNotifier.downloading)
+                          if (fileNotifier.zipfileName == '')
                             Padding(
                               padding: const EdgeInsets.only(bottom: 24.0),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(500),
                                 child: SizedBox(
-                                  width: (Platform.isWindows ||
-                                          Platform.isMacOS)
+                                  width: (Platform.isWindows || Platform.isMacOS)
                                       ? MediaQuery.of(context).size.width * 0.25
                                       : MediaQuery.of(context).size.width * 0.4,
                                   child: LinearProgressIndicator(
-                                    backgroundColor:
-                                        Colors.white.withOpacity(0.1),
+                                    backgroundColor: Colors.white.withOpacity(0.1),
                                     color: Colors.white,
                                     minHeight: 2,
                                   ),
@@ -278,7 +265,7 @@ class _HomePageOldState extends State<HomePageOld>
                                     ),
                                     child: Center(
                                       child: Text(
-                                        _fileNotifier.zipfileName[0],
+                                        fileNotifier.zipfileName[0],
                                         style: GoogleFonts.poppins(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
@@ -289,26 +276,17 @@ class _HomePageOldState extends State<HomePageOld>
                                   ),
                                   const SizedBox(width: 12),
                                   Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         SizedBox(
-                                          width: ((Platform.isWindows ||
-                                                      Platform.isMacOS)
-                                                  ? MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.25
-                                                  : MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.4) -
+                                          width: ((Platform.isWindows || Platform.isMacOS)
+                                                  ? MediaQuery.of(context).size.width * 0.25
+                                                  : MediaQuery.of(context).size.width * 0.4) -
                                               24 -
                                               38,
                                           child: Text(
-                                            _fileNotifier.zipfileName,
+                                            fileNotifier.zipfileName,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: GoogleFonts.poppins(
@@ -320,24 +298,15 @@ class _HomePageOldState extends State<HomePageOld>
                                         ),
                                         const SizedBox(height: 8),
                                         ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(500),
+                                          borderRadius: BorderRadius.circular(500),
                                           child: SizedBox(
-                                            width: ((Platform.isWindows ||
-                                                        Platform.isMacOS)
-                                                    ? MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        0.25
-                                                    : MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        0.4) -
+                                            width: ((Platform.isWindows || Platform.isMacOS)
+                                                    ? MediaQuery.of(context).size.width * 0.25
+                                                    : MediaQuery.of(context).size.width * 0.4) -
                                                 24 -
                                                 38,
                                             child: LinearProgressIndicator(
-                                              backgroundColor:
-                                                  Colors.white.withOpacity(0.1),
+                                              backgroundColor: Colors.white.withOpacity(0.1),
                                               color: Colors.white,
                                               minHeight: 3,
                                             ),
@@ -347,22 +316,18 @@ class _HomePageOldState extends State<HomePageOld>
                                 ],
                               ),
                             ),
-                        if (_fileNotifier.fileLink != null)
+                        if (fileNotifier.fileLink != null)
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               InkWell(
-                                onTap: () => FlutterClipboard.copy(_fileNotifier
-                                                .fileLink !=
-                                            null
+                                onTap: () => FlutterClipboard.copy(fileNotifier.fileLink != null
                                         ? Platform.isAndroid || Platform.isIOS
-                                            ? "Some files were shared with you.\nTo access them, visit ${_fileNotifier.fileLink} from your mobile device. To access them on your PC, download Odin from https://shrtco.de/odin and enter this unique token - ${_shortenerService.token}"
-                                            : "Some files were shared with you.\nTo access them, download Odin from https://shrtco.de/odin and enter this unique token - ${_fileNotifier.fileLink}"
+                                            ? "Some files were shared with you.\nTo access them, visit ${fileNotifier.fileLink} from your mobile device. To access them on your PC, download Odin from https://shrtco.de/odin and enter this unique token - ${shortenerService.token}"
+                                            : "Some files were shared with you.\nTo access them, download Odin from https://shrtco.de/odin and enter this unique token - ${fileNotifier.fileLink}"
                                         : '')
                                     .then((value) => _toast.showToast(
-                                        Platform.isIOS || Platform.isMacOS
-                                            ? CupertinoIcons.check_mark
-                                            : Icons.check,
+                                        Platform.isIOS || Platform.isMacOS ? CupertinoIcons.check_mark : Icons.check,
                                         Platform.isIOS || Platform.isAndroid
                                             ? "Link copied to clipboard."
                                             : "Token copied to clipboard.")),
@@ -375,15 +340,13 @@ class _HomePageOldState extends State<HomePageOld>
                                       width: 0.5,
                                     ),
                                   ),
-                                  padding:
-                                      const EdgeInsets.fromLTRB(16, 10, 10, 10),
-                                  margin:
-                                      const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                                  padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
+                                  margin: const EdgeInsets.fromLTRB(16, 16, 8, 16),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        _fileNotifier.fileLink.toString(),
+                                        fileNotifier.fileLink.toString(),
                                         style: GoogleFonts.poppins(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w200,
@@ -410,7 +373,7 @@ class _HomePageOldState extends State<HomePageOld>
                                 ),
                               ),
                               InkWell(
-                                onTap: _fileNotifier.fileLink != null
+                                onTap: fileNotifier.fileLink != null
                                     ? () => setState(() {
                                           _qrVisible = !_qrVisible;
                                         })
@@ -424,10 +387,8 @@ class _HomePageOldState extends State<HomePageOld>
                                       width: 0.5,
                                     ),
                                   ),
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                                  margin:
-                                      const EdgeInsets.fromLTRB(8, 16, 16, 16),
+                                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                  margin: const EdgeInsets.fromLTRB(8, 16, 16, 16),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -435,9 +396,7 @@ class _HomePageOldState extends State<HomePageOld>
                                         height: 24.0,
                                         width: 24.0,
                                         child: Icon(
-                                          Platform.isIOS || Platform.isMacOS
-                                              ? CupertinoIcons.qrcode
-                                              : Icons.qr_code,
+                                          Platform.isIOS || Platform.isMacOS ? CupertinoIcons.qrcode : Icons.qr_code,
                                           size: 16,
                                           color: Colors.white.withOpacity(0.8),
                                         ),
@@ -448,10 +407,10 @@ class _HomePageOldState extends State<HomePageOld>
                               ),
                             ],
                           ),
-                        if (!_fileNotifier.processing &&
-                            !_fileNotifier.uploading &&
-                            !_fileNotifier.downloading &&
-                            _fileNotifier.fileLink == null)
+                        if (!fileNotifier.processing &&
+                            !fileNotifier.uploading &&
+                            !fileNotifier.downloading &&
+                            fileNotifier.fileLink == null)
                           Text(
                             "or",
                             style: GoogleFonts.poppins(
@@ -461,10 +420,10 @@ class _HomePageOldState extends State<HomePageOld>
                               color: Colors.white.withOpacity(0.5),
                             ),
                           ),
-                        if (!_fileNotifier.processing &&
-                            !_fileNotifier.uploading &&
-                            !_fileNotifier.downloading &&
-                            _fileNotifier.fileLink == null)
+                        if (!fileNotifier.processing &&
+                            !fileNotifier.uploading &&
+                            !fileNotifier.downloading &&
+                            fileNotifier.fileLink == null)
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -477,13 +436,10 @@ class _HomePageOldState extends State<HomePageOld>
                                     width: 0.5,
                                   ),
                                 ),
-                                padding:
-                                    const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                                margin:
-                                    const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                margin: const EdgeInsets.fromLTRB(16, 16, 8, 16),
                                 child: SizedBox(
-                                  width: (Platform.isWindows ||
-                                          Platform.isMacOS)
+                                  width: (Platform.isWindows || Platform.isMacOS)
                                       ? MediaQuery.of(context).size.width * 0.2
                                       : MediaQuery.of(context).size.width * 0.4,
                                   height: 44,
@@ -509,20 +465,16 @@ class _HomePageOldState extends State<HomePageOld>
                                 ),
                               ),
                               InkWell(
-                                onTap: _tokenController.text.isNotEmpty &&
-                                        _tokenController.text.length > 16
+                                onTap: _tokenController.text.isNotEmpty && _tokenController.text.length > 16
                                     ? () async {
-                                        final _filePath = await _fileNotifier
-                                            .getFileFromToken(
-                                                _tokenController.text.trim());
+                                        final filePath =
+                                            await fileNotifier.getFileFromToken(_tokenController.text.trim());
                                         _tokenController.clear();
-                                        if (Platform.isWindows ||
-                                            Platform.isMacOS) {
-                                          launch(_filePath);
+                                        if (Platform.isWindows || Platform.isMacOS) {
+                                          launchUrlString(filePath);
                                         } else {
-                                          _toast.showMobileToast(
-                                              "Files saved in Downloads.");
-                                          await OpenFile.open(_filePath);
+                                          _toast.showMobileToast("Files saved in Downloads.");
+                                          await OpenFile.open(filePath);
                                         }
                                       }
                                     : null,
@@ -535,10 +487,8 @@ class _HomePageOldState extends State<HomePageOld>
                                       width: 0.5,
                                     ),
                                   ),
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                                  margin:
-                                      const EdgeInsets.fromLTRB(8, 16, 16, 16),
+                                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                  margin: const EdgeInsets.fromLTRB(8, 16, 16, 16),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -548,8 +498,7 @@ class _HomePageOldState extends State<HomePageOld>
                                         child: Icon(
                                           Platform.isIOS || Platform.isMacOS
                                               ? CupertinoIcons.qrcode
-                                              : Icons.adaptive
-                                                  .arrow_forward_rounded,
+                                              : Icons.adaptive.arrow_forward_rounded,
                                           size: 16,
                                           color: Colors.white.withOpacity(0.8),
                                         ),
@@ -563,14 +512,12 @@ class _HomePageOldState extends State<HomePageOld>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 32.0),
                           child: Text(
-                            _fileNotifier.fileLink != null
+                            fileNotifier.fileLink != null
                                 ? "Share this token with your friends to access the files."
                                 : "Files are encrypted with AES-256 encryption and will be deleted after 15 hours.",
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
-                              fontSize: (Platform.isWindows || Platform.isMacOS)
-                                  ? 10
-                                  : 12,
+                              fontSize: (Platform.isWindows || Platform.isMacOS) ? 10 : 12,
                               fontWeight: FontWeight.normal,
                               letterSpacing: -0.1,
                               color: Colors.white.withOpacity(0.2),
@@ -604,7 +551,7 @@ class _HomePageOldState extends State<HomePageOld>
                     alignment: Alignment.center,
                     child: GestureDetector(
                       onTap: () async {
-                        await _fileNotifier.getLinkFromFilePicker();
+                        await fileNotifier.getLinkFromFilePicker();
                       },
                     ),
                   ),
@@ -612,9 +559,9 @@ class _HomePageOldState extends State<HomePageOld>
               ),
             ),
             // QR code
-            if (_qrVisible && _fileNotifier.fileLink != null)
+            if (_qrVisible && fileNotifier.fileLink != null)
               GestureDetector(
-                onTap: _fileNotifier.fileLink != null
+                onTap: fileNotifier.fileLink != null
                     ? () => setState(() {
                           _qrVisible = !_qrVisible;
                         })
@@ -625,11 +572,11 @@ class _HomePageOldState extends State<HomePageOld>
                   ),
                 ),
               ),
-            if (_qrVisible && _fileNotifier.fileLink != null)
+            if (_qrVisible && fileNotifier.fileLink != null)
               Align(
                 alignment: Alignment.center,
                 child: GestureDetector(
-                  onTap: _fileNotifier.fileLink != null
+                  onTap: fileNotifier.fileLink != null
                       ? () => setState(() {
                             _qrVisible = !_qrVisible;
                           })
@@ -641,9 +588,7 @@ class _HomePageOldState extends State<HomePageOld>
                       boxShadow: [
                         BoxShadow(
                           blurRadius: glow ? 40 : 10,
-                          color: glow
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.white.withOpacity(0.0),
+                          color: glow ? Colors.white.withOpacity(0.1) : Colors.white.withOpacity(0.0),
                         )
                       ],
                     ),
@@ -672,7 +617,7 @@ class _HomePageOldState extends State<HomePageOld>
                               child: QrImage(
                                 // backgroundColor: Colors.white12,
                                 foregroundColor: Colors.white,
-                                data: _fileNotifier.fileLink!,
+                                data: fileNotifier.fileLink!,
                                 size: (Platform.isWindows || Platform.isMacOS)
                                     ? MediaQuery.of(context).size.width / 2.6
                                     : MediaQuery.of(context).size.width * 0.7,
@@ -721,28 +666,27 @@ class _HomePageOldState extends State<HomePageOld>
                         child: PopupMenuButton(
                           onSelected: (value) {
                             if (value == 1) {
-                              launch('https://github.com/odinapp/odin#readme');
+                              launchUrlString('https://github.com/odinapp/odin#readme');
                             } else if (value == 2) {
-                              launch(
-                                  'https://www.buymeacoffee.com/HashStudios');
+                              launchUrlString('https://www.buymeacoffee.com/HashStudios');
                             }
                           },
                           itemBuilder: (context) => [
                             PopupMenuItem(
+                              height: 40,
+                              value: 1,
                               child: Text(
                                 "About",
                                 style: GoogleFonts.poppins(fontSize: 14),
                               ),
-                              height: 40,
-                              value: 1,
                             ),
                             PopupMenuItem(
+                              value: 2,
+                              height: 40,
                               child: Text(
                                 "Support us",
                                 style: GoogleFonts.poppins(fontSize: 14),
                               ),
-                              value: 2,
-                              height: 40,
                             ),
                           ],
                         ),

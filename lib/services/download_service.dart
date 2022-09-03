@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:android_path_provider/android_path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:odin/services/logger.dart';
 import 'package:path/path.dart';
@@ -19,13 +18,13 @@ class DownloadService {
       if (!status.isGranted) {
         await Permission.storage.request();
       }
-      dir = Directory(await AndroidPathProvider.downloadsPath);
+      dir = await getTemporaryDirectory();
     } else if (Platform.isIOS) {
       dir = await getTemporaryDirectory();
     } else {
       dir = await getDownloadsDirectory();
     }
-    String path = join(dir?.path ?? '', fileName);
+    String path = join(dir.path, fileName);
     logger.d("File path : $path");
     return path;
   }
@@ -41,13 +40,12 @@ class DownloadService {
             return (status ?? 0) < 500;
           }),
     );
-    final filePath = await _getFilePath(
-        basename(response.headers.map["location"]?[0] ?? ''));
+    final filePath = await _getFilePath(basename(response.headers.map["location"]?[0] ?? ''));
     await dio.download(
       url,
       filePath,
       onReceiveProgress: (rcv, total) {
-        progress = ((rcv / total) * 100).toStringAsFixed(0) + "%";
+        progress = "${((rcv / total) * 100).toStringAsFixed(0)}%";
       },
       deleteOnError: true,
     );

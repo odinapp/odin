@@ -5,8 +5,7 @@ part 'create_file.g.dart';
 
 @JsonSerializable()
 class CreateFile {
-  CreateFile(
-      {this.path, this.content, this.message, this.branch, this.committer});
+  CreateFile({this.path, this.content, this.message, this.branch, this.committer});
 
   String? path;
   String? message;
@@ -14,8 +13,7 @@ class CreateFile {
   String? branch;
   CommitUser? committer;
 
-  factory CreateFile.fromJson(Map<String, dynamic> json) =>
-      _$CreateFileFromJson(json);
+  factory CreateFile.fromJson(Map<String, dynamic> json) => _$CreateFileFromJson(json);
 
   Map<String, dynamic> toJson() => _$CreateFileToJson(this);
 }
