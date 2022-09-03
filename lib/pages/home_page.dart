@@ -3,6 +3,8 @@ import 'package:odin/constants/colors.dart';
 import 'package:odin/services/dio_service.dart';
 import 'package:odin/services/file_service.dart';
 import 'package:odin/services/locator.dart';
+import 'package:odin/services/odin_service.dart';
+import 'package:odin/services/zip_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -46,11 +48,8 @@ class _Body extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _PrimaryButton(
-            onPressed: () async {
-              final dummyFile = await locator<FileService>().pickSingleFile();
-              if (dummyFile != null) {
-                locator<DioService>().uploadFileAnonymous(dummyFile);
-              }
+            onPressed: () {
+              locator<OdinService>().uploadFiles();
             },
             text: 'Upload File',
           ),

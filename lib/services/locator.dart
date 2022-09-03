@@ -7,6 +7,7 @@ import 'package:odin/services/encryption_service.dart';
 import 'package:odin/services/environment_service.dart';
 import 'package:odin/services/file_service.dart';
 import 'package:odin/services/github_service.dart';
+import 'package:odin/services/odin_service.dart';
 import 'package:odin/services/preferences_service.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:odin/services/shortener_service.dart';
@@ -23,7 +24,7 @@ void setupLocator() {
 
   // Services
   locator.registerLazySingleton<EnvironmentService>(() => EnvironmentService());
-  locator.registerLazySingleton<GithubService>(() => GithubService());
+  // locator.registerLazySingleton<GithubService>(() => GithubService());
   locator.registerLazySingleton<ShortenerService>(() => ShortenerService());
   locator.registerLazySingleton<RandomService>(() => RandomService());
   locator.registerLazySingleton<ZipService>(() => ZipService());
@@ -31,8 +32,9 @@ void setupLocator() {
   locator.registerLazySingleton<ToastService>(() => ToastService());
   locator.registerLazySingleton<PreferencesService>(() => PreferencesService());
   locator.registerLazySingleton<EncryptionService>(() => EncryptionService());
-  locator.registerLazySingleton<DownloadService>(() => DownloadService());
+  // locator.registerLazySingleton<DownloadService>(() => DownloadService());
   locator.registerLazySingleton<DioService>(() => DioService());
+  locator.registerLazySingleton<OdinService>(() => OdinService());
 
   // Globals
   locator.registerLazySingleton<OColor>(() => OColor());

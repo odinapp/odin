@@ -12,18 +12,19 @@ class FileNotifier with ChangeNotifier {
   String get zipfileName => _fileService.zipfileName;
 
   Future<void> getLinkFromFilePicker() async {
-    await _fileService.getLinkFromFilePicker();
+    // await _fileService.getLinkFromFilePicker();
     notifyListeners();
   }
 
   Future<void> getLinkFromDroppedFiles(List<XFile> xfiles) async {
-    await _fileService.getLinkFromDroppedFiles(xfiles);
+    // await _fileService.getLinkFromDroppedFiles(xfiles);
     notifyListeners();
   }
 
   Future<String> getFileFromToken(String token) async {
-    final filePath = await _fileService.getFileFromToken(token);
+    // final filePath = await _fileService.getFileFromToken(token);
     notifyListeners();
-    return filePath;
+    // return filePath;
+    return '';
   }
 }

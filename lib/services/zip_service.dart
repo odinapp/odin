@@ -58,4 +58,21 @@ class ZipService {
     file.deleteSync(); // Delete the original ZIP file
     return Directory(outDirectory).path;
   }
+
+  Future<File?> convertMultipleFilesIntoZip(List<File> files) async {
+    try {
+      File zippedFile;
+      if (files.length > 1) {
+        zippedFile = await zipFile(fileToZips: files);
+      } else {
+        final Directory cacheDir = await getTemporaryDirectory();
+        zippedFile = files[0];
+        zippedFile = zippedFile.copySync(join(cacheDir.path, basename(files[0].path)));
+      }
+      return zippedFile;
+    } catch (e, st) {
+      logger.e(e, e, st);
+      return null;
+    }
+  }
 }
