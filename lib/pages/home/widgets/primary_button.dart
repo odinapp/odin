@@ -19,7 +19,11 @@ class PrimaryButton extends StatelessWidget {
           onPressed: () async {
             final dummyFiles = await locator<FileService>().pickMultipleFiles();
             if (dummyFiles != null) {
-              Navigator.pushNamed(context, '/upload', arguments: dummyFiles);
+              locator<AppRouter>().push(
+                UploadRoute(
+                  uploadFiles: dummyFiles,
+                ),
+              );
             }
           },
           style: ElevatedButton.styleFrom(

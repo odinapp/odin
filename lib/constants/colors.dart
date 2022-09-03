@@ -47,8 +47,9 @@ class OColor {
   static const Color _dBackground = Color(0xFF151515);
   static const Color _dBackgroundContainer = Color(0xFF111111);
   static const Color _dError = Color(0xffcf6679);
-  static const Color _secondaryOnBackground = Color(0xFF838383);
-  static const Color _secondaryContainerOnBackground = Color(0xFF181818);
+  static const Color _dSecondaryOnBackground = Color(0xFF838383);
+  static const Color _dSecondaryContainerOnBackground = Color(0xFF181818);
+  static const Color _dCardOnBackground = Color(0xFF1E1E1E);
 
   Color get lPrimary => _lPrimary;
   Color get lPrimaryContainer => _lPrimaryContainer;
@@ -65,8 +66,9 @@ class OColor {
   Color get dBackground => _dBackground;
   Color get dBackgroundContainer => _dBackgroundContainer;
   Color get dError => _dError;
-  Color get dSecondaryOnBackground => _secondaryOnBackground;
-  Color get dSecondaryContainerOnBackground => _secondaryContainerOnBackground;
+  Color get dSecondaryOnBackground => _dSecondaryOnBackground;
+  Color get dSecondaryContainerOnBackground => _dSecondaryContainerOnBackground;
+  Color get dCardOnBackground => _dCardOnBackground;
 
   Color get primary {
     if (_context == null) {
@@ -119,7 +121,7 @@ class OColor {
 
   Color get secondaryContainerOnBackground {
     if (_context == null) {
-      return _secondaryOnBackground;
+      return _dSecondaryOnBackground;
     }
     if (Theme.of(_context!).brightness == Brightness.light) {
       throw UnimplementedError();
@@ -130,12 +132,23 @@ class OColor {
 
   Color get secondaryOnBackground {
     if (_context == null) {
-      return _secondaryOnBackground;
+      return _dSecondaryOnBackground;
     }
     if (Theme.of(_context!).brightness == Brightness.light) {
       throw UnimplementedError();
     } else {
       return dSecondaryOnBackground;
+    }
+  }
+
+  Color get cardOnBackground {
+    if (_context == null) {
+      return _dCardOnBackground;
+    }
+    if (Theme.of(_context!).brightness == Brightness.light) {
+      throw UnimplementedError();
+    } else {
+      return dCardOnBackground;
     }
   }
 

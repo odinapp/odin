@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 // import 'package:better_open_file/better_open_file.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:odin/constants/theme.dart';
-import 'package:odin/pages/home/home_page.dart';
 import 'package:odin/providers/dio_notifier.dart';
+import 'package:odin/router/route_observer.dart';
+import 'package:odin/router/router.dart';
 import 'package:odin/services/environment_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
@@ -119,14 +121,19 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final OTheme theme = locator<OTheme>();
+    final AppRouter appRouter = locator<AppRouter>();
 
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Odin - Open-source easy file sharing for everyone.',
       theme: theme.lightTheme,
       darkTheme: theme.darkTheme,
       themeMode: ThemeMode.dark,
-      home: const HomePage(),
+      routerDelegate: AutoRouterDelegate(
+        appRouter,
+        navigatorObservers: () => [AppRouteObserver()],
+      ),
+      routeInformationParser: appRouter.defaultRouteParser(),
     );
   }
 }

@@ -10,35 +10,62 @@
 //
 // ignore_for_file: type=lint
 
-// ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i2;
-import 'package:flutter/material.dart' as _i3;
-import 'package:odin/pages/home/home_page.dart' as _i1;
+part of 'router.dart';
 
-class AppRouter extends _i2.RootStackRouter {
-  AppRouter([_i3.GlobalKey<_i3.NavigatorState>? navigatorKey])
-      : super(navigatorKey);
+class _$AppRouter extends RootStackRouter {
+  _$AppRouter([GlobalKey<NavigatorState>? navigatorKey]) : super(navigatorKey);
 
   @override
-  final Map<String, _i2.PageFactory> pagesMap = {
+  final Map<String, PageFactory> pagesMap = {
     HomeRoute.name: (routeData) {
-      return _i2.CupertinoPageX<dynamic>(
-          routeData: routeData, child: const _i1.HomePage());
+      return AdaptivePage<dynamic>(
+          routeData: routeData, child: const HomePage());
+    },
+    UploadRoute.name: (routeData) {
+      final args = routeData.argsAs<UploadRouteArgs>();
+      return AdaptivePage<dynamic>(
+          routeData: routeData,
+          child: UploadPage(key: args.key, uploadFiles: args.uploadFiles));
     }
   };
 
   @override
-  List<_i2.RouteConfig> get routes => [
-        _i2.RouteConfig('/home-page#redirect',
+  List<RouteConfig> get routes => [
+        RouteConfig('/home-page#redirect',
             path: '/home-page', redirectTo: '/', fullMatch: true),
-        _i2.RouteConfig(HomeRoute.name, path: '/home-page')
+        RouteConfig(HomeRoute.name, path: '/'),
+        RouteConfig(UploadRoute.name, path: '/upload')
       ];
 }
 
 /// generated route for
-/// [_i1.HomePage]
-class HomeRoute extends _i2.PageRouteInfo<void> {
-  const HomeRoute() : super(HomeRoute.name, path: '/home-page');
+/// [HomePage]
+class HomeRoute extends PageRouteInfo<void> {
+  const HomeRoute() : super(HomeRoute.name, path: '/');
 
   static const String name = 'HomeRoute';
+}
+
+/// generated route for
+/// [UploadPage]
+class UploadRoute extends PageRouteInfo<UploadRouteArgs> {
+  UploadRoute({Key? key, required List<File> uploadFiles})
+      : super(UploadRoute.name,
+            path: '/upload',
+            args: UploadRouteArgs(key: key, uploadFiles: uploadFiles));
+
+  static const String name = 'UploadRoute';
+}
+
+class UploadRouteArgs {
+  const UploadRouteArgs({this.key, required this.uploadFiles});
+
+  final Key? key;
+
+  final List<File> uploadFiles;
+
+  @override
+  String toString() {
+    return 'UploadRouteArgs{key: $key, uploadFiles: $uploadFiles}';
+  }
 }
