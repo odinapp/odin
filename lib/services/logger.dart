@@ -48,6 +48,29 @@ class LogOutputPrinter extends PrettyPrinter {
         }
         developer.log(cacheDir.path);
       });
+    } else if (Platform.isMacOS) {
+      getTemporaryDirectory().then((cacheDir) async {
+        if (!cacheDir.existsSync()) {
+          getDownloadsDirectory().then((cDir) async {
+            _logFolderPath = join(cDir?.path ?? '', "logs");
+            try {
+              await Directory(_logFolderPath).create();
+            } catch (e) {
+              // Ignore if it already exists
+            }
+            await setLogCapture(true);
+          });
+        } else {
+          _logFolderPath = join(cacheDir.path, "logs");
+          try {
+            await Directory(_logFolderPath).create();
+          } catch (e) {
+            // Ignore if it already exists
+          }
+          await setLogCapture(true);
+        }
+        developer.log(cacheDir.path);
+      });
     } else {
       getExternalStorageDirectory().then((cacheDir) async {
         if (cacheDir == null) {
