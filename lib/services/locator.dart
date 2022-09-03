@@ -1,8 +1,10 @@
 import 'package:get_it/get_it.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/theme.dart';
+import 'package:odin/services/dio_service.dart';
 import 'package:odin/services/download_service.dart';
 import 'package:odin/services/encryption_service.dart';
+import 'package:odin/services/environment_service.dart';
 import 'package:odin/services/file_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/preferences_service.dart';
@@ -20,6 +22,7 @@ void setupLocator() {
   // locator.registerFactory<CurrentDataNotifier>(() => CurrentDataNotifier());
 
   // Services
+  locator.registerLazySingleton<EnvironmentService>(() => EnvironmentService());
   locator.registerLazySingleton<GithubService>(() => GithubService());
   locator.registerLazySingleton<ShortenerService>(() => ShortenerService());
   locator.registerLazySingleton<RandomService>(() => RandomService());
@@ -29,6 +32,7 @@ void setupLocator() {
   locator.registerLazySingleton<PreferencesService>(() => PreferencesService());
   locator.registerLazySingleton<EncryptionService>(() => EncryptionService());
   locator.registerLazySingleton<DownloadService>(() => DownloadService());
+  locator.registerLazySingleton<DioService>(() => DioService());
 
   // Globals
   locator.registerLazySingleton<OColor>(() => OColor());
