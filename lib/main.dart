@@ -6,7 +6,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:odin/constants/theme.dart';
-import 'package:odin/pages/home_page.dart';
+import 'package:odin/pages/home/home_page.dart';
 import 'package:odin/providers/file_notifier.dart';
 import 'package:odin/services/environment_service.dart';
 import 'package:odin/services/locator.dart';

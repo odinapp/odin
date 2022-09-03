@@ -1,7 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class OColor {
   BuildContext? _context;
+
+  // Font
+  TextStyle textStyle({
+    Color? color,
+    Color? backgroundColor,
+    double? fontSize,
+    FontWeight? fontWeight,
+    FontStyle? fontStyle,
+    double? letterSpacing,
+    double? wordSpacing,
+    TextBaseline? textBaseline,
+    double? height,
+    Locale? locale,
+  }) =>
+      GoogleFonts.inter(
+        color: color,
+        backgroundColor: backgroundColor,
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        fontStyle: fontStyle,
+        letterSpacing: letterSpacing,
+        wordSpacing: wordSpacing,
+        textBaseline: textBaseline,
+        height: height,
+        locale: locale,
+      );
 
   // Light Theme Colors
   static const Color _lPrimary = Color(0xFF7D5DEC);
@@ -20,6 +47,8 @@ class OColor {
   static const Color _dBackground = Color(0xFF151515);
   static const Color _dBackgroundContainer = Color(0xFF111111);
   static const Color _dError = Color(0xffcf6679);
+  static const Color _secondaryOnBackground = Color(0xFF838383);
+  static const Color _secondaryContainerOnBackground = Color(0xFF181818);
 
   Color get lPrimary => _lPrimary;
   Color get lPrimaryContainer => _lPrimaryContainer;
@@ -36,6 +65,8 @@ class OColor {
   Color get dBackground => _dBackground;
   Color get dBackgroundContainer => _dBackgroundContainer;
   Color get dError => _dError;
+  Color get dSecondaryOnBackground => _secondaryOnBackground;
+  Color get dSecondaryContainerOnBackground => _secondaryContainerOnBackground;
 
   Color get primary {
     if (_context == null) {
@@ -84,6 +115,28 @@ class OColor {
       return dError;
     }
     return Theme.of(_context!).brightness == Brightness.light ? lError : dError;
+  }
+
+  Color get secondaryContainerOnBackground {
+    if (_context == null) {
+      return _secondaryOnBackground;
+    }
+    if (Theme.of(_context!).brightness == Brightness.light) {
+      throw UnimplementedError();
+    } else {
+      return dSecondaryContainerOnBackground;
+    }
+  }
+
+  Color get secondaryOnBackground {
+    if (_context == null) {
+      return _secondaryOnBackground;
+    }
+    if (Theme.of(_context!).brightness == Brightness.light) {
+      throw UnimplementedError();
+    } else {
+      return dSecondaryOnBackground;
+    }
   }
 
   // Constructors
