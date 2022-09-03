@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-odin-dev-161414-authRole",
+      "UnauthRoleArn": "arn:aws:iam::523640688992:role/amplify-odin-dev-161414-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::523640688992:role/amplify-odin-dev-161414-authRole",
+      "Region": "ap-south-1",
+      "DeploymentBucketName": "amplify-odin-dev-161414-deployment",
+      "UnauthRoleName": "amplify-odin-dev-161414-unauthRole",
+      "StackName": "amplify-odin-dev-161414",
+      "StackId": "arn:aws:cloudformation:ap-south-1:523640688992:stack/amplify-odin-dev-161414/5b4e75b0-2b75-11ed-8902-02e2fe35f9e0",
+      "AmplifyAppId": "d2qhzfa1xxkdqe"
+    }
+  }
+}

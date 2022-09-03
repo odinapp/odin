@@ -1,6 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+// Amplify Flutter Packages
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+
+// Amplify Config
+import 'amplifyconfiguration.dart';
+
 // import 'package:better_open_file/better_open_file.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
@@ -107,12 +114,30 @@ class _MyAppState extends State<MyApp> {
     // }
   }
 
+  Future<void> _configureAmplify() async {
+    // Add any Amplify plugins you want to use
+    final authPlugin = AmplifyAuthCognito();
+    await Amplify.addPlugin(authPlugin);
+
+    // You can use addPlugins if you are going to be adding multiple plugins
+    // await Amplify.addPlugins([authPlugin, analyticsPlugin]);
+
+    // Once Plugins are added, configure Amplify
+    // Note: Amplify can only be configured once.
+    try {
+      await Amplify.configure(amplifyconfig);
+    } on AmplifyAlreadyConfiguredException {
+      safePrint("Tried to reconfigure Amplify; this can occur when your app restarts on Android.");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     if (Platform.isAndroid || Platform.isIOS) {
       initDynamicLinks();
     }
+    _configureAmplify();
   }
 
   @override
