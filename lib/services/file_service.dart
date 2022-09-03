@@ -24,6 +24,23 @@ class FileService {
   String? fileLink;
   String zipfileName = '';
 
+  Future<File?> pickSingleFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: false,
+      );
+      if (result != null) {
+        return File(result.files.single.path!);
+      } else {
+        throw Exception('No file selected');
+      }
+    } catch (e, st) {
+      logger.e(e, e, st);
+      return null;
+    }
+  }
+
   Future<void> getLinkFromFilePicker() async {
     fileLink = null;
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
