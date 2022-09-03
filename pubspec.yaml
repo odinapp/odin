@@ -38,7 +38,6 @@ dependencies:
   desktop_drop: ^0.3.3
   dio: ^4.0.3
   file_picker: ^3.0.4
-  firebase_dynamic_links: ^4.3.6
   flex_color_scheme: ^6.0.0
   flutter:
     sdk: flutter

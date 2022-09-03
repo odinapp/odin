@@ -295,41 +295,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.4"
-  firebase_core:
-    dependency: transitive
-    description:
-      name: firebase_core
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.21.1"
-  firebase_core_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_core_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.5.1"
-  firebase_core_web:
-    dependency: transitive
-    description:
-      name: firebase_core_web
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.7.2"
-  firebase_dynamic_links:
-    dependency: "direct main"
-    description:
-      name: firebase_dynamic_links
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.3.6"
-  firebase_dynamic_links_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_dynamic_links_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.3+11"
   fixnum:
     dependency: transitive
     description:
@@ -591,7 +556,7 @@ packages:
     source: hosted
     version: "1.8.2"
   path_provider:
-    dependency: "direct main"
+    dependency: "direct overridden"
     description:
       name: path_provider
       url: "https://pub.dartlang.org"
