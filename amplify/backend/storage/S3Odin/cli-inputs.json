@@ -1,0 +1,17 @@
+{
+  "resourceName": "S3Odin",
+  "policyUUID": "69df4048",
+  "bucketName": "odin-temp-bucket",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "CREATE_AND_UPDATE",
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

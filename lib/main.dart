@@ -4,6 +4,7 @@ import 'dart:io';
 // Amplify Flutter Packages
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 
 // Amplify Config
 import 'amplifyconfiguration.dart';
@@ -117,7 +118,8 @@ class _MyAppState extends State<MyApp> {
   Future<void> _configureAmplify() async {
     // Add any Amplify plugins you want to use
     final authPlugin = AmplifyAuthCognito();
-    await Amplify.addPlugin(authPlugin);
+    final storagePlugin = AmplifyStorageS3();
+    await Amplify.addPlugins([authPlugin, storagePlugin]);
 
     // You can use addPlugins if you are going to be adding multiple plugins
     // await Amplify.addPlugins([authPlugin, analyticsPlugin]);

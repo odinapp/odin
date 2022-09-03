@@ -92,6 +92,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.0"
+  amplify_storage_s3:
+    dependency: "direct main"
+    description:
+      name: amplify_storage_s3
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0-next.0"
+  amplify_storage_s3_android:
+    dependency: transitive
+    description:
+      name: amplify_storage_s3_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0-next.0"
+  amplify_storage_s3_ios:
+    dependency: transitive
+    description:
+      name: amplify_storage_s3_ios
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0-next.0"
   analyzer:
     dependency: transitive
     description:

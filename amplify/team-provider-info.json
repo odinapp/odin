@@ -10,6 +10,12 @@
       "StackName": "amplify-odin-dev-161414",
       "StackId": "arn:aws:cloudformation:ap-south-1:523640688992:stack/amplify-odin-dev-161414/5b4e75b0-2b75-11ed-8902-02e2fe35f9e0",
       "AmplifyAppId": "d2qhzfa1xxkdqe"
+    },
+    "categories": {
+      "auth": {
+        "odin03c95c8a": {},
+        "true": {}
+      }
     }
   }
 }
