@@ -22,15 +22,8 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.7.0"
-  android_path_provider:
-    dependency: "direct main"
-    description:
-      name: android_path_provider
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0"
   archive:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: archive
       url: "https://pub.dartlang.org"
@@ -226,7 +219,7 @@ packages:
     source: hosted
     version: "3.0.2"
   cross_file:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: cross_file
       url: "https://pub.dartlang.org"
@@ -598,7 +591,7 @@ packages:
     source: hosted
     version: "1.8.2"
   path_provider:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: path_provider
       url: "https://pub.dartlang.org"
