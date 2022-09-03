@@ -25,7 +25,10 @@ class DioService {
     return exampleFile;
   }
 
-  Future<String> uploadFilesAnonymous(List<File> files) async {
+  Future<String> uploadFilesAnonymous(
+    List<File> files,
+    void Function(int, int)? onSendProgress,
+  ) async {
     try {
       logger.d('[DioService]: baseUrl: $baseUrl');
       final apiUrl = '$baseUrl/file/upload';
@@ -49,6 +52,7 @@ class DioService {
       final response = await post(
         path: "file/upload",
         data: formData,
+        onSendProgress: onSendProgress,
       );
 
       return response?.data['id'] ?? '';
@@ -60,6 +64,7 @@ class DioService {
 
   Future<String> uploadFileAnonymous(
     File file,
+    void Function(int, int)? onSendProgress,
   ) async {
     try {
       logger.d('[DioService]: baseUrl: $baseUrl');
@@ -83,6 +88,7 @@ class DioService {
       final response = await post(
         path: "file/upload",
         data: formData,
+        onSendProgress: onSendProgress,
       );
       return response?.data['id'] ?? '';
     } catch (e) {
@@ -96,6 +102,7 @@ class DioService {
     required String path,
     Map<String, String>? headers,
     Map<String, String>? body,
+    void Function(int, int)? onRecieveProgress,
   }) async {
     try {
       final Stopwatch stopwatch = Stopwatch()..start();
@@ -107,6 +114,7 @@ class DioService {
         options: Options(
           headers: headers,
         ),
+        onReceiveProgress: onRecieveProgress,
       );
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
@@ -126,6 +134,7 @@ class DioService {
     dynamic data,
     Map<String, String>? headers,
     Map<String, String>? body,
+    void Function(int, int)? onSendProgress,
   }) async {
     try {
       final Stopwatch stopwatch = Stopwatch()..start();
@@ -137,6 +146,7 @@ class DioService {
           headers: headers,
           extra: body,
         ),
+        onSendProgress: onSendProgress,
       );
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");

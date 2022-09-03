@@ -16,8 +16,11 @@ class PrimaryButton extends StatelessWidget {
         width: 276.toAutoScaledWidth,
         height: 96.toAutoScaledHeight,
         child: ElevatedButton(
-          onPressed: () {
-            locator<OdinService>().uploadFiles(asZip: false);
+          onPressed: () async {
+            final dummyFiles = await locator<FileService>().pickMultipleFiles();
+            if (dummyFiles != null) {
+              Navigator.pushNamed(context, '/upload', arguments: dummyFiles);
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: color.secondary,

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:odin/constants/theme.dart';
 import 'package:odin/pages/home/home_page.dart';
-import 'package:odin/providers/file_notifier.dart';
+import 'package:odin/providers/dio_notifier.dart';
 import 'package:odin/services/environment_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
@@ -29,7 +29,8 @@ void main() async {
     runApp(
       MultiProvider(
         providers: [
-          ChangeNotifierProvider<FileNotifier>(create: (_) => FileNotifier()),
+          // ChangeNotifierProvider<FileNotifier>(create: (_) => FileNotifier()),
+          ChangeNotifierProvider<DioNotifier>(create: (_) => locator<DioNotifier>()),
         ],
         child: const MyApp(),
       ),

@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/theme.dart';
+import 'package:odin/providers/dio_notifier.dart';
 import 'package:odin/services/dio_service.dart';
 import 'package:odin/services/download_service.dart';
 import 'package:odin/services/encryption_service.dart';
@@ -21,6 +22,9 @@ GetIt locator = GetIt.instance;
 void setupLocator() {
   Stopwatch stopwatch = Stopwatch()..start();
   // locator.registerFactory<CurrentDataNotifier>(() => CurrentDataNotifier());
+
+  // Providers
+  locator.registerSingleton<DioNotifier>(DioNotifier());
 
   // Services
   locator.registerLazySingleton<EnvironmentService>(() => EnvironmentService());
