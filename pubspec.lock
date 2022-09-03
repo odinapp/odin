@@ -67,38 +67,48 @@ packages:
   bitsdojo_window:
     dependency: "direct main"
     description:
-      name: bitsdojo_window
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.4"
+      path: bitsdojo_window
+      ref: HEAD
+      resolved-ref: "08bb441aeff2c2a4e8e5c14335ffc7fb36aa166f"
+      url: "https://github.com/odinapp/bitsdojo_window"
+    source: git
+    version: "0.1.3"
   bitsdojo_window_linux:
     dependency: transitive
     description:
-      name: bitsdojo_window_linux
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: bitsdojo_window_linux
+      ref: HEAD
+      resolved-ref: "08bb441aeff2c2a4e8e5c14335ffc7fb36aa166f"
+      url: "https://github.com/odinapp/bitsdojo_window"
+    source: git
     version: "0.1.3"
   bitsdojo_window_macos:
     dependency: transitive
     description:
-      name: bitsdojo_window_macos
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: bitsdojo_window_macos
+      ref: HEAD
+      resolved-ref: "08bb441aeff2c2a4e8e5c14335ffc7fb36aa166f"
+      url: "https://github.com/odinapp/bitsdojo_window"
+    source: git
     version: "0.1.3"
   bitsdojo_window_platform_interface:
     dependency: transitive
     description:
-      name: bitsdojo_window_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: bitsdojo_window_platform_interface
+      ref: HEAD
+      resolved-ref: "08bb441aeff2c2a4e8e5c14335ffc7fb36aa166f"
+      url: "https://github.com/odinapp/bitsdojo_window"
+    source: git
     version: "0.1.2"
   bitsdojo_window_windows:
     dependency: transitive
     description:
-      name: bitsdojo_window_windows
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.4"
+      path: bitsdojo_window_windows
+      ref: HEAD
+      resolved-ref: "08bb441aeff2c2a4e8e5c14335ffc7fb36aa166f"
+      url: "https://github.com/odinapp/bitsdojo_window"
+    source: git
+    version: "0.1.3"
   boolean_selector:
     dependency: transitive
     description:
@@ -294,7 +304,7 @@ packages:
       name: file_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.4"
+    version: "5.0.1"
   fixnum:
     dependency: transitive
     description:
@@ -416,7 +426,7 @@ packages:
     source: hosted
     version: "0.15.0"
   http:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -556,12 +566,54 @@ packages:
     source: hosted
     version: "1.8.2"
   path_provider:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: path_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.1"
+    version: "2.0.11"
+  path_provider_android:
+    dependency: transitive
+    description:
+      name: path_provider_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.20"
+  path_provider_ios:
+    dependency: transitive
+    description:
+      name: path_provider_ios
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.11"
+  path_provider_linux:
+    dependency: transitive
+    description:
+      name: path_provider_linux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.7"
+  path_provider_macos:
+    dependency: transitive
+    description:
+      name: path_provider_macos
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.6"
+  path_provider_platform_interface:
+    dependency: transitive
+    description:
+      name: path_provider_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.4"
+  path_provider_windows:
+    dependency: transitive
+    description:
+      name: path_provider_windows
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.2"
   permission_handler:
     dependency: "direct main"
     description:
@@ -610,7 +662,7 @@ packages:
       name: platform
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.1"
+    version: "3.1.0"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -625,6 +677,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.5.1"
+  process:
+    dependency: transitive
+    description:
+      name: process
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.2.4"
   provider:
     dependency: "direct main"
     description:
@@ -666,28 +725,56 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.7+3"
+    version: "2.0.15"
+  shared_preferences_android:
+    dependency: transitive
+    description:
+      name: shared_preferences_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.12"
+  shared_preferences_ios:
+    dependency: transitive
+    description:
+      name: shared_preferences_ios
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
+  shared_preferences_linux:
+    dependency: transitive
+    description:
+      name: shared_preferences_linux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
   shared_preferences_macos:
     dependency: transitive
     description:
       name: shared_preferences_macos
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.1+11"
+    version: "2.0.4"
   shared_preferences_platform_interface:
     dependency: transitive
     description:
       name: shared_preferences_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.4"
+    version: "2.1.0"
   shared_preferences_web:
     dependency: transitive
     description:
       name: shared_preferences_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.2+7"
+    version: "2.0.4"
+  shared_preferences_windows:
+    dependency: transitive
+    description:
+      name: shared_preferences_windows
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
   shelf:
     dependency: transitive
     description:
@@ -869,12 +956,19 @@ packages:
     source: hosted
     version: "2.2.0"
   win32:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0"
+    version: "2.7.0"
+  xdg_directories:
+    dependency: transitive
+    description:
+      name: xdg_directories
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0+2"
   xml:
     dependency: transitive
     description:

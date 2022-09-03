@@ -29,7 +29,7 @@ class LogOutputPrinter extends PrettyPrinter {
       getTemporaryDirectory().then((cacheDir) async {
         if (!cacheDir.existsSync()) {
           getDownloadsDirectory().then((cDir) async {
-            _logFolderPath = join(cDir.path, "logs");
+            _logFolderPath = join(cDir?.path ?? '', "logs");
             try {
               await Directory(_logFolderPath).create();
             } catch (e) {

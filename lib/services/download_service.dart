@@ -24,7 +24,7 @@ class DownloadService {
     } else {
       dir = await getDownloadsDirectory();
     }
-    String path = join(dir.path, fileName);
+    String path = join(dir?.path ?? '', fileName);
     logger.d("File path : $path");
     return path;
   }
