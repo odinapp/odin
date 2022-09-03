@@ -7,6 +7,7 @@ import 'package:odin/services/file_service.dart';
 import 'package:odin/services/github_service.dart';
 import 'package:odin/services/preferences_service.dart';
 import 'package:odin/services/random_service.dart';
+import 'package:odin/services/s3_upload_service.dart';
 import 'package:odin/services/shortener_service.dart';
 import 'package:odin/services/toast_service.dart';
 import 'package:odin/services/zip_service.dart';
@@ -29,6 +30,7 @@ void setupLocator() {
   locator.registerLazySingleton<PreferencesService>(() => PreferencesService());
   locator.registerLazySingleton<EncryptionService>(() => EncryptionService());
   locator.registerLazySingleton<DownloadService>(() => DownloadService());
+  locator.registerLazySingleton<S3UploadService>(() => S3UploadService());
 
   // Globals
   locator.registerLazySingleton<OColor>(() => OColor());
