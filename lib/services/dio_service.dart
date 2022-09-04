@@ -28,6 +28,7 @@ class DioService {
   Future<String> uploadFilesAnonymous(
     List<File> files,
     void Function(int, int)? onSendProgress,
+    CancelToken cancelToken,
   ) async {
     try {
       logger.d('[DioService]: baseUrl: $baseUrl');
@@ -49,10 +50,11 @@ class DioService {
 
       formData.fields.add(MapEntry("directoryName", directoryName));
 
-      final response = await post(
+      final response = await _post(
         path: "file/upload",
         data: formData,
         onSendProgress: onSendProgress,
+        cancelToken: cancelToken,
       );
 
       return response?.data['id'] ?? '';
@@ -65,6 +67,7 @@ class DioService {
   Future<String> uploadFileAnonymous(
     File file,
     void Function(int, int)? onSendProgress,
+    CancelToken cancelToken,
   ) async {
     try {
       logger.d('[DioService]: baseUrl: $baseUrl');
@@ -85,10 +88,11 @@ class DioService {
       logger.d('[DioService]: request: $request');
       FormData formData = FormData.fromMap(request);
 
-      final response = await post(
+      final response = await _post(
         path: "file/upload",
         data: formData,
         onSendProgress: onSendProgress,
+        cancelToken: cancelToken,
       );
       return response?.data['id'] ?? '';
     } catch (e) {
@@ -98,11 +102,12 @@ class DioService {
   }
 
   // Basic dio get request
-  Future<Response?> get({
+  Future<Response?> _get({
     required String path,
     Map<String, String>? headers,
     Map<String, String>? body,
     void Function(int, int)? onRecieveProgress,
+    CancelToken? cancelToken,
   }) async {
     try {
       final Stopwatch stopwatch = Stopwatch()..start();
@@ -115,6 +120,7 @@ class DioService {
           headers: headers,
         ),
         onReceiveProgress: onRecieveProgress,
+        cancelToken: cancelToken,
       );
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
@@ -129,12 +135,13 @@ class DioService {
   }
 
   // Basic dio post request
-  Future<Response?> post({
+  Future<Response?> _post({
     required String path,
     dynamic data,
     Map<String, String>? headers,
     Map<String, String>? body,
     void Function(int, int)? onSendProgress,
+    CancelToken? cancelToken,
   }) async {
     try {
       final Stopwatch stopwatch = Stopwatch()..start();
@@ -147,6 +154,7 @@ class DioService {
           extra: body,
         ),
         onSendProgress: onSendProgress,
+        cancelToken: cancelToken,
       );
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
