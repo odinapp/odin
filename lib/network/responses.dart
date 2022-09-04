@@ -16,8 +16,10 @@ class UploadFilesFailure extends RepositoryFailure {
 }
 
 class UploadFilesSuccess extends RepositorySuccess {
+  final String token;
   UploadFilesSuccess({
     String? message,
+    required this.token,
   }) : super(message: message);
 }
 

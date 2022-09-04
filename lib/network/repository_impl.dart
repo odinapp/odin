@@ -16,26 +16,26 @@ class OdinRepositoryImpl implements OdinRepository {
     required UploadFilesRequest request,
   }) async {
     final client = await ONetworkingBox.unsecureClient();
-    if (client != null) {
-      final formData = FormData();
-      final totalFileSizeInBytes = request.totalFileSize;
+    try {
+      if (client != null) {
+        final formData = FormData();
+        final totalFileSizeInBytes = request.totalFileSize;
 
-      for (var file in request.files) {
-        logger.d('[DioService]: fileName: ${file.path.split('/').last}');
-        formData.files.addAll([
-          MapEntry(
-            "file",
-            await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
-          ),
-        ]);
-      }
+        for (var file in request.files) {
+          logger.d('[DioService]: fileName: ${file.path.split('/').last}');
+          formData.files.addAll([
+            MapEntry(
+              "file",
+              await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
+            ),
+          ]);
+        }
 
-      final directoryName = randomService.getRandomString(10);
+        final directoryName = randomService.getRandomString(10);
 
-      formData.fields.add(MapEntry("directoryName", directoryName));
-      formData.fields.add(MapEntry("totalFileSize", totalFileSizeInBytes.toString()));
+        formData.fields.add(MapEntry("directoryName", directoryName));
+        formData.fields.add(MapEntry("totalFileSize", totalFileSizeInBytes.toString()));
 
-      try {
         final response = await client.post(
           _EndPoint.uploadFiles,
           cancelToken: request.cancelToken,
@@ -46,23 +46,23 @@ class OdinRepositoryImpl implements OdinRepository {
 
         if (statusCode.isSuccess) {
           final data = response.data;
-          return Success(UploadFilesSuccess());
+          return Success(UploadFilesSuccess(token: data['token']));
         } else {
           return Failure(UploadFilesFailure(message: response.data));
         }
-      } on DioError catch (dioError) {
-        final exception = Exception(
-          '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
-        );
-        logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
-            dioError.stackTrace);
-        return Failure(UploadFilesFailure(message: dioError.response.toString()));
-      } catch (e, st) {
-        logger.e('[DioService]: uploadFilesAnonymous', e, st);
-        return Failure(UploadFilesFailure(message: e.toString()));
+      } else {
+        return Failure(UploadFilesFailure(message: 'Client is null'));
       }
-    } else {
-      return Failure(UploadFilesFailure());
+    } on DioError catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
+          dioError.stackTrace);
+      return Failure(UploadFilesFailure(message: dioError.response.toString()));
+    } catch (e, st) {
+      logger.e('[DioService]: uploadFilesAnonymous', e, st);
+      return Failure(UploadFilesFailure(message: e.toString()));
     }
   }
 

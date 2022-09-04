@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:odin/amenities/connectivity/amenity.dart';
@@ -55,6 +54,6 @@ class ORetryInterceptor extends Interceptor {
 
 extension on DioError {
   bool get isRetryRequired {
-    return type == DioErrorType.other && error != null && error is SocketException;
+    return false;
   }
 }

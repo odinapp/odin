@@ -49,7 +49,11 @@ class MainContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _HeaderText(color: color),
-            _InfoText(color: color),
+            _InfoText(
+              color: color,
+              text:
+                  'The files are protected with end to end AES-256 encryption and can only be accessed using a unique token.',
+            ),
           ],
         ),
         const Spacer(),

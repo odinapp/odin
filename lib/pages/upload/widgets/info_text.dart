@@ -4,9 +4,13 @@ class _InfoText extends StatelessWidget {
   const _InfoText({
     Key? key,
     required this.color,
+    required this.text,
+    this.center = false,
   }) : super(key: key);
 
   final OColor color;
+  final String text;
+  final bool center;
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +18,13 @@ class _InfoText extends StatelessWidget {
       padding:
           EdgeInsets.fromLTRB(60.toAutoScaledWidth, 0.toAutoScaledHeight, 60.toAutoScaledWidth, 24.toAutoScaledHeight),
       child: Text(
-        'The files are protected with end to end AES-256 encryption and can only be accessed using a unique token.',
+        text,
+        textAlign: center ? TextAlign.center : TextAlign.left,
         style: color.textStyle(
           color: color.secondaryOnBackground,
-          fontSize: 24.toAutoScaledFont,
+          fontSize: 22.toAutoScaledFont,
           fontWeight: FontWeight.w300,
-          height: 36.toAutoScaledFont / 24.toAutoScaledFont,
+          height: 34.toAutoScaledFont / 22.toAutoScaledFont,
         ),
       ),
     );

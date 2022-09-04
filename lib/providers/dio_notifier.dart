@@ -23,6 +23,19 @@ class DioNotifier with ChangeNotifier {
 
   CancelToken get cancelToken => _cancelToken;
 
+  UploadFilesSuccess? uploadFilesSuccess;
+  UploadFilesFailure? uploadFilesFailure;
+  UploadFileSuccess? uploadFileSuccess;
+  UploadFileFailure? uploadFileFailure;
+
+  set apiStatus(ApiStatus? value) {
+    _dioService.apiStatus = value ?? ApiStatus.init;
+    notifyListeners();
+  }
+
+  Stream<ApiStatus> get apiStatusStream => _dioService.apiStatusStream;
+  ApiStatus? get apiStatus => _dioService.apiStatusStream.valueOrNull;
+
   Future<File> createDummyFile() async {
     return await _dioService.createDummyFile();
   }
@@ -32,6 +45,7 @@ class DioNotifier with ChangeNotifier {
     void Function(int, int)? onSendProgress,
   ) async {
     selectedFiles = files;
+    apiStatus = ApiStatus.loading;
     notifyListeners();
     Future<Result<UploadFilesSuccess, UploadFilesFailure>> uploadFiles() async {
       final odinRepository = OdinRepository();
@@ -63,19 +77,24 @@ class DioNotifier with ChangeNotifier {
     }
 
     void onSuccess(UploadFilesSuccess success) async {
+      apiStatus = ApiStatus.success;
+      uploadFilesSuccess = success;
+      uploadFilesFailure = null;
+      notifyListeners();
       logger.d('[DioService]: UploadFilesSuccess ${success.message}');
     }
 
     void onFailure(UploadFilesFailure failure) {
+      apiStatus = ApiStatus.failed;
+      uploadFilesSuccess = null;
+      uploadFilesFailure = failure;
+      notifyListeners();
       logger.d('[DioService]: UploadFilesFailure ${failure.message}');
     }
 
     final response = await oNetwork<UploadFilesSuccess, UploadFilesFailure>(uploadFiles);
 
     response.resolve(onSuccess, onFailure);
-
-    selectedFiles = [];
-    notifyListeners();
   }
 
   Future<void> uploadFileAnonymous(
@@ -83,6 +102,7 @@ class DioNotifier with ChangeNotifier {
     void Function(int, int)? onSendProgress,
   ) async {
     selectedFiles = [file];
+    apiStatus = ApiStatus.loading;
     notifyListeners();
 
     Future<Result<UploadFileSuccess, UploadFileFailure>> uploadFile() async {
@@ -111,22 +131,29 @@ class DioNotifier with ChangeNotifier {
     }
 
     void onSuccess(UploadFileSuccess success) async {
+      apiStatus = ApiStatus.success;
+      uploadFileSuccess = success;
+      uploadFileFailure = null;
+      notifyListeners();
       logger.d('[DioService]: UploadFilesSuccess ${success.message}');
     }
 
     void onFailure(UploadFileFailure failure) {
+      apiStatus = ApiStatus.failed;
+      uploadFileSuccess = null;
+      uploadFileFailure = failure;
+      notifyListeners();
       logger.d('[DioService]: UploadFilesFailure ${failure.message}');
     }
 
     final response = await oNetwork<UploadFileSuccess, UploadFileFailure>(uploadFile);
 
     response.resolve(onSuccess, onFailure);
-
-    selectedFiles = [];
-    notifyListeners();
   }
 
   Future<void> cancelCurrentRequest() async {
+    apiStatus = ApiStatus.failed;
     _cancelToken.cancel();
+    notifyListeners();
   }
 }
