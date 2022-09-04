@@ -1,14 +1,15 @@
 import 'package:get_it/get_it.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/theme.dart';
+import 'package:odin/providers/booter_notifier.dart';
 import 'package:odin/providers/dio_notifier.dart';
 import 'package:odin/router/router.dart';
 import 'package:odin/services/dio_service.dart';
-import 'package:odin/services/download_service.dart';
+// import 'package:odin/services/download_service.dart';
 import 'package:odin/services/encryption_service.dart';
 import 'package:odin/services/environment_service.dart';
 import 'package:odin/services/file_service.dart';
-import 'package:odin/services/github_service.dart';
+// import 'package:odin/services/github_service.dart';
 import 'package:odin/services/odin_service.dart';
 import 'package:odin/services/preferences_service.dart';
 import 'package:odin/services/random_service.dart';
@@ -41,6 +42,7 @@ void setupLocator() {
 
   // Providers
   locator.registerSingleton<DioNotifier>(DioNotifier());
+  locator.registerSingleton<BooterNotifier>(BooterNotifier());
 
   // Globals
   locator.registerLazySingleton<OColor>(() => OColor());

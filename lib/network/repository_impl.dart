@@ -19,7 +19,9 @@ class OdinRepositoryImpl implements OdinRepository {
 
     if (client != null) {
       final formData = FormData();
+      var totalFileSizeInBytes = 0;
       for (var file in request.files) {
+        totalFileSizeInBytes += await file.length();
         logger.d('[DioService]: fileName: ${file.path.split('/').last}');
         formData.files.addAll([
           MapEntry(
@@ -32,6 +34,7 @@ class OdinRepositoryImpl implements OdinRepository {
       final directoryName = randomService.getRandomString(10);
 
       formData.fields.add(MapEntry("directoryName", directoryName));
+      formData.fields.add(MapEntry("totalFileSize", totalFileSizeInBytes.toString()));
 
       final response = await client.post(
         _EndPoint.uploadFiles,
@@ -40,13 +43,12 @@ class OdinRepositoryImpl implements OdinRepository {
         data: formData,
       );
       final statusCode = response.statusCode;
-      //TODO: Validation on status code, error handling
 
       if (statusCode.isSuccess) {
         final data = response.data;
         return Success(UploadFilesSuccess());
       } else {
-        return Failure(UploadFilesFailure());
+        return Failure(UploadFilesFailure(message: response.data));
       }
     } else {
       return Failure(UploadFilesFailure());
@@ -60,10 +62,12 @@ class OdinRepositoryImpl implements OdinRepository {
     if (client != null) {
       String fileName = request.file.path.split('/').last;
       final directoryName = randomService.getRandomString(10);
+      final fileSize = await request.file.length();
 
       final multipartFile = await MultipartFile.fromFile(request.file.path, filename: fileName);
       final requestJson = <String, dynamic>{
         'directoryName': directoryName,
+        'totalFileSize': fileSize.toString(),
       };
 
       requestJson['media'] = multipartFile;
@@ -79,7 +83,6 @@ class OdinRepositoryImpl implements OdinRepository {
         data: formData,
       );
       final statusCode = response.statusCode;
-      //TODO: Validation on status code, error handling
 
       if (statusCode.isSuccess) {
         final data = response.data;

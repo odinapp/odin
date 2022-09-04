@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:odin/amenities/connectivity/amenity.dart';
 import 'package:odin/network/networking_box/networking_box.dart';
 import 'package:odin/services/logger.dart';
 

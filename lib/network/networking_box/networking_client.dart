@@ -5,41 +5,19 @@ abstract class _ONetworkHeaderKeys {
   static const String appVersion = 'X-App-Version';
   static const String deviceOs = 'X-Device-OS';
   static const String deviceOsVersion = 'X-Device-OS-Version';
-
-  @Deprecated('Although can be used currently, it will be removed soon. Use appVersion instead.')
-  static const String httpAppVersion = 'HTTP_X_APP_VERSION';
-
-  @Deprecated('Although can be used currently, it will be removed soon. Use deviceOs instead.')
-  static const String httpDeviceOs = 'HTTP_X_DEVICE_OS';
-
-  @Deprecated('Although can be used currently, it will be removed soon. User deviceOsVersion instead.')
-  static const String httpDeviceOsVersion = 'HTTP_X_DEVICE_OS_VERSION';
-
-  @Deprecated('Although can be used currently, it will be removed soon. Don\'t have to send this in future.')
-  static const String clientSecret = 'Client-Secret';
-
-  @Deprecated('Although can be used currently, it will be removed soon. Don\'t have to send this in future.')
-  static const String clientId = 'Client-Id';
 }
 
 class ONetworkingClient extends DioForNative {
   static final envService = locator<EnvironmentService>();
   // TODO: Add default base url for production
-  static final String _baseUrl = '${envService.environment.API_URL}api/${envService.environment.API_VERSION}';
+  static final String _baseUrl = '${envService.environment.API_URL}api/${envService.environment.API_VERSION}/';
 
   // TODO: Add default required headers here
   static final Map<String, String> _defaultHeaders = {
     _ONetworkHeaderKeys.contentType: 'application/json',
-
-    // TODO: Use AppInfoAmenity.instance.version instead
     _ONetworkHeaderKeys.appVersion: AppInfoAmenity.instance.info.version,
-    _ONetworkHeaderKeys.httpAppVersion: AppInfoAmenity.instance.info.version,
-
     _ONetworkHeaderKeys.deviceOs: DeviceInfoAmenity.instance.info.osName,
-    _ONetworkHeaderKeys.httpDeviceOs: DeviceInfoAmenity.instance.info.osName,
-
     _ONetworkHeaderKeys.deviceOsVersion: DeviceInfoAmenity.instance.info.osVersion,
-    _ONetworkHeaderKeys.httpDeviceOsVersion: DeviceInfoAmenity.instance.info.osVersion,
   };
 
   ONetworkingClient({

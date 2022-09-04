@@ -41,11 +41,10 @@ class _UploadPageState extends State<UploadPage> {
     final dioNotifier = locator<DioNotifier>();
     final uploadFiles = widget.uploadFiles;
 
-    final uploadResult = await dioNotifier.uploadFilesAnonymous(
+    await dioNotifier.uploadFilesAnonymous(
       uploadFiles,
       (count, total) {},
     );
-    print(uploadResult);
   }
 
   @override

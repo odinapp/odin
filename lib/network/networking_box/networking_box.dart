@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:dio/native_imp.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:odin/amenities/app_info/amenity.dart';
+import 'package:odin/amenities/device_info/amenity.dart';
 import 'package:odin/network/networking_box/interceptors/retry.dart';
 import 'package:odin/services/environment_service.dart';
 import 'package:odin/services/locator.dart';
@@ -35,12 +37,12 @@ abstract class ONetworkingBox {
     final isUserLoggedIn = false;
     logger.d('QBackgroundCaching isUserLoggedIn: $isUserLoggedIn');
 
-    if (isUserLoggedIn) {
-      logger.d('QBackgroundCaching secureClient from isUserLoggedIn: $isUserLoggedIn');
-      client = await _createSecureClient(options: options);
-    } else {
-      logger.d('[secureClient] Client could not be created');
-    }
+    // if (isUserLoggedIn) {
+    //   logger.d('QBackgroundCaching secureClient from isUserLoggedIn: $isUserLoggedIn');
+    //   client = await _createSecureClient(options: options);
+    // } else {
+    logger.d('[secureClient] Client could not be created');
+    // }
 
     return client;
   }

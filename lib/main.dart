@@ -7,6 +7,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:odin/constants/theme.dart';
+import 'package:odin/providers/booter_notifier.dart';
 import 'package:odin/providers/dio_notifier.dart';
 import 'package:odin/router/route_observer.dart';
 import 'package:odin/router/router.dart';
@@ -33,6 +34,7 @@ void main() async {
         providers: [
           // ChangeNotifierProvider<FileNotifier>(create: (_) => FileNotifier()),
           ChangeNotifierProvider<DioNotifier>(create: (_) => locator<DioNotifier>()),
+          ChangeNotifierProvider<BooterNotifier>(create: (_) => locator<BooterNotifier>()),
         ],
         child: const MyApp(),
       ),

@@ -13,7 +13,7 @@ class DioNotifier with ChangeNotifier {
   double _progress = 0;
   int _progressPercentage = 0;
 
-  CancelToken _cancelToken = CancelToken();
+  final CancelToken _cancelToken = CancelToken();
 
   double get progress => _progress;
   int get progressPercentage => _progressPercentage;
