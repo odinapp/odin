@@ -9,14 +9,15 @@ import 'package:odin/providers/dio_notifier.dart';
 import 'package:odin/router/router.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
+import 'package:odin/utilities/byte_formatter.dart';
 import 'package:provider/provider.dart';
 
 part 'widgets/main_container.dart';
-// part 'widgets/bg_illustration.dart';
-// part 'widgets/primary_button.dart';
-// part 'widgets/header_title.dart';
-// part 'widgets/or_divider.dart';
-// part 'widgets/secondary_button.dart';
+part 'widgets/back_button.dart';
+part 'widgets/cross_button.dart';
+part 'widgets/header_text.dart';
+part 'widgets/info_text.dart';
+part 'widgets/progress_bar.dart';
 
 class UploadPage extends StatefulWidget {
   const UploadPage({

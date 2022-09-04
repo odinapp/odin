@@ -12,9 +12,11 @@ abstract class RepositoryPostRequest {
 
 class UploadFilesRequest extends RepositoryPostRequest {
   final List<File> files;
+  final int totalFileSize;
 
   UploadFilesRequest({
     required this.files,
+    required this.totalFileSize,
     void Function(int, int)? onSendProgress,
     CancelToken? cancelToken,
   }) : super(
@@ -25,8 +27,10 @@ class UploadFilesRequest extends RepositoryPostRequest {
 
 class UploadFileRequest extends RepositoryPostRequest {
   final File file;
+  final int fileSize;
 
-  UploadFileRequest({required this.file, void Function(int, int)? onSendProgress, CancelToken? cancelToken})
+  UploadFileRequest(
+      {required this.file, required this.fileSize, void Function(int, int)? onSendProgress, CancelToken? cancelToken})
       : super(
           onSendProgress: onSendProgress,
           cancelToken: cancelToken,

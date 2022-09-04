@@ -21,65 +21,47 @@ class MainContainer extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            Positioned(
-              top: 4.toAutoScaledHeight,
-              left: 19.toAutoScaledWidth,
-              child: TextButton(
-                onPressed: () => locator<AppRouter>().pop(),
-                style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                ),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      oImage.arrowLeft,
-                      width: 16.toAutoScaledWidth,
-                      height: 16.toAutoScaledHeight,
-                    ),
-                    16.toAutoScaledWidth.toHorizontalSizedBox,
-                    Text(
-                      'Back',
-                      style: color.textStyle(
-                        color: color.secondaryOnBackground,
-                        fontSize: 24.toAutoScaledFont,
-                        fontWeight: FontWeight.w300,
-                        height: 28.toAutoScaledFont / 24.toAutoScaledFont,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.toAutoScaledWidth),
-                child: Container(
-                  width: 780.toAutoScaledWidth,
-                  height: 96.toAutoScaledHeight,
-                  // Todo:// Add color
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF242424),
-                    borderRadius: BorderRadius.circular(20.toAutoScaledWidth),
-                  ),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: AnimatedContainer(
-                      duration: const Duration(
-                        milliseconds: 100,
-                      ),
-                      height: 96.toAutoScaledHeight,
-                      width: (Provider.of<DioNotifier>(context).progress * 780).toAutoScaledWidth,
-                      decoration: BoxDecoration(
-                        color: color.primary.withOpacity(0.2),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _BackButton(color: color),
+            MainContent(color: color),
           ],
         ),
       ),
+    );
+  }
+}
+
+class MainContent extends StatelessWidget {
+  const MainContent({
+    Key? key,
+    required this.color,
+  }) : super(key: key);
+
+  final OColor color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Spacer(),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _HeaderText(color: color),
+            _InfoText(color: color),
+          ],
+        ),
+        const Spacer(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _ProgressBar(color: color),
+            const _CrossButton(),
+          ],
+        ),
+        const Spacer(),
+      ],
     );
   }
 }

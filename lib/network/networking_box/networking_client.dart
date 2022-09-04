@@ -32,6 +32,7 @@ class ONetworkingClient extends DioForNative {
               if (timezone != null) ...{'Timezone': timezone},
             },
             validateStatus: (_) => true,
+            connectTimeout: 3000,
           ),
         ) {
     logger.d('Headers : $_defaultHeaders');
@@ -52,6 +53,7 @@ class ONetworkingClient extends DioForNative {
             },
             responseType: options.responseType ?? ResponseType.json,
             validateStatus: (_) => true,
+            connectTimeout: 3000,
           ),
         );
 
