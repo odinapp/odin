@@ -128,6 +128,12 @@ class DioService {
         throw HttpException(response.statusCode.toString());
       }
       return response;
+    } on DioError catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
+          dioError.stackTrace);
     } catch (e, st) {
       logger.e("Get Request Failed.", e, st);
       return null;
@@ -162,6 +168,12 @@ class DioService {
         throw HttpException(response.statusCode.toString());
       }
       return response;
+    } on DioError catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
+          dioError.stackTrace);
     } catch (e, st) {
       logger.e("Post Request Failed.", e, st);
       return null;

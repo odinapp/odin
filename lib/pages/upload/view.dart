@@ -5,9 +5,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:odin/constants/app.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/images.dart';
-import 'package:odin/services/file_service.dart';
+import 'package:odin/providers/dio_notifier.dart';
+import 'package:odin/router/router.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
+import 'package:provider/provider.dart';
 
 part 'widgets/main_container.dart';
 // part 'widgets/bg_illustration.dart';
@@ -16,13 +18,35 @@ part 'widgets/main_container.dart';
 // part 'widgets/or_divider.dart';
 // part 'widgets/secondary_button.dart';
 
-class UploadPage extends StatelessWidget {
+class UploadPage extends StatefulWidget {
   const UploadPage({
     Key? key,
     required this.uploadFiles,
   }) : super(key: key);
 
   final List<File> uploadFiles;
+
+  @override
+  State<UploadPage> createState() => _UploadPageState();
+}
+
+class _UploadPageState extends State<UploadPage> {
+  @override
+  void initState() {
+    super.initState();
+    _uploadFiles();
+  }
+
+  Future<void> _uploadFiles() async {
+    final dioNotifier = locator<DioNotifier>();
+    final uploadFiles = widget.uploadFiles;
+
+    final uploadResult = await dioNotifier.uploadFilesAnonymous(
+      uploadFiles,
+      (count, total) {},
+    );
+    print(uploadResult);
+  }
 
   @override
   Widget build(BuildContext context) {
