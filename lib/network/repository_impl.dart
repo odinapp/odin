@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:odin/model/files_metadata.dart';
 import 'package:odin/network/networking_box/networking_box.dart';
 import 'package:odin/network/repository.dart';
 import 'package:odin/services/locator.dart';
@@ -103,6 +104,48 @@ class OdinRepositoryImpl implements OdinRepository {
       }
     } else {
       return Failure(UploadFileFailure());
+    }
+  }
+
+  @override
+  Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>> fetchFilesMetadata({
+    required FetchFilesMetadataRequest request,
+  }) async {
+    final client = await ONetworkingBox.unsecureClient();
+
+    try {
+      if (client != null) {
+        final response = await client.get(
+          _EndPoint.fetchFilesMetadata,
+          cancelToken: request.cancelToken,
+          onReceiveProgress: request.onReceiveProgress,
+          queryParameters: {
+            'token': request.token,
+          },
+        );
+
+        final statusCode = response.statusCode;
+
+        if (statusCode.isSuccess) {
+          final data = response.data;
+          final filesMetadata = FilesMetadata.fromJson(data);
+          return Success(FetchFilesMetadataSuccess(filesMetadata: filesMetadata));
+        } else {
+          return Failure(FetchFilesMetadataFailure(message: response.data));
+        }
+      } else {
+        return Failure(FetchFilesMetadataFailure(message: 'Client is null'));
+      }
+    } on DioError catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
+          dioError.stackTrace);
+      return Failure(FetchFilesMetadataFailure(message: dioError.response.toString()));
+    } catch (e, st) {
+      logger.e('[DioService]: uploadFilesAnonymous', e, st);
+      return Failure(FetchFilesMetadataFailure(message: e.toString()));
     }
   }
 }

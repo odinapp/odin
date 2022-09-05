@@ -4,11 +4,11 @@ class SuccessBody extends StatelessWidget {
   const SuccessBody({
     Key? key,
     required this.color,
-    required this.uploadFilesSuccess,
+    required this.fetchFilesMetadataSuccess,
   }) : super(key: key);
 
   final OColor color;
-  final UploadFilesSuccess uploadFilesSuccess;
+  final FetchFilesMetadataSuccess fetchFilesMetadataSuccess;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +85,9 @@ class _SuccessContent extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.only(left: 40.0.toAutoScaledWidth),
                       child: Text(
-                        Provider.of<DioNotifier>(context).uploadFilesSuccess?.token ?? 'Cannot fetch token',
+                        Provider.of<DioNotifier>(context).fetchFilesMetadataSuccess?.filesMetadata.basePath ??
+                            'Cannot fetch token',
+                        overflow: TextOverflow.ellipsis,
                         style: color.textStyle(
                           color: color.secondaryOnBackground,
                           fontSize: 28.toAutoScaledFont,
@@ -101,7 +103,7 @@ class _SuccessContent extends StatelessWidget {
                           text: Provider.of<DioNotifier>(
                                 context,
                                 listen: false,
-                              ).uploadFilesSuccess?.token ??
+                              ).fetchFilesMetadataSuccess?.filesMetadata.basePath ??
                               'Cannot fetch token'));
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

@@ -21,6 +21,12 @@ class DioService {
 
   set apiStatus(ApiStatus v) => _apiStatusSubject.add(v);
 
+  final _miniApiStatusSubject = BehaviorSubject<ApiStatus>.seeded(ApiStatus.init);
+
+  ValueStream<ApiStatus> get miniApiStatusStream => _miniApiStatusSubject.stream;
+
+  set miniApiStatus(ApiStatus v) => _miniApiStatusSubject.add(v);
+
   Future<File> createDummyFile() async {
     // Create a dummy file
     const exampleString = 'Example file contents';

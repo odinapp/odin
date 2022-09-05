@@ -26,6 +26,10 @@ class _$AppRouter extends RootStackRouter {
       return AdaptivePage<dynamic>(
           routeData: routeData,
           child: UploadPage(key: args.key, uploadFiles: args.uploadFiles));
+    },
+    DownloadRoute.name: (routeData) {
+      return AdaptivePage<dynamic>(
+          routeData: routeData, child: const DownloadPage());
     }
   };
 
@@ -34,7 +38,8 @@ class _$AppRouter extends RootStackRouter {
         RouteConfig('/home-page#redirect',
             path: '/home-page', redirectTo: '/', fullMatch: true),
         RouteConfig(HomeRoute.name, path: '/'),
-        RouteConfig(UploadRoute.name, path: '/upload')
+        RouteConfig(UploadRoute.name, path: '/upload'),
+        RouteConfig(DownloadRoute.name, path: '/download')
       ];
 }
 
@@ -68,4 +73,12 @@ class UploadRouteArgs {
   String toString() {
     return 'UploadRouteArgs{key: $key, uploadFiles: $uploadFiles}';
   }
+}
+
+/// generated route for
+/// [DownloadPage]
+class DownloadRoute extends PageRouteInfo<void> {
+  const DownloadRoute() : super(DownloadRoute.name, path: '/download');
+
+  static const String name = 'DownloadRoute';
 }

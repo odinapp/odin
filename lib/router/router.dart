@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:odin/pages/download/view.dart';
 import 'package:odin/pages/home/home_page.dart';
 import 'package:odin/pages/upload/view.dart';
 
@@ -18,6 +19,10 @@ part 'router.gr.dart';
     AutoRoute(
       path: '/upload',
       page: UploadPage,
+    ),
+    AutoRoute(
+      path: '/download',
+      page: DownloadPage,
     ),
   ],
 )

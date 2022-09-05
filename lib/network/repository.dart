@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:odin/model/files_metadata.dart';
 import 'package:odin/network/repository_impl.dart';
 import 'package:odin/utilities/networking.dart';
 
@@ -18,5 +19,9 @@ abstract class OdinRepository extends Repository {
 
   Future<Result<UploadFileSuccess, UploadFileFailure>> uploadFileAnonymous({
     required UploadFileRequest request,
+  });
+
+  Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>> fetchFilesMetadata({
+    required FetchFilesMetadataRequest request,
   });
 }

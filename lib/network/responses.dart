@@ -38,3 +38,21 @@ class UploadFileSuccess extends RepositorySuccess {
     String? message,
   }) : super(message: message);
 }
+
+class FetchFilesMetadataFailure extends RepositoryFailure {
+  final OdinFailureReason odinFailureReason;
+
+  FetchFilesMetadataFailure({
+    int? statusCode,
+    String? message,
+    this.odinFailureReason = OdinFailureReason.unknown,
+  }) : super(statusCode: statusCode, message: message);
+}
+
+class FetchFilesMetadataSuccess extends RepositorySuccess {
+  final FilesMetadata filesMetadata;
+  FetchFilesMetadataSuccess({
+    String? message,
+    required this.filesMetadata,
+  }) : super(message: message);
+}

@@ -16,7 +16,11 @@ class SecondaryButton extends StatelessWidget {
         width: 300.toAutoScaledWidth,
         height: 96.toAutoScaledHeight,
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            locator<AppRouter>().push(
+              const DownloadRoute(),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: color.secondaryContainerOnBackground,
           ),
@@ -25,7 +29,7 @@ class SecondaryButton extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Recieve files',
+                'Receive files',
                 style: color.textStyle(
                   color: color.secondaryOnBackground,
                   fontSize: 28.toAutoScaledFont,

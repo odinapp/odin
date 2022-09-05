@@ -28,6 +28,9 @@ class DioNotifier with ChangeNotifier {
   UploadFileSuccess? uploadFileSuccess;
   UploadFileFailure? uploadFileFailure;
 
+  FetchFilesMetadataSuccess? fetchFilesMetadataSuccess;
+  FetchFilesMetadataFailure? fetchFilesMetadataFailure;
+
   set apiStatus(ApiStatus? value) {
     _dioService.apiStatus = value ?? ApiStatus.init;
     notifyListeners();
@@ -35,6 +38,14 @@ class DioNotifier with ChangeNotifier {
 
   Stream<ApiStatus> get apiStatusStream => _dioService.apiStatusStream;
   ApiStatus? get apiStatus => _dioService.apiStatusStream.valueOrNull;
+
+  set miniApiStatus(ApiStatus? value) {
+    _dioService.miniApiStatus = value ?? ApiStatus.init;
+    notifyListeners();
+  }
+
+  Stream<ApiStatus> get miniApiStatusStream => _dioService.miniApiStatusStream;
+  ApiStatus? get miniApiStatus => _dioService.miniApiStatusStream.valueOrNull;
 
   Future<File> createDummyFile() async {
     return await _dioService.createDummyFile();
@@ -151,8 +162,62 @@ class DioNotifier with ChangeNotifier {
     response.resolve(onSuccess, onFailure);
   }
 
+  Future<void> fetchFilesMetadata(
+    String token,
+    void Function(int, int)? onReceiveProgress,
+  ) async {
+    miniApiStatus = ApiStatus.loading;
+    notifyListeners();
+    Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>> _fetchFilesMetadata() async {
+      final odinRepository = OdinRepository();
+
+      final response = await odinRepository.fetchFilesMetadata(
+        request: FetchFilesMetadataRequest(
+          token: token,
+          onReceiveProgress: (count, total) {
+            _progress = count / total;
+            _progressPercentage = (_progress * 100).toInt();
+
+            onReceiveProgress?.call(count, total);
+
+            notifyListeners();
+          },
+          cancelToken: _cancelToken,
+        ),
+      );
+
+      return response;
+    }
+
+    void onSuccess(FetchFilesMetadataSuccess success) async {
+      miniApiStatus = ApiStatus.success;
+      fetchFilesMetadataSuccess = success;
+      fetchFilesMetadataFailure = null;
+      notifyListeners();
+      logger.d('[DioService]: FetchFilesMetadataSuccess ${success.message}');
+    }
+
+    void onFailure(FetchFilesMetadataFailure failure) {
+      miniApiStatus = ApiStatus.failed;
+      fetchFilesMetadataSuccess = null;
+      fetchFilesMetadataFailure = failure;
+      notifyListeners();
+      logger.d('[DioService]: FetchFilesMetadataFailure ${failure.message}');
+    }
+
+    final response = await oNetwork<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>(_fetchFilesMetadata);
+
+    response.resolve(onSuccess, onFailure);
+  }
+
   Future<void> cancelCurrentRequest() async {
     apiStatus = ApiStatus.failed;
+    _cancelToken.cancel();
+    notifyListeners();
+  }
+
+  Future<void> cancelMiniRequest() async {
+    miniApiStatus = ApiStatus.failed;
     _cancelToken.cancel();
     notifyListeners();
   }

@@ -12,7 +12,7 @@ part 'widgets/main_container.dart';
 part 'widgets/bg_illustration.dart';
 part 'widgets/primary_button.dart';
 part 'widgets/header_title.dart';
-part 'widgets/or_divider.dart';
+part 'widgets/divider.dart';
 part 'widgets/secondary_button.dart';
 
 class HomePage extends StatelessWidget {
