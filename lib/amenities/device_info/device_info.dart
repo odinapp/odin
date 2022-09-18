@@ -15,69 +15,69 @@ class DeviceInfoAmenityImpl implements DeviceInfoAmenity {
 
     final deviceInfo = DeviceInfoPlugin();
 
-    switch (Platform.operatingSystem) {
-      case 'android':
-        final aInfo = await deviceInfo.androidInfo;
-        info = ODeviceInfo(
-          osName: 'Android',
-          osVersion: aInfo.version.release.toString(),
-          deviceName: aInfo.model.toString(),
-          deviceId: aInfo.id.toString(),
-        );
-        break;
-      case 'ios':
-        final iInfo = await deviceInfo.iosInfo;
-        info = ODeviceInfo(
-          osName: 'iOS',
-          osVersion: iInfo.systemVersion.toString(),
-          deviceName: iInfo.name.toString(),
-          deviceId: iInfo.identifierForVendor.toString(),
-        );
-        break;
-      case 'macos':
-        final mInfo = await deviceInfo.macOsInfo;
-        info = ODeviceInfo(
-          osName: 'macOS',
-          osVersion: mInfo.osRelease.toString(),
-          deviceName: mInfo.model.toString(),
-          deviceId: mInfo.systemGUID.toString(),
-        );
-        break;
-      case 'windows':
-        final wInfo = await deviceInfo.windowsInfo;
-        info = ODeviceInfo(
-          osName: 'Windows',
-          osVersion: 'NA',
-          deviceName: wInfo.computerName.toString(),
-          deviceId: 'NA',
-        );
-        break;
-      case 'linux':
-        final lInfo = await deviceInfo.linuxInfo;
-        info = ODeviceInfo(
-          osName: 'Linux',
-          osVersion: lInfo.version.toString(),
-          deviceName: lInfo.name.toString(),
-          deviceId: lInfo.id.toString(),
-        );
-        break;
-      default:
-        if (kIsWeb) {
-          final webInfo = await deviceInfo.webBrowserInfo;
+    if (!kIsWeb) {
+      switch (Platform.operatingSystem) {
+        case 'android':
+          final aInfo = await deviceInfo.androidInfo;
           info = ODeviceInfo(
-            osName: 'Web',
-            osVersion: webInfo.userAgent.toString(),
-            deviceName: webInfo.browserName.toString(),
-            deviceId: webInfo.appVersion.toString(),
+            osName: 'Android',
+            osVersion: aInfo.version.release.toString(),
+            deviceName: aInfo.model.toString(),
+            deviceId: aInfo.id.toString(),
           );
-        } else {
+          break;
+        case 'ios':
+          final iInfo = await deviceInfo.iosInfo;
+          info = ODeviceInfo(
+            osName: 'iOS',
+            osVersion: iInfo.systemVersion.toString(),
+            deviceName: iInfo.name.toString(),
+            deviceId: iInfo.identifierForVendor.toString(),
+          );
+          break;
+        case 'macos':
+          final mInfo = await deviceInfo.macOsInfo;
+          info = ODeviceInfo(
+            osName: 'macOS',
+            osVersion: mInfo.osRelease.toString(),
+            deviceName: mInfo.model.toString(),
+            deviceId: mInfo.systemGUID.toString(),
+          );
+          break;
+        case 'windows':
+          final wInfo = await deviceInfo.windowsInfo;
+          info = ODeviceInfo(
+            osName: 'Windows',
+            osVersion: 'NA',
+            deviceName: wInfo.computerName.toString(),
+            deviceId: 'NA',
+          );
+          break;
+        case 'linux':
+          final lInfo = await deviceInfo.linuxInfo;
+          info = ODeviceInfo(
+            osName: 'Linux',
+            osVersion: lInfo.version.toString(),
+            deviceName: lInfo.name.toString(),
+            deviceId: lInfo.id.toString(),
+          );
+          break;
+        default:
           info = ODeviceInfo(
             osName: 'Unknown-Platform',
             osVersion: 'Unknown-Platform',
             deviceName: 'Unknown-Platform',
             deviceId: 'Unknown-Platform',
           );
-        }
+      }
+    } else {
+      final webInfo = await deviceInfo.webBrowserInfo;
+      info = ODeviceInfo(
+        osName: 'Web',
+        osVersion: webInfo.userAgent.toString(),
+        deviceName: webInfo.browserName.toString(),
+        deviceId: webInfo.appVersion.toString(),
+      );
     }
 
     logger.d('DeviceInfo: $info');

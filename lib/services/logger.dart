@@ -25,7 +25,7 @@ class LogOutputPrinter extends PrettyPrinter {
   RandomAccessFile? _logFile;
 
   LogOutputPrinter() {
-    if (Platform.isWindows) {
+    if (!kIsWeb && Platform.isWindows) {
       getTemporaryDirectory().then((cacheDir) async {
         if (!cacheDir.existsSync()) {
           getDownloadsDirectory().then((cDir) async {
@@ -48,7 +48,7 @@ class LogOutputPrinter extends PrettyPrinter {
         }
         developer.log(cacheDir.path);
       });
-    } else if (Platform.isMacOS) {
+    } else if (!kIsWeb && Platform.isMacOS) {
       getTemporaryDirectory().then((cacheDir) async {
         if (!cacheDir.existsSync()) {
           getDownloadsDirectory().then((cDir) async {
@@ -71,7 +71,7 @@ class LogOutputPrinter extends PrettyPrinter {
         }
         developer.log(cacheDir.path);
       });
-    } else {
+    } else if (!kIsWeb) {
       getExternalStorageDirectory().then((cacheDir) async {
         if (cacheDir == null) {
           getApplicationDocumentsDirectory().then((cDir) async {

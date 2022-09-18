@@ -4,6 +4,7 @@ import 'dart:io';
 // import 'package:better_open_file/better_open_file.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:odin/constants/theme.dart';
@@ -19,7 +20,7 @@ import 'package:provider/provider.dart';
 // import 'package:url_launcher/url_launcher_string.dart';
 
 void main() async {
-  if (Platform.environment.containsKey('FLUTTER_TEST')) {
+  if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
     TestWidgetsFlutterBinding.ensureInitialized();
   } else {
     WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +44,7 @@ void main() async {
     logger.e(obj, obj, stacktrace);
   });
 
-  if (Platform.isWindows || Platform.isMacOS) {
+  if (!kIsWeb && Platform.isWindows || Platform.isMacOS) {
     doWhenWindowReady(() {
       final win = appWindow;
       const initialSize = Size(720, 512);
@@ -115,8 +116,10 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid || Platform.isIOS) {
-      initDynamicLinks();
+    if (!kIsWeb) {
+      if (Platform.isAndroid || Platform.isIOS) {
+        initDynamicLinks();
+      }
     }
   }
 
