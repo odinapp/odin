@@ -56,3 +56,21 @@ class FetchFilesMetadataSuccess extends RepositorySuccess {
     required this.filesMetadata,
   }) : super(message: message);
 }
+
+class FetchConfigFailure extends RepositoryFailure {
+  final OdinFailureReason odinFailureReason;
+
+  FetchConfigFailure({
+    int? statusCode,
+    String? message,
+    this.odinFailureReason = OdinFailureReason.unknown,
+  }) : super(statusCode: statusCode, message: message);
+}
+
+class FetchConfigSuccess extends RepositorySuccess {
+  final Config config;
+  FetchConfigSuccess({
+    String? message,
+    required this.config,
+  }) : super(message: message);
+}

@@ -51,7 +51,7 @@ class MainContent extends StatelessWidget {
             _HeaderText(color: color),
             _InfoText(
               color: color,
-              text:
+              text: oApp.currentConfig?.upload.description ??
                   'The files are protected with end to end AES-256 encryption and can only be accessed using a unique token.',
             ),
           ],

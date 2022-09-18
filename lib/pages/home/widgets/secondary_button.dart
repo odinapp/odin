@@ -29,7 +29,7 @@ class SecondaryButton extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Receive files',
+                oApp.currentConfig?.home.secondaryButtonText ?? 'Receive files',
                 style: color.textStyle(
                   color: color.secondaryOnBackground,
                   fontSize: 28.toAutoScaledFont,

@@ -27,7 +27,7 @@ class _BackButton extends StatelessWidget {
             ),
             16.toAutoScaledWidth.toHorizontalSizedBox,
             Text(
-              'Back',
+              oApp.currentConfig?.upload.backButtonText ?? 'Back',
               style: color.textStyle(
                 color: color.secondaryOnBackground,
                 fontSize: 24.toAutoScaledFont,

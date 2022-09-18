@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:odin/booters/config/config_booter.dart';
 import 'package:odin/booters/core_amenities/amenities_booter.dart';
 import 'package:odin/providers/booter_notifier.dart';
 import 'package:odin/services/logger.dart';
@@ -21,10 +22,11 @@ class BooterService {
 
     await Future.wait(preBootUpSequence);
 
-    // final bootUpProcesses = [
-    // ];
+    final bootUpProcesses = [
+      ConfigBooter.instance.bootUp(),
+    ];
 
-    // await Future.wait(bootUpProcesses);
+    await Future.wait(bootUpProcesses);
 
     appBootStatus = AppBootStatus.booted;
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:odin/model/config.dart';
 import 'package:odin/model/files_metadata.dart';
 import 'package:odin/network/repository_impl.dart';
 import 'package:odin/utilities/networking.dart';
@@ -23,5 +24,9 @@ abstract class OdinRepository extends Repository {
 
   Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>> fetchFilesMetadata({
     required FetchFilesMetadataRequest request,
+  });
+
+  Future<Result<FetchConfigSuccess, FetchConfigFailure>> fetchConfig({
+    required FetchConfigRequest request,
   });
 }

@@ -34,7 +34,7 @@ class PrimaryButton extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Send files',
+                oApp.currentConfig?.home.primaryButtonText ?? 'Send files',
                 style: color.textStyle(
                   color: color.primary,
                   fontSize: 28.toAutoScaledFont,

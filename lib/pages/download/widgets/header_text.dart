@@ -14,7 +14,7 @@ class _HeaderText extends StatelessWidget {
       padding:
           EdgeInsets.fromLTRB(60.toAutoScaledWidth, 0.toAutoScaledHeight, 60.toAutoScaledWidth, 24.toAutoScaledHeight),
       child: Text(
-        'Enter unique file token.',
+        oApp.currentConfig?.token.title ?? 'Enter unique file token.',
         style: color.textStyle(
           color: color.secondary,
           fontSize: 48.toAutoScaledFont,

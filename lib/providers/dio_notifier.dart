@@ -31,6 +31,9 @@ class DioNotifier with ChangeNotifier {
   FetchFilesMetadataSuccess? fetchFilesMetadataSuccess;
   FetchFilesMetadataFailure? fetchFilesMetadataFailure;
 
+  FetchConfigSuccess? fetchConfigSuccess;
+  FetchConfigFailure? fetchConfigFailure;
+
   set apiStatus(ApiStatus? value) {
     _dioService.apiStatus = value ?? ApiStatus.init;
     notifyListeners();
@@ -206,6 +209,49 @@ class DioNotifier with ChangeNotifier {
     }
 
     final response = await oNetwork<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>(_fetchFilesMetadata);
+
+    response.resolve(onSuccess, onFailure);
+  }
+
+  Future<void> fetchConfig(
+    void Function(int, int)? onReceiveProgress,
+  ) async {
+    notifyListeners();
+    Future<Result<FetchConfigSuccess, FetchConfigFailure>> _fetchConfig() async {
+      final odinRepository = OdinRepository();
+
+      final response = await odinRepository.fetchConfig(
+        request: FetchConfigRequest(
+          onReceiveProgress: (count, total) {
+            _progress = count / total;
+            _progressPercentage = (_progress * 100).toInt();
+
+            onReceiveProgress?.call(count, total);
+
+            notifyListeners();
+          },
+          cancelToken: _cancelToken,
+        ),
+      );
+
+      return response;
+    }
+
+    void onSuccess(FetchConfigSuccess success) async {
+      fetchConfigSuccess = success;
+      fetchConfigFailure = null;
+      notifyListeners();
+      logger.d('[DioService]: FetchConfigSuccess ${success.message}');
+    }
+
+    void onFailure(FetchConfigFailure failure) {
+      fetchConfigSuccess = null;
+      fetchConfigFailure = failure;
+      notifyListeners();
+      logger.d('[DioService]: FetchConfigFailure ${failure.message}');
+    }
+
+    final response = await oNetwork<FetchConfigSuccess, FetchConfigFailure>(_fetchConfig);
 
     response.resolve(onSuccess, onFailure);
   }

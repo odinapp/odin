@@ -35,7 +35,7 @@ class _PrimaryButton extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Receive files',
+                oApp.currentConfig?.token.primaryButtonText ?? 'Receive files',
                 style: color.textStyle(
                   color: color.secondary,
                   fontSize: 28.toAutoScaledFont,

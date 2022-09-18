@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:odin/model/config.dart';
 import 'package:odin/model/files_metadata.dart';
 import 'package:odin/network/networking_box/networking_box.dart';
 import 'package:odin/network/repository.dart';
@@ -144,8 +145,46 @@ class OdinRepositoryImpl implements OdinRepository {
           dioError.stackTrace);
       return Failure(FetchFilesMetadataFailure(message: dioError.response.toString()));
     } catch (e, st) {
-      logger.e('[DioService]: uploadFilesAnonymous', e, st);
+      logger.e('[DioService]: fetchFilesMetadata', e, st);
       return Failure(FetchFilesMetadataFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<FetchConfigSuccess, FetchConfigFailure>> fetchConfig({required FetchConfigRequest request}) async {
+    final client = await ONetworkingBox.unsecureClient();
+
+    try {
+      if (client != null) {
+        final response = await client.get(
+          _EndPoint.config,
+          cancelToken: request.cancelToken,
+          onReceiveProgress: request.onReceiveProgress,
+          queryParameters: {},
+        );
+
+        final statusCode = response.statusCode;
+
+        if (statusCode.isSuccess) {
+          final data = response.data;
+          final config = Config.fromJson(data);
+          return Success(FetchConfigSuccess(config: config));
+        } else {
+          return Failure(FetchConfigFailure(message: response.data));
+        }
+      } else {
+        return Failure(FetchConfigFailure(message: 'Client is null'));
+      }
+    } on DioError catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
+          dioError.stackTrace);
+      return Failure(FetchConfigFailure(message: dioError.response.toString()));
+    } catch (e, st) {
+      logger.e('[DioService]: fetchConfig', e, st);
+      return Failure(FetchConfigFailure(message: e.toString()));
     }
   }
 }

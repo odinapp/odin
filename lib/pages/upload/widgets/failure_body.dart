@@ -92,7 +92,7 @@ class _FailureContent extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.only(right: 40.0.toAutoScaledWidth),
                     child: Text(
-                      'Back to home',
+                      oApp.currentConfig?.upload.errorButtonText ?? 'Back to home',
                       style: color.textStyle(
                         color: color.secondaryOnBackground,
                         fontSize: 28.toAutoScaledFont,

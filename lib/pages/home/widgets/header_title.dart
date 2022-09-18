@@ -13,7 +13,7 @@ class HeaderTitle extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.fromLTRB(60.toAutoScaledWidth, 60.toAutoScaledHeight, 0, 0),
       child: Text(
-        'Open-source\neasy file sharing\nfor everyone.',
+        oApp.currentConfig?.home.title ?? 'Open-source\neasy file sharing\nfor everyone.',
         style: color.textStyle(
           color: color.secondary,
           fontSize: 68.toAutoScaledFont,

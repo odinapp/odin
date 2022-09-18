@@ -62,3 +62,13 @@ class FetchFilesMetadataRequest extends RepositoryGetRequest {
           cancelToken: cancelToken,
         );
 }
+
+class FetchConfigRequest extends RepositoryGetRequest {
+  FetchConfigRequest({
+    void Function(int, int)? onReceiveProgress,
+    CancelToken? cancelToken,
+  }) : super(
+          onReceiveProgress: onReceiveProgress,
+          cancelToken: cancelToken,
+        );
+}

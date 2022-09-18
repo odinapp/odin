@@ -77,7 +77,7 @@ class _MainContentState extends State<MainContent> {
             _ClickableInfoText(
               color: widget.color,
               onTap: () {},
-              text:
+              text: oApp.currentConfig?.token.description ??
                   'Ask your friend for this unique token to download the shared files. Without it you won’t be able to download the files. ',
             ),
           ],
@@ -135,7 +135,7 @@ class _MainContentState extends State<MainContent> {
                   focusedErrorBorder: InputBorder.none,
                   fillColor: Colors.transparent,
                   hoverColor: Colors.transparent,
-                  hintText: 'Enter 21 chars long unique token',
+                  hintText: oApp.currentConfig?.token.textFieldHintText ?? 'Enter 21 chars long unique token',
                   hintStyle: TextStyle(
                     color: widget.color.secondaryOnBackground,
                     fontSize: 22.toAutoScaledFont,

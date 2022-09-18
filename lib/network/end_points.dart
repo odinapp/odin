@@ -6,4 +6,5 @@ class _EndPoint {
   // static String channels(familyId) => 'api/v3/communities/$familyId/channels/';
   static const String uploadFiles = 'file/upload/';
   static const String fetchFilesMetadata = 'file/info/';
+  static const String config = 'config/';
 }
