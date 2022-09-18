@@ -63,6 +63,21 @@ class _MainContentState extends State<MainContent> {
     );
   }
 
+  Future<void> _downloadFile() async {
+    final dioNotifier = locator<DioNotifier>();
+    final dioService = locator<DioService>();
+
+    final filePath = await dioService.getTempFilePath();
+
+    await dioNotifier.downloadFile(
+      token,
+      filePath,
+      (count, total) {
+        logger.d('Downloaded $count/$total');
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -92,7 +107,7 @@ class _MainContentState extends State<MainContent> {
             _PrimaryButton(
               color: widget.color,
               enabled: Provider.of<DioNotifier>(context).miniApiStatus == ApiStatus.success && token.length > 3,
-              onPressed: _fetchMetadata,
+              onPressed: _downloadFile,
             ),
             60.toAutoScaledWidth.toHorizontalSizedBox,
           ],

@@ -72,3 +72,18 @@ class FetchConfigRequest extends RepositoryGetRequest {
           cancelToken: cancelToken,
         );
 }
+
+class DownloadFileRequest extends RepositoryGetRequest {
+  final String token;
+  final String savePath;
+
+  DownloadFileRequest({
+    required this.token,
+    required this.savePath,
+    void Function(int, int)? onReceiveProgress,
+    CancelToken? cancelToken,
+  }) : super(
+          onReceiveProgress: onReceiveProgress,
+          cancelToken: cancelToken,
+        );
+}

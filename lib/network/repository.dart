@@ -29,4 +29,8 @@ abstract class OdinRepository extends Repository {
   Future<Result<FetchConfigSuccess, FetchConfigFailure>> fetchConfig({
     required FetchConfigRequest request,
   });
+
+  Future<Result<DownloadFileSuccess, DownloadFileFailure>> downloadFile({
+    required DownloadFileRequest request,
+  });
 }

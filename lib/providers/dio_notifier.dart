@@ -34,6 +34,9 @@ class DioNotifier with ChangeNotifier {
   FetchConfigSuccess? fetchConfigSuccess;
   FetchConfigFailure? fetchConfigFailure;
 
+  DownloadFileSuccess? downloadFileSuccess;
+  DownloadFileFailure? downloadFileFailure;
+
   set apiStatus(ApiStatus? value) {
     _dioService.apiStatus = value ?? ApiStatus.init;
     notifyListeners();
@@ -252,6 +255,53 @@ class DioNotifier with ChangeNotifier {
     }
 
     final response = await oNetwork<FetchConfigSuccess, FetchConfigFailure>(_fetchConfig);
+
+    response.resolve(onSuccess, onFailure);
+  }
+
+  Future<void> downloadFile(
+    String token,
+    String fileName,
+    void Function(int, int)? onReceiveProgress,
+  ) async {
+    notifyListeners();
+    Future<Result<DownloadFileSuccess, DownloadFileFailure>> _downloadFile() async {
+      final odinRepository = OdinRepository();
+
+      final response = await odinRepository.downloadFile(
+        request: DownloadFileRequest(
+          token: token,
+          savePath: fileName,
+          onReceiveProgress: (count, total) {
+            _progress = count / total;
+            _progressPercentage = (_progress * 100).toInt();
+
+            onReceiveProgress?.call(count, total);
+
+            notifyListeners();
+          },
+          cancelToken: _cancelToken,
+        ),
+      );
+
+      return response;
+    }
+
+    void onSuccess(DownloadFileSuccess success) async {
+      downloadFileSuccess = success;
+      downloadFileFailure = null;
+      notifyListeners();
+      logger.d('[DioService]: DownloadFileSuccess ${success.message}');
+    }
+
+    void onFailure(DownloadFileFailure failure) {
+      downloadFileSuccess = null;
+      downloadFileFailure = failure;
+      notifyListeners();
+      logger.d('[DioService]: DownloadFileFailure ${failure.message}');
+    }
+
+    final response = await oNetwork<DownloadFileSuccess, DownloadFileFailure>(_downloadFile);
 
     response.resolve(onSuccess, onFailure);
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:odin/model/config.dart';
 import 'package:odin/model/files_metadata.dart';
@@ -185,6 +187,58 @@ class OdinRepositoryImpl implements OdinRepository {
     } catch (e, st) {
       logger.e('[DioService]: fetchConfig', e, st);
       return Failure(FetchConfigFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<DownloadFileSuccess, DownloadFileFailure>> downloadFile({
+    required DownloadFileRequest request,
+  }) async {
+    final client = await ONetworkingBox.unsecureClient(
+      options: ONetworkingOptions(
+        responseType: ResponseType.bytes,
+      ),
+    );
+
+    try {
+      if (client != null) {
+        final response = await client.get(
+          _EndPoint.downloadFiles,
+          cancelToken: request.cancelToken,
+          onReceiveProgress: request.onReceiveProgress,
+          queryParameters: {
+            "token": request.token,
+          },
+        );
+
+        final statusCode = response.statusCode;
+
+        if (statusCode.isSuccess) {
+          final filename = response.headers.value('Filename') ?? 'defaultFile.txt';
+          final filePath = '${request.savePath}/$filename';
+          logger.d('filePath: $filePath');
+          File file = File(filePath);
+          var raf = file.openSync(mode: FileMode.write);
+          final data = response.data;
+          raf.writeFromSync(data);
+          await raf.close();
+          return Success(DownloadFileSuccess(file: file));
+        } else {
+          return Failure(DownloadFileFailure(message: response.data));
+        }
+      } else {
+        return Failure(DownloadFileFailure(message: 'Client is null'));
+      }
+    } on DioError catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
+          dioError.stackTrace);
+      return Failure(DownloadFileFailure(message: dioError.response.toString()));
+    } catch (e, st) {
+      logger.e('[DioService]: downloadFile', e, st);
+      return Failure(DownloadFileFailure(message: e.toString()));
     }
   }
 }

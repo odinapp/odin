@@ -37,4 +37,11 @@ class DioService {
 
     return exampleFile;
   }
+
+  Future<String> getTempFilePath() async {
+    // Create a dummy file
+    final tempDir = await getTemporaryDirectory();
+
+    return tempDir.path;
+  }
 }
