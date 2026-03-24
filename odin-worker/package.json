@@ -12,10 +12,10 @@
     "fflate": "^0.8.2"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.8.0",
+    "@cloudflare/vitest-pool-workers": "^0.12.0",
     "@cloudflare/workers-types": "^4.20250321.0",
     "typescript": "^5.4.5",
-    "vitest": "^2.0.0",
+    "vitest": "^3.2.0",
     "wrangler": "^3.114.0"
   }
 }
