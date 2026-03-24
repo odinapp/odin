@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { env } from 'cloudflare:test';
 import { randomString, generateToken, extractTokenCode } from '../lib/token';
 
@@ -20,6 +20,13 @@ describe('randomString', () => {
 });
 
 describe('generateToken', () => {
+  beforeEach(async () => {
+    // Clean up all keys pre-seeded by collision tests
+    for (const k of ['aaaaaaaa', 'bbbbbbbb', 'cccccccc', 'dddddddd', 'eeeeeeee', 'ffffffff']) {
+      await env.KV_METADATA.delete(k);
+    }
+  });
+
   it('returns an 8-char token when KV has no collision', async () => {
     const token = await generateToken(env.KV_METADATA);
     expect(token).toHaveLength(8);

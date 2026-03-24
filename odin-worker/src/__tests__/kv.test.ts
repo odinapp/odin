@@ -48,6 +48,14 @@ describe('cleanup index helpers', () => {
   beforeEach(async () => {
     await env.KV_METADATA.delete('cleanup:kv00003');
     await env.KV_METADATA.delete('cleanup:kv00004');
+    await env.KV_METADATA.delete('cleanup:kv00005');
+  });
+
+  it('round-trips a cleanup entry through KV', async () => {
+    const entry: CleanupEntry = { token: 'kv00005', r2Key: 'kv00005/f.txt', expiresAt: '2026-03-25T00:00:00.000Z' };
+    await setCleanupEntry(env.KV_METADATA, 'kv00005', entry);
+    const raw = await env.KV_METADATA.get('cleanup:kv00005');
+    expect(JSON.parse(raw!)).toEqual(entry);
   });
 
   it('lists cleanup entries by prefix', async () => {
