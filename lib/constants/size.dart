@@ -21,7 +21,10 @@ abstract class DimensionalPolicies {
       return width;
     }();
 
-    final widthScaleRatio = deviceWidth / designWidth;
+    // Guard: if width is 0 (viewport not yet measured), use design width so
+    // widgets render at their intended sizes rather than collapsing to 0.
+    final effectiveWidth = deviceWidth <= 0 ? designWidth : deviceWidth;
+    final widthScaleRatio = effectiveWidth / designWidth;
 
     return widthScaleRatio;
   }
