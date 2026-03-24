@@ -5,6 +5,7 @@ export default defineWorkersConfig({
     poolOptions: {
       workers: {
         wrangler: { configPath: './wrangler.toml' },
+        isolatedStorage: false,
         miniflare: {
           kvNamespaces: ['KV_METADATA'],
           r2Buckets: ['R2_BUCKET'],
