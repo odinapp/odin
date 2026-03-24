@@ -62,6 +62,8 @@ class DioNotifier with ChangeNotifier {
     void Function(int, int)? onSendProgress,
   ) async {
     selectedFiles = files;
+    _progress = 0;
+    _progressPercentage = 0;
     apiStatus = ApiStatus.loading;
     notifyListeners();
     Future<Result<UploadFilesSuccess, UploadFilesFailure>> uploadFiles() async {
@@ -79,8 +81,10 @@ class DioNotifier with ChangeNotifier {
           files: files,
           totalFileSize: selectedFilesSize,
           onSendProgress: (count, total) {
-            _progress = count / total;
-            _progressPercentage = (_progress * 100).toInt();
+            if (total > 0) {
+              _progress = count / total;
+              _progressPercentage = (_progress * 100).toInt();
+            }
 
             onSendProgress?.call(count, total);
 
@@ -119,6 +123,8 @@ class DioNotifier with ChangeNotifier {
     void Function(int, int)? onSendProgress,
   ) async {
     selectedFiles = [file];
+    _progress = 0;
+    _progressPercentage = 0;
     apiStatus = ApiStatus.loading;
     notifyListeners();
 
@@ -133,8 +139,10 @@ class DioNotifier with ChangeNotifier {
           file: file,
           fileSize: selectedFilesSize,
           onSendProgress: (count, total) {
-            _progress = count / total;
-            _progressPercentage = (_progress * 100).toInt();
+            if (total > 0) {
+              _progress = count / total;
+              _progressPercentage = (_progress * 100).toInt();
+            }
 
             onSendProgress?.call(count, total);
 
@@ -181,12 +189,13 @@ class DioNotifier with ChangeNotifier {
         request: FetchFilesMetadataRequest(
           token: token,
           onReceiveProgress: (count, total) {
-            _progress = count / total;
-            _progressPercentage = (_progress * 100).toInt();
+            if (total > 0) {
+              _progress = count / total;
+              _progressPercentage = (_progress * 100).toInt();
+              notifyListeners();
+            }
 
             onReceiveProgress?.call(count, total);
-
-            notifyListeners();
           },
           cancelToken: _cancelToken,
         ),
@@ -226,12 +235,13 @@ class DioNotifier with ChangeNotifier {
       final response = await odinRepository.fetchConfig(
         request: FetchConfigRequest(
           onReceiveProgress: (count, total) {
-            _progress = count / total;
-            _progressPercentage = (_progress * 100).toInt();
+            if (total > 0) {
+              _progress = count / total;
+              _progressPercentage = (_progress * 100).toInt();
+              notifyListeners();
+            }
 
             onReceiveProgress?.call(count, total);
-
-            notifyListeners();
           },
           cancelToken: _cancelToken,
         ),
@@ -264,6 +274,8 @@ class DioNotifier with ChangeNotifier {
     String fileName,
     void Function(int, int)? onReceiveProgress,
   ) async {
+    _progress = 0;
+    _progressPercentage = 0;
     notifyListeners();
     Future<Result<DownloadFileSuccess, DownloadFileFailure>> _downloadFile() async {
       final odinRepository = OdinRepository();
@@ -273,12 +285,13 @@ class DioNotifier with ChangeNotifier {
           token: token,
           savePath: fileName,
           onReceiveProgress: (count, total) {
-            _progress = count / total;
-            _progressPercentage = (_progress * 100).toInt();
+            if (total > 0) {
+              _progress = count / total;
+              _progressPercentage = (_progress * 100).toInt();
+              notifyListeners();
+            }
 
             onReceiveProgress?.call(count, total);
-
-            notifyListeners();
           },
           cancelToken: _cancelToken,
         ),
