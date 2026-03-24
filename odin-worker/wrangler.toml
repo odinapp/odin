@@ -1,0 +1,20 @@
+name = "odin-worker"
+main = "src/index.ts"
+compatibility_date = "2025-03-24"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+PUBLIC_URL = "https://odin-worker.workers.dev"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "odin-files"
+preview_bucket_name = "odin-files-preview"
+
+[[kv_namespaces]]
+binding = "KV_METADATA"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
+
+[triggers]
+crons = ["0 * * * *"]
