@@ -50,7 +50,10 @@ class OdinRepositoryImpl implements OdinRepository {
 
         if (statusCode.isSuccess) {
           final data = response.data;
-          return Success(UploadFilesSuccess(token: data['token']));
+          return Success(UploadFilesSuccess(
+            token: data['token'],
+            deleteToken: data['deleteToken'],
+          ));
         } else {
           return Failure(UploadFilesFailure(message: response.data));
         }

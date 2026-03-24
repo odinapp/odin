@@ -17,9 +17,11 @@ class UploadFilesFailure extends RepositoryFailure {
 
 class UploadFilesSuccess extends RepositorySuccess {
   final String token;
+  final String? deleteToken;
   UploadFilesSuccess({
     String? message,
     required this.token,
+    this.deleteToken,
   }) : super(message: message);
 }
 

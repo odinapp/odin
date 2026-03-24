@@ -128,6 +128,9 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    // Reset any stale status left over from a previous upload/download
+    locator<DioNotifier>().apiStatus = ApiStatus.init;
+    locator<DioNotifier>().miniApiStatus = ApiStatus.init;
   }
 
   @override
