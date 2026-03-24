@@ -1,19 +1,16 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
-import 'package:odin/services/zip_service.dart';
 
 class ShortenerService {
   String token = "";
-  final _zipService = locator<ZipService>();
   final _dio = Dio(BaseOptions(
     baseUrl: 'https://api.shrtco.de/v2/',
   ));
 
   Future<Response?> get({
-    required uri,
+    required String uri,
     Map<String, String>? headers,
     Map<String, String>? body,
   }) async {
@@ -29,13 +26,13 @@ class ShortenerService {
       }
       return response;
     } catch (e, st) {
-      logger.e("Get Request Failed.", e, st);
+      logger.e("Get Request Failed.", error: e, stackTrace: st);
       return null;
     }
   }
 
   Future<Response?> post({
-    required uri,
+    required String uri,
     Map<String, String>? headers,
     Map<String, String>? body,
   }) async {
@@ -51,7 +48,7 @@ class ShortenerService {
       }
       return response;
     } catch (e, st) {
-      logger.e("Post Request Failed.", e, st);
+      logger.e("Post Request Failed.", error: e, stackTrace: st);
       return null;
     }
   }

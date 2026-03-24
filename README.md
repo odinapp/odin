@@ -7,7 +7,7 @@
 
 
 <p align="center">
-<a href="https://flutter.dev/"><img src="https://img.shields.io/badge/Flutter-v2.5.1-blue?logo=flutter"></a>
+<a href="https://flutter.dev/"><img src="https://img.shields.io/badge/Flutter-stable-blue?logo=flutter"></a>
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/stars/odinapp/odin.svg?style=flat&logo=github&colorB=deeppink&label=stars"></a>
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/v/release/odinapp/odin.svg"></a>
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/license/odinapp/odin.svg" alt="License: AGPL"></a>
@@ -82,33 +82,51 @@ echo 'GITHUB_TOKEN=**GITHUB_TOKEN**' >> .env
 
 **Step 3:**
 
-Follow the instructions [here](https://flutter.dev/docs/get-started/install) to install Flutter. As Odin uses the `stable` channel, you need to switch the channel if you are on `dev` or `beta` channels. Just type:
+Install [FVM](https://fvm.app/) (Flutter Version Management), then from the repository root install the SDK pinned for this project:
 
 ```shell
-flutter channel stable
+fvm install
 ```
+
+Odin pins the **stable** Flutter channel via `.fvmrc`. Use `fvm flutter` / `fvm dart` for all Flutter and Dart commands so you use that SDK (not a mismatched global install).
 
 **Step 4:**
 
-You should enable the specified platform first if you don't enable it before and then select the desktop device.
+Enable the desktop embedder for your OS if you have not already, then pick the desktop device when running.
+
 ```shell
 # for windows
-flutter config --enable-windows-desktop
+fvm flutter config --enable-windows-desktop
 
 # for macos
-flutter config --enable-macos-desktop
+fvm flutter config --enable-macos-desktop
 
 # for linux
-flutter config --enable-linux-desktop
+fvm flutter config --enable-linux-desktop
 ```
 
 **Step 5:**
 
-To run the app just type these commands in terminal or use the Run and Debug option from your editor of choice.
+To fetch packages and run the app (from the repo root):
+
 ```shell
-flutter pub get
-flutter run
+fvm flutter pub get
+fvm flutter run
 ```
+
+**Editor tip:** Point your IDE’s Flutter SDK path to `.fvm/flutter_sdk` inside this repo so analysis and device selection match FVM.
+
+### Verify your setup
+
+From the repo root:
+
+```shell
+fvm flutter analyze --no-fatal-infos
+fvm flutter test
+```
+
+For Android: `fvm flutter build apk` (debug or release). For Linux desktop, install the [Flutter Linux prerequisites](https://docs.flutter.dev/platform-integration/linux/setup) (for example `cmake`, `ninja-build`, and GTK development packages), then run `fvm flutter build linux` or `fvm flutter run -d linux`.
+
 ## Roadmap
 
 ```

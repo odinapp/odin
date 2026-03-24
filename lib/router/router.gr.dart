@@ -1,65 +1,69 @@
-// **************************************************************************
-// AutoRouteGenerator
-// **************************************************************************
-
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
-// AutoRouteGenerator
+// AutoRouterGenerator
 // **************************************************************************
-//
+
 // ignore_for_file: type=lint
+// coverage:ignore-file
 
 part of 'router.dart';
 
-class _$AppRouter extends RootStackRouter {
-  _$AppRouter([GlobalKey<NavigatorState>? navigatorKey]) : super(navigatorKey);
+/// generated route for
+/// [DownloadPage]
+class DownloadRoute extends PageRouteInfo<void> {
+  const DownloadRoute({List<PageRouteInfo>? children})
+    : super(DownloadRoute.name, initialChildren: children);
 
-  @override
-  final Map<String, PageFactory> pagesMap = {
-    HomeRoute.name: (routeData) {
-      return AdaptivePage<dynamic>(
-          routeData: routeData, child: const HomePage());
-    },
-    UploadRoute.name: (routeData) {
-      final args = routeData.argsAs<UploadRouteArgs>();
-      return AdaptivePage<dynamic>(
-          routeData: routeData,
-          child: UploadPage(key: args.key, uploadFiles: args.uploadFiles));
-    },
-    DownloadRoute.name: (routeData) {
-      return AdaptivePage<dynamic>(
-          routeData: routeData, child: const DownloadPage());
-    }
-  };
+  static const String name = 'DownloadRoute';
 
-  @override
-  List<RouteConfig> get routes => [
-        RouteConfig('/home-page#redirect',
-            path: '/home-page', redirectTo: '/', fullMatch: true),
-        RouteConfig(HomeRoute.name, path: '/'),
-        RouteConfig(UploadRoute.name, path: '/upload'),
-        RouteConfig(DownloadRoute.name, path: '/download')
-      ];
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DownloadPage();
+    },
+  );
 }
 
 /// generated route for
 /// [HomePage]
 class HomeRoute extends PageRouteInfo<void> {
-  const HomeRoute() : super(HomeRoute.name, path: '/');
+  const HomeRoute({List<PageRouteInfo>? children})
+    : super(HomeRoute.name, initialChildren: children);
 
   static const String name = 'HomeRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const HomePage();
+    },
+  );
 }
 
 /// generated route for
 /// [UploadPage]
 class UploadRoute extends PageRouteInfo<UploadRouteArgs> {
-  UploadRoute({Key? key, required List<File> uploadFiles})
-      : super(UploadRoute.name,
-            path: '/upload',
-            args: UploadRouteArgs(key: key, uploadFiles: uploadFiles));
+  UploadRoute({
+    Key? key,
+    required List<File> uploadFiles,
+    List<PageRouteInfo>? children,
+  }) : super(
+         UploadRoute.name,
+         args: UploadRouteArgs(key: key, uploadFiles: uploadFiles),
+         initialChildren: children,
+       );
 
   static const String name = 'UploadRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<UploadRouteArgs>();
+      return UploadPage(key: args.key, uploadFiles: args.uploadFiles);
+    },
+  );
 }
 
 class UploadRouteArgs {
@@ -73,12 +77,16 @@ class UploadRouteArgs {
   String toString() {
     return 'UploadRouteArgs{key: $key, uploadFiles: $uploadFiles}';
   }
-}
 
-/// generated route for
-/// [DownloadPage]
-class DownloadRoute extends PageRouteInfo<void> {
-  const DownloadRoute() : super(DownloadRoute.name, path: '/download');
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! UploadRouteArgs) return false;
+    return key == other.key &&
+        const ListEquality<File>().equals(uploadFiles, other.uploadFiles);
+  }
 
-  static const String name = 'DownloadRoute';
+  @override
+  int get hashCode =>
+      key.hashCode ^ const ListEquality<File>().hash(uploadFiles);
 }

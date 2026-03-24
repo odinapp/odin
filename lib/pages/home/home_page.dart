@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:odin/constants/app.dart';
@@ -15,6 +16,7 @@ part 'widgets/header_title.dart';
 part 'widgets/divider.dart';
 part 'widgets/secondary_button.dart';
 
+@RoutePage()
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 

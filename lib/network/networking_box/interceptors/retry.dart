@@ -17,7 +17,7 @@ class ORetryInterceptor extends Interceptor {
   });
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.isRetryRequired) {
       isDisconnected = true;
 
@@ -30,29 +30,29 @@ class ORetryInterceptor extends Interceptor {
               logger.d('[ORetryInterceptor.onError] retry initiated');
               isDisconnected = false;
 
-              final requestOptions = err.requestOptions;
-
-              final retryResponse = await client.request(
-                requestOptions.path,
-                cancelToken: requestOptions.cancelToken,
-                data: requestOptions.data,
-                queryParameters: requestOptions.queryParameters,
-                onSendProgress: requestOptions.onSendProgress,
-                onReceiveProgress: requestOptions.onReceiveProgress,
-              );
-
-              handler.resolve(retryResponse);
+              try {
+                final retryResponse = await client.dio.fetch(err.requestOptions);
+                handler.resolve(retryResponse);
+              } catch (e) {
+                if (e is DioException) {
+                  handler.next(e);
+                } else {
+                  handler.next(
+                    DioException(requestOptions: err.requestOptions, error: e),
+                  );
+                }
+              }
             }
           }
         },
       );
     } else {
-      super.onError(err, handler);
+      handler.next(err);
     }
   }
 }
 
-extension on DioError {
+extension on DioException {
   bool get isRetryRequired {
     return false;
   }

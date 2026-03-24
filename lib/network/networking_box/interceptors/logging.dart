@@ -9,23 +9,20 @@ class ONetworkLoggingInterceptor extends Interceptor {
     logger.d('RequestOptions.url : ${options.uri}');
     logger.d('RequestOptions.data : ${options.data}');
 
-    return super.onRequest(options, handler);
+    handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     logger.d('Response : $response');
 
-    return super.onResponse(response, handler);
+    handler.next(response);
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     logger.d('Error : $err');
 
-    return super.onError(
-      err,
-      handler,
-    );
+    handler.next(err);
   }
 }

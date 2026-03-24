@@ -30,13 +30,13 @@ class FileService {
         type: FileType.any,
         allowMultiple: false,
       );
-      if (result != null) {
+      if (result != null && result.files.single.path != null) {
         return File(result.files.single.path!);
       } else {
         throw Exception('No file selected');
       }
     } catch (e, st) {
-      logger.e(e, e, st);
+      logger.e('$e', error: e, stackTrace: st);
       return null;
     }
   }
@@ -48,12 +48,15 @@ class FileService {
         allowMultiple: true,
       );
       if (result != null) {
-        return result.files.map((e) => File(e.path!)).toList();
+        return result.files
+            .where((e) => e.path != null && e.path!.isNotEmpty)
+            .map((e) => File(e.path!))
+            .toList();
       } else {
         throw Exception('No file selected');
       }
     } catch (e, st) {
-      logger.e(e, e, st);
+      logger.e('$e', error: e, stackTrace: st);
       return null;
     }
   }

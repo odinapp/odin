@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -24,6 +25,7 @@ part 'widgets/progress_bar.dart';
 part 'widgets/success_body.dart';
 part 'widgets/failure_body.dart';
 
+@RoutePage()
 class UploadPage extends StatefulWidget {
   const UploadPage({
     Key? key,

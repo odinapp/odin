@@ -50,7 +50,7 @@ class ToastService {
     } else {
       fToast.showToast(
         child: toast,
-        positionedToastBuilder: (context, child) {
+        positionedToastBuilder: (context, child, gravity) {
           return Positioned(
             top: 32.0 + MediaQuery.of(context).padding.top,
             left: MediaQuery.of(context).size.width / 2 - 125,

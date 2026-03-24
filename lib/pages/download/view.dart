@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +13,6 @@ import 'package:odin/services/dio_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
 import 'package:odin/services/logger.dart';
-import 'package:odin/utilities/byte_formatter.dart';
 import 'package:odin/utilities/debounce.dart';
 import 'package:odin/utilities/networking.dart';
 import 'package:provider/provider.dart';
@@ -23,11 +23,11 @@ part 'widgets/primary_button.dart';
 part 'widgets/header_text.dart';
 part 'widgets/info_text.dart';
 part 'widgets/clickable_info_text.dart';
-part 'widgets/progress_bar.dart';
 part 'widgets/success_body.dart';
 part 'widgets/failure_body.dart';
 part 'widgets/metadata_text.dart';
 
+@RoutePage()
 class DownloadPage extends StatefulWidget {
   const DownloadPage({
     Key? key,

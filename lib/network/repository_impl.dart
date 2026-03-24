@@ -57,15 +57,18 @@ class OdinRepositoryImpl implements OdinRepository {
       } else {
         return Failure(UploadFilesFailure(message: 'Client is null'));
       }
-    } on DioError catch (dioError) {
+    } on DioException catch (dioError) {
       final exception = Exception(
         '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
       );
-      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
-          dioError.stackTrace);
+      logger.e(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}',
+        error: exception,
+        stackTrace: dioError.stackTrace,
+      );
       return Failure(UploadFilesFailure(message: dioError.response.toString()));
     } catch (e, st) {
-      logger.e('[DioService]: uploadFilesAnonymous', e, st);
+      logger.e('[DioService]: uploadFilesAnonymous', error: e, stackTrace: st);
       return Failure(UploadFilesFailure(message: e.toString()));
     }
   }
@@ -100,7 +103,6 @@ class OdinRepositoryImpl implements OdinRepository {
       final statusCode = response.statusCode;
 
       if (statusCode.isSuccess) {
-        final data = response.data;
         return Success(UploadFileSuccess());
       } else {
         return Failure(UploadFileFailure());
@@ -139,15 +141,18 @@ class OdinRepositoryImpl implements OdinRepository {
       } else {
         return Failure(FetchFilesMetadataFailure(message: 'Client is null'));
       }
-    } on DioError catch (dioError) {
+    } on DioException catch (dioError) {
       final exception = Exception(
         '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
       );
-      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
-          dioError.stackTrace);
+      logger.e(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}',
+        error: exception,
+        stackTrace: dioError.stackTrace,
+      );
       return Failure(FetchFilesMetadataFailure(message: dioError.response.toString()));
     } catch (e, st) {
-      logger.e('[DioService]: fetchFilesMetadata', e, st);
+      logger.e('[DioService]: fetchFilesMetadata', error: e, stackTrace: st);
       return Failure(FetchFilesMetadataFailure(message: e.toString()));
     }
   }
@@ -177,15 +182,18 @@ class OdinRepositoryImpl implements OdinRepository {
       } else {
         return Failure(FetchConfigFailure(message: 'Client is null'));
       }
-    } on DioError catch (dioError) {
+    } on DioException catch (dioError) {
       final exception = Exception(
         '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
       );
-      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
-          dioError.stackTrace);
+      logger.e(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}',
+        error: exception,
+        stackTrace: dioError.stackTrace,
+      );
       return Failure(FetchConfigFailure(message: dioError.response.toString()));
     } catch (e, st) {
-      logger.e('[DioService]: fetchConfig', e, st);
+      logger.e('[DioService]: fetchConfig', error: e, stackTrace: st);
       return Failure(FetchConfigFailure(message: e.toString()));
     }
   }
@@ -229,15 +237,18 @@ class OdinRepositoryImpl implements OdinRepository {
       } else {
         return Failure(DownloadFileFailure(message: 'Client is null'));
       }
-    } on DioError catch (dioError) {
+    } on DioException catch (dioError) {
       final exception = Exception(
         '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
       );
-      logger.e('[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}', exception,
-          dioError.stackTrace);
+      logger.e(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}',
+        error: exception,
+        stackTrace: dioError.stackTrace,
+      );
       return Failure(DownloadFileFailure(message: dioError.response.toString()));
     } catch (e, st) {
-      logger.e('[DioService]: downloadFile', e, st);
+      logger.e('[DioService]: downloadFile', error: e, stackTrace: st);
       return Failure(DownloadFileFailure(message: e.toString()));
     }
   }

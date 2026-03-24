@@ -8,7 +8,7 @@ class ConnectivityAmenityImpl implements ConnectivityAmenity {
   final StreamController<ConnectivityStatus> _connectivityStatusStreamController =
       StreamController<ConnectivityStatus>.broadcast();
 
-  late StreamSubscription<ConnectivityResult> _connectivityResultStreamSubscription;
+  late StreamSubscription<List<ConnectivityResult>> _connectivityResultStreamSubscription;
 
   @override
   Stream<ConnectivityStatus> get onConnectivityStatusChanged => _connectivityStatusStreamController.stream;
@@ -18,9 +18,9 @@ class ConnectivityAmenityImpl implements ConnectivityAmenity {
     var connectivityStatus = ConnectivityStatus.connected;
 
     final connectivity = Connectivity();
-    final connectivityResult = await connectivity.checkConnectivity();
+    final results = await connectivity.checkConnectivity();
 
-    if (connectivityResult == ConnectivityResult.none) {
+    if (results.isEmpty || results.contains(ConnectivityResult.none)) {
       connectivityStatus = ConnectivityStatus.disconnected;
     }
 
@@ -33,8 +33,8 @@ class ConnectivityAmenityImpl implements ConnectivityAmenity {
 
     final connectivity = Connectivity();
     _connectivityResultStreamSubscription = connectivity.onConnectivityChanged.listen(
-      (connectivityResult) {
-        if (connectivityResult == ConnectivityResult.none) {
+      (List<ConnectivityResult> results) {
+        if (results.isEmpty || results.contains(ConnectivityResult.none)) {
           logger.d('[connectivity.onConnectivityChanged] disconnected');
           _connectivityStatusStreamController.add(ConnectivityStatus.disconnected);
         } else {

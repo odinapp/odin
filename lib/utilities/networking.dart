@@ -29,7 +29,7 @@ class ONetworking {
               try {
                 throw Exception(f.data);
               } catch (e, s) {
-                logger.e(e, e, s);
+                logger.e('$e', error: e, stackTrace: s);
               }
             }
           }
@@ -40,7 +40,7 @@ class ONetworking {
               try {
                 throw Exception(f.data);
               } catch (e, s) {
-                logger.e(e, e, s);
+                logger.e('$e', error: e, stackTrace: s);
               }
             }
           }

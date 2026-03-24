@@ -11,16 +11,13 @@ class OTokenInvalidInterceptor extends Interceptor {
       ///403 is for authorization
     }
 
-    return super.onResponse(response, handler);
+    handler.next(response);
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     logger.e('status code : ${err.response?.statusCode}');
 
-    return super.onError(
-      err,
-      handler,
-    );
+    handler.next(err);
   }
 }

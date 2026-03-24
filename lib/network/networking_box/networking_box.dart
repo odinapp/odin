@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:dio/native_imp.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:odin/amenities/app_info/amenity.dart';
 import 'package:odin/amenities/device_info/amenity.dart';
 import 'package:odin/network/networking_box/interceptors/retry.dart';
@@ -51,7 +50,8 @@ abstract class ONetworkingBox {
     ONetworkingOptions? options,
     bool loggingEnabled = true,
   }) async {
-    final currentTimezoneRegion = await FlutterNativeTimezone.getLocalTimezone();
+    final currentTimezoneRegion =
+        (await FlutterTimezone.getLocalTimezone()).identifier;
 
     final client = options != null
         ? ONetworkingClient.fromOptions(
@@ -67,37 +67,6 @@ abstract class ONetworkingBox {
     }
 
     return client;
-  }
-
-  static Future<ONetworkingClient?> _createSecureClient({
-    ONetworkingOptions? options,
-    bool loggingEnabled = true,
-  }) async {
-    final currentTimezoneRegion = await FlutterNativeTimezone.getLocalTimezone();
-
-    final token = 'ODIN_NO_TOKEN';
-
-    logger.d('QBackgroundCaching inside secureClient token: $token');
-    try {
-      final client = options != null
-          ? ONetworkingClient.fromOptions(
-              options,
-              authorizationToken: token,
-              timezone: currentTimezoneRegion,
-            )
-          : ONetworkingClient(
-              authorizationToken: token,
-              timezone: currentTimezoneRegion,
-            );
-
-      if (loggingEnabled) {
-        client.addLoggingIntercept();
-      }
-      return client;
-    } catch (e, s) {
-      logger.e('QBackgroundCaching error: $e \n QBackgroundCaching stacktrace: $s');
-      return null;
-    }
   }
 }
 

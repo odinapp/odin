@@ -1,0 +1,20 @@
+// AGP 8+ requires `namespace` on every Android library module. Legacy Flutter
+// plugins may omit it; set it from AndroidManifest `package` as soon as the
+// Android library plugin is applied.
+subprojects { subproject ->
+    subproject.plugins.withId("com.android.library") {
+        subproject.android {
+            def ns = namespace
+            if (ns == null || ns.toString().trim().isEmpty()) {
+                def manifest = subproject.file("src/main/AndroidManifest.xml")
+                if (manifest.exists()) {
+                    def text = manifest.getText("UTF-8")
+                    def matcher = text =~ /package="([^"]+)"/
+                    if (matcher.find()) {
+                        namespace = matcher.group(1)
+                    }
+                }
+            }
+        }
+    }
+}

@@ -2,11 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 // import 'package:better_open_file/better_open_file.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:odin/constants/theme.dart';
 import 'package:odin/providers/booter_notifier.dart';
 import 'package:odin/providers/dio_notifier.dart';
@@ -20,11 +18,7 @@ import 'package:provider/provider.dart';
 // import 'package:url_launcher/url_launcher_string.dart';
 
 void main() async {
-  if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
-    TestWidgetsFlutterBinding.ensureInitialized();
-  } else {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
+  WidgetsFlutterBinding.ensureInitialized();
   // Initialize the app
   setupLocator();
   await locator<EnvironmentService>().init();
@@ -41,10 +35,10 @@ void main() async {
       ),
     );
   }, (obj, stacktrace) {
-    logger.e(obj, obj, stacktrace);
+    logger.e('$obj', error: obj, stackTrace: stacktrace);
   });
 
-  if (!kIsWeb && Platform.isWindows || Platform.isMacOS) {
+  if (!kIsWeb && (Platform.isWindows || Platform.isMacOS)) {
     doWhenWindowReady(() {
       final win = appWindow;
       const initialSize = Size(720, 512);
@@ -134,11 +128,9 @@ class _MyAppState extends State<MyApp> {
       theme: theme.lightTheme,
       darkTheme: theme.darkTheme,
       themeMode: ThemeMode.dark,
-      routerDelegate: AutoRouterDelegate(
-        appRouter,
+      routerConfig: appRouter.config(
         navigatorObservers: () => [AppRouteObserver()],
       ),
-      routeInformationParser: appRouter.defaultRouteParser(),
     );
   }
 }

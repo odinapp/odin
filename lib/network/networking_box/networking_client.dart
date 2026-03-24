@@ -7,12 +7,18 @@ abstract class _ONetworkHeaderKeys {
   static const String deviceOsVersion = 'X-Device-OS-Version';
 }
 
-class ONetworkingClient extends DioForNative {
+/// HTTP client with shared Odin headers and simple request timing logs.
+/// Wraps [Dio] because Dio 5+ cannot be subclassed.
+class ONetworkingClient {
+  ONetworkingClient._(this.dio);
+
+  final Dio dio;
+
+  Interceptors get interceptors => dio.interceptors;
+
   static final envService = locator<EnvironmentService>();
-  // TODO: Add default base url for production
   static final String _baseUrl = '${envService.environment.API_URL}api/${envService.environment.API_VERSION}/';
 
-  // TODO: Add default required headers here
   static final Map<String, String> _defaultHeaders = {
     _ONetworkHeaderKeys.contentType: 'application/json',
     _ONetworkHeaderKeys.appVersion: AppInfoAmenity.instance.info.version,
@@ -20,55 +26,60 @@ class ONetworkingClient extends DioForNative {
     _ONetworkHeaderKeys.deviceOsVersion: DeviceInfoAmenity.instance.info.osVersion,
   };
 
-  ONetworkingClient({
+  factory ONetworkingClient({
     String? authorizationToken,
     String? timezone,
-  }) : super(
-          BaseOptions(
-            baseUrl: _baseUrl,
-            headers: {
-              ..._defaultHeaders,
-              if (authorizationToken != null) ...{'Authorization': 'Bearer $authorizationToken'},
-              if (timezone != null) ...{'Timezone': timezone},
-            },
-            validateStatus: (_) => true,
-            connectTimeout: 3000,
-          ),
-        ) {
+  }) {
+    final d = Dio(
+      BaseOptions(
+        baseUrl: _baseUrl,
+        headers: {
+          ..._defaultHeaders,
+          if (authorizationToken != null) ...{'Authorization': 'Bearer $authorizationToken'},
+          if (timezone != null) ...{'Timezone': timezone},
+        },
+        validateStatus: (_) => true,
+        connectTimeout: const Duration(milliseconds: 3000),
+      ),
+    );
+    final client = ONetworkingClient._(d);
     logger.d('Headers : $_defaultHeaders');
+    return client;
   }
 
-  ONetworkingClient.fromOptions(
+  factory ONetworkingClient.fromOptions(
     ONetworkingOptions options, {
     String? authorizationToken,
     String? timezone,
-  }) : super(
-          BaseOptions(
-            baseUrl: options.baseUrl ?? _baseUrl,
-            headers: {
-              ..._defaultHeaders,
-              if (options.headers != null) ...options.headers!,
-              if (authorizationToken != null) ...{'Authorization': 'Bearer $authorizationToken'},
-              if (timezone != null) ...{'Timezone': timezone},
-            },
-            responseType: options.responseType ?? ResponseType.json,
-            validateStatus: (_) => true,
-            connectTimeout: 3000,
-          ),
-        );
+  }) {
+    final d = Dio(
+      BaseOptions(
+        baseUrl: options.baseUrl ?? _baseUrl,
+        headers: {
+          ..._defaultHeaders,
+          if (options.headers != null) ...options.headers!,
+          if (authorizationToken != null) ...{'Authorization': 'Bearer $authorizationToken'},
+          if (timezone != null) ...{'Timezone': timezone},
+        },
+        responseType: options.responseType ?? ResponseType.json,
+        validateStatus: (_) => true,
+        connectTimeout: const Duration(milliseconds: 3000),
+      ),
+    );
+    return ONetworkingClient._(d);
+  }
 
-  @override
   Future<Response<T>> post<T>(
     String path, {
-    data,
+    Object? data,
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final Stopwatch stopwatch = Stopwatch()..start();
-    final response = await super.post<T>(
+    final stopwatch = Stopwatch()..start();
+    final response = await dio.post<T>(
       path,
       data: data,
       queryParameters: queryParameters,
@@ -81,7 +92,6 @@ class ONetworkingClient extends DioForNative {
     return response;
   }
 
-  @override
   Future<Response<T>> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -89,8 +99,8 @@ class ONetworkingClient extends DioForNative {
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final Stopwatch stopwatch = Stopwatch()..start();
-    final response = await super.get<T>(
+    final stopwatch = Stopwatch()..start();
+    final response = await dio.get<T>(
       path,
       queryParameters: queryParameters,
       options: options,

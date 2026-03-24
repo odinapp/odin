@@ -6,7 +6,6 @@ import 'package:odin/services/logger.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:odin/utilities/byte_formatter.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ZipService {
   final RandomService _randomService = locator<RandomService>();
@@ -18,8 +17,7 @@ class ZipService {
   }) async {
     logger.d('Started Zipping Files');
     final ZipFileEncoder encoder = ZipFileEncoder();
-    final Directory zipFileSaveDirectory = await getTemporaryDirectory();
-    final zipFileSavePath = zipFileSaveDirectory.path;
+    final zipFileSavePath = Directory.systemTemp.path;
     // Manually create a zip at the zipFilePath
     final String zipFilePath = join(zipFileSavePath,
         "${basename(fileToZips.first.path).replaceAll('.', '_')}_${_randomService.getRandomString(15)}.zip");
@@ -65,13 +63,12 @@ class ZipService {
       if (files.length > 1) {
         zippedFile = await zipFile(fileToZips: files);
       } else {
-        final Directory cacheDir = await getTemporaryDirectory();
         zippedFile = files[0];
-        zippedFile = zippedFile.copySync(join(cacheDir.path, basename(files[0].path)));
+        zippedFile = zippedFile.copySync(join(Directory.systemTemp.path, basename(files[0].path)));
       }
       return zippedFile;
     } catch (e, st) {
-      logger.e(e, e, st);
+      logger.e('$e', error: e, stackTrace: st);
       return null;
     }
   }
