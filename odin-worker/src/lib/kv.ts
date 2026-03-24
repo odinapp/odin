@@ -49,10 +49,14 @@ export async function listCleanupEntries(kv: KVNamespace): Promise<CleanupEntry[
 
   do {
     const result = await kv.list({ prefix: 'cleanup:', cursor, limit: 1000 });
-    for (const key of result.keys) {
-      const value = await kv.get(key.name);
+    const values = await Promise.all(result.keys.map(key => kv.get(key.name)));
+    for (const value of values) {
       if (value !== null) {
-        entries.push(JSON.parse(value) as CleanupEntry);
+        try {
+          entries.push(JSON.parse(value) as CleanupEntry);
+        } catch {
+          // Skip malformed entries — they'll age out with KV TTL
+        }
       }
     }
     cursor = result.list_complete ? undefined : result.cursor;
