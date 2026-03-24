@@ -4,3 +4,4 @@ dist/
 .dev.vars
 coverage/
 *.local
+wrangler.toml

@@ -159,9 +159,9 @@ class _MainContentState extends State<MainContent> {
                   ),
                 ),
                 inputFormatters: [
-                  LengthLimitingTextInputFormatter(21),
+                  LengthLimitingTextInputFormatter(200),
                   FilteringTextInputFormatter.allow(
-                    RegExp(r'[a-zA-Z0-9]'),
+                    RegExp(r'[a-zA-Z0-9:/.\-_~%?&=#@]'),
                   ),
                 ],
                 onChanged: (value) async {

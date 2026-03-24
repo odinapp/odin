@@ -49,7 +49,7 @@ https://user-images.githubusercontent.com/42910433/143038817-cb935815-aea7-41c1-
 
 ## Getting Started
 
-To build on MacOS or Windows, please follow these simple steps.
+To build on MacOS, Windows, Linux, Android, or iOS follow these steps.
 
 **Step 1:**
 
@@ -62,23 +62,20 @@ git clone https://github.com/odinapp/odin.git
 ```shell
 cd odin
 ```
+
+Create the `.env` file:
+
 ```shell
-touch .env
-```
-```shell
-echo 'GITHUB_TOKEN=**GITHUB_ACCESS_TOKEN**' >> .env
-```
-```shell
-echo 'GITHUB_USERNAME=**GITHUB_USERNAME**' >> .env
-```
-```shell
-echo 'GITHUB_TOKEN=**GITHUB_TOKEN**' >> .env
+cat > .env <<'EOF'
+API_URL=https://<your-worker>.workers.dev/
+API_VERSION=v1
+SUCCESSFUL_STATUS_CODE=200
+EOF
 ```
 
->
->
-> These environment variables are required as Odin uses a GitHub Repo to store the uploaded files. 
-> You may read GitHub docs to access these secrets.
+> **Backend:** Odin uses a Cloudflare Workers backend. Deploy your own using the code in `odin-worker/`,
+> then set `API_URL` to your deployment URL. The `.env` file is gitignored — never commit it.
+> No GitHub credentials are required.
 
 **Step 3:**
 
