@@ -26,9 +26,15 @@ export async function handleUpload(req: Request, env: Env): Promise<Response> {
   }
 
   // Reject early on declared size before reading any bytes into memory
-  const declaredSize = parseInt(formData.get('totalFileSize') as string ?? '0', 10);
-  if (!isNaN(declaredSize) && declaredSize > MAX_BYTES) {
-    return jsonError(413, 'file too large');
+  const rawSize = formData.get('totalFileSize');
+  if (rawSize !== null) {
+    const declaredSize = parseInt(rawSize as string, 10);
+    if (isNaN(declaredSize)) {
+      return jsonError(400, 'invalid totalFileSize');
+    }
+    if (declaredSize > MAX_BYTES) {
+      return jsonError(413, 'file too large');
+    }
   }
 
   // Collect files from both 'file' (multi-file path) and 'media' (single-file path)
@@ -90,6 +96,8 @@ export async function handleUpload(req: Request, env: Env): Promise<Response> {
       expiresAt: expiresAt.toISOString(),
     });
   } catch {
+    // Compensate: delete the R2 object to avoid orphan
+    await env.R2_BUCKET.delete(r2Key).catch(() => undefined);
     return jsonError(500, 'storage error');
   }
 
