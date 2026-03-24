@@ -44,13 +44,19 @@ export async function deleteCleanupEntry(kv: KVNamespace, token: string): Promis
 }
 
 export async function listCleanupEntries(kv: KVNamespace): Promise<CleanupEntry[]> {
-  const list = await kv.list({ prefix: 'cleanup:' });
   const entries: CleanupEntry[] = [];
-  for (const key of list.keys) {
-    const value = await kv.get(key.name);
-    if (value !== null) {
-      entries.push(JSON.parse(value) as CleanupEntry);
+  let cursor: string | undefined;
+
+  do {
+    const result = await kv.list({ prefix: 'cleanup:', cursor, limit: 1000 });
+    for (const key of result.keys) {
+      const value = await kv.get(key.name);
+      if (value !== null) {
+        entries.push(JSON.parse(value) as CleanupEntry);
+      }
     }
-  }
+    cursor = result.list_complete ? undefined : result.cursor;
+  } while (cursor !== undefined);
+
   return entries;
 }
