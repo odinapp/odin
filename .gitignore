@@ -62,3 +62,10 @@ macos/GoogleService-Info.plist
 
 # FVM Version Cache
 .fvm/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example

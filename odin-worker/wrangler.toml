@@ -1,10 +1,10 @@
-name = "odin-worker"
+name = "odin"
 main = "src/index.ts"
 compatibility_date = "2025-03-24"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
-PUBLIC_URL = "https://odin-worker.workers.dev"
+PUBLIC_URL = "https://odin.prismwalls.workers.dev"
 
 [[r2_buckets]]
 binding = "R2_BUCKET"
@@ -13,10 +13,8 @@ preview_bucket_name = "odin-files-preview"
 
 [[kv_namespaces]]
 binding = "KV_METADATA"
-# TODO (Task 13): Replace with real IDs from: npx wrangler kv namespace create odin-metadata
-# Until then, `wrangler dev` will fail — use `npm test` (miniflare) for local development.
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
-preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
+id = "941ae40d709d46d59869d16be3fe00ad"
+preview_id = "fdc4d514be384d9d932b85b01ad5c568"
 
 [triggers]
 crons = ["0 * * * *"]
