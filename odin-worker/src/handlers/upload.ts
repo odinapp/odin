@@ -12,6 +12,12 @@ export async function handleUpload(req: Request, env: Env): Promise<Response> {
     return jsonError(400, 'no file provided');
   }
 
+  // Reject on Content-Length header before buffering any bytes
+  const contentLength = parseInt(req.headers.get('content-length') ?? '0', 10);
+  if (!isNaN(contentLength) && contentLength > MAX_BYTES) {
+    return jsonError(413, 'file too large');
+  }
+
   let formData: FormData;
   try {
     formData = await req.formData();

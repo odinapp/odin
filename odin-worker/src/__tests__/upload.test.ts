@@ -83,4 +83,14 @@ describe('POST /api/v1/file/upload/', () => {
     const meta = await env.KV_METADATA.get(code);
     expect(JSON.parse(meta!).filename).toBe('files.zip');
   });
+
+  it('succeeds when totalFileSize field is absent', async () => {
+    const form = new FormData();
+    form.append('file', new File(['hello'], 'x.txt'));
+    form.append('directoryName', 'x');
+    // no totalFileSize field
+    const req = new Request('https://example.com/api/v1/file/upload/', { method: 'POST', body: form });
+    const res = await handleUpload(req, env);
+    expect(res.status).toBe(200);
+  });
 });
