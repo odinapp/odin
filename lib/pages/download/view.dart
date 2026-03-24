@@ -120,7 +120,7 @@ class _MobileDownloadBody extends StatefulWidget {
 class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   late final TextEditingController _controller;
   String _token = '';
-  ODebounce _debounce = ODebounce(const Duration(milliseconds: 300));
+  final ODebounce _debounce = ODebounce(const Duration(milliseconds: 400));
 
   OColor get color => widget.color;
 
@@ -128,9 +128,14 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
-    // Reset any stale status left over from a previous upload/download
-    locator<DioNotifier>().apiStatus = ApiStatus.init;
-    locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+    // Reset stale status from a previous upload/download — deferred to avoid
+    // calling notifyListeners() during an ongoing build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        locator<DioNotifier>().apiStatus = ApiStatus.init;
+        locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+      }
+    });
   }
 
   @override
@@ -195,7 +200,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
             const SizedBox(height: 10),
             Text(
               oApp.currentConfig?.token.description ??
-                  'Paste or type a token to download the shared files.',
+                  'Enter the 8-character token shared with you.',
               style: GoogleFonts.inter(
                 color: color.secondaryOnBackground,
                 fontSize: 14,
@@ -225,30 +230,33 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                       controller: _controller,
                       style: GoogleFonts.inter(
                         color: color.secondary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 2,
                       ),
+                      textCapitalization: TextCapitalization.none,
+                      autocorrect: false,
+                      enableSuggestions: false,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        hintText: oApp.currentConfig?.token.textFieldHintText ?? 'Enter token',
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                        hintText: oApp.currentConfig?.token.textFieldHintText ?? 'e.g. aB3kR9mQ',
                         hintStyle: GoogleFonts.inter(
                           color: color.secondaryOnBackground,
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
+                          letterSpacing: 0,
                         ),
                       ),
                       inputFormatters: [
-                        LengthLimitingTextInputFormatter(200),
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'[a-zA-Z0-9:/.\-_~%?&=#@]'),
-                        ),
+                        LengthLimitingTextInputFormatter(8),
+                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
                       ],
                       onChanged: (value) {
                         setState(() => _token = value);
-                        if (value.length > 3) {
+                        if (value.length >= 6) {
                           _debounce.call(_fetchMetadata);
                         } else {
                           locator<DioNotifier>().miniApiStatus = ApiStatus.init;
@@ -279,14 +287,14 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                 ],
               ),
             ),
-            // Metadata hint
+            // Metadata / error hint
             if (miniStatus == ApiStatus.success) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               _MobileMetadataHint(color: color),
             ] else if (miniStatus == ApiStatus.failed) ...[
               const SizedBox(height: 8),
               Text(
-                notifier.fetchFilesMetadataFailure?.message ?? 'Token not found or expired',
+                _friendlyError(notifier.fetchFilesMetadataFailure?.message),
                 style: GoogleFonts.inter(
                   color: color.error,
                   fontSize: 12,
@@ -300,9 +308,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: miniStatus == ApiStatus.success && _token.length > 3
-                    ? _download
-                    : null,
+                onPressed: miniStatus == ApiStatus.success ? _download : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: color.primary,
                   disabledBackgroundColor: const Color(0xFF2A2A2A),
@@ -313,15 +319,14 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : Text(
-                        oApp.currentConfig?.token.primaryButtonText ?? 'Download',
+                        oApp.currentConfig?.token.primaryButtonText ?? 'Download files',
                         style: GoogleFonts.inter(
-                          color: miniStatus == ApiStatus.success ? Colors.white : color.secondaryOnBackground,
+                          color: miniStatus == ApiStatus.success
+                              ? Colors.white
+                              : color.secondaryOnBackground,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
@@ -333,6 +338,18 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
         ),
       ),
     );
+  }
+
+  String _friendlyError(String? raw) {
+    if (raw == null || raw.isEmpty) return 'Token not found or expired.';
+    final lower = raw.toLowerCase();
+    if (lower.contains('not found') || lower.contains('expired')) {
+      return 'Token not found or expired. Check it and try again.';
+    }
+    if (lower.contains('network') || lower.contains('connection')) {
+      return 'No internet connection. Check your network and try again.';
+    }
+    return raw;
   }
 }
 
@@ -349,17 +366,21 @@ class _MobileMetadataHint extends StatelessWidget {
 
     final fileCount = metadata.files?.length ?? 0;
     final totalSize = metadata.totalFileSize ?? '';
-    final label = fileCount == 1
-        ? '1 file · $totalSize'
-        : '$fileCount files · $totalSize';
+    final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
 
-    return Text(
-      label,
-      style: GoogleFonts.inter(
-        color: color.primary,
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
+    return Row(
+      children: [
+        Icon(Icons.check_circle_rounded, color: color.primary, size: 14),
+        const SizedBox(width: 6),
+        Text(
+          '$fileLabel · $totalSize — ready to download',
+          style: GoogleFonts.inter(
+            color: color.primary,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

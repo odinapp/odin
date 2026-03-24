@@ -330,83 +330,92 @@ class _MobileSuccessBody extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const Spacer(),
+            // Token label
             Center(
               child: Text(
-                'Share the token below to let others download.',
+                'SHARE TOKEN',
+                style: GoogleFonts.inter(
+                  color: color.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2.5,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Token — bold and large, tap to copy
+            GestureDetector(
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: token));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Token copied',
+                      style: GoogleFonts.inter(color: color.secondary, fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
+                    backgroundColor: color.cardOnBackground,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 22),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A1A),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: color.primary.withOpacity(0.25), width: 1),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      token,
+                      style: GoogleFonts.inter(
+                        color: color.secondary,
+                        fontSize: 38,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 6,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.touch_app_rounded, color: color.secondaryOnBackground, size: 13),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Tap to copy',
+                          style: GoogleFonts.inter(
+                            color: color.secondaryOnBackground,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: Text(
+                'Send this token to anyone you want to share with.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   color: color.secondaryOnBackground,
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.w400,
                   height: 1.5,
                 ),
               ),
             ),
-            const Spacer(),
-            // Token box
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: const Color(0xFF242424),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      token,
-                      style: GoogleFonts.inter(
-                        color: color.secondaryOnBackground,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: token));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Copied to clipboard',
-                            style: GoogleFonts.inter(
-                              color: color.secondary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          backgroundColor: color.cardOnBackground,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: color.primary.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: SvgPicture.asset(
-                        oImage.copy,
-                        width: 18,
-                        height: 18,
-                        colorFilter: ColorFilter.mode(color.primary, BlendMode.srcIn),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Copy button (large, primary)
+            const SizedBox(height: 16),
+            // Copy button
             SizedBox(
               width: double.infinity,
               height: 52,
@@ -416,14 +425,13 @@ class _MobileSuccessBody extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Copied to clipboard',
+                        'Token copied',
                         style: GoogleFonts.inter(color: color.secondary, fontSize: 14),
                       ),
                       backgroundColor: color.cardOnBackground,
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },
@@ -473,7 +481,7 @@ class _MobileSuccessBody extends StatelessWidget {
                   Icon(Icons.delete_outline_rounded, color: color.error, size: 16),
                   const SizedBox(width: 6),
                   Text(
-                    'Delete files',
+                    'Need to delete early?',
                     style: GoogleFonts.inter(
                       color: color.error,
                       fontSize: 13,
@@ -484,7 +492,7 @@ class _MobileSuccessBody extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'Save your delete link to remove files from the server before they auto-expire.',
+                'Files auto-delete after 15 hours. To remove them sooner, save your delete link.',
                 style: GoogleFonts.inter(
                   color: color.secondaryOnBackground,
                   fontSize: 12,

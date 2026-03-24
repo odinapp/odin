@@ -49,13 +49,21 @@ class OdinRepositoryImpl implements OdinRepository {
         final statusCode = response.statusCode;
 
         if (statusCode.isSuccess) {
-          final data = response.data;
+          final data = response.data as Map<String, dynamic>;
+          // Extract just the 8-char code from the full URL (e.g. https://.../d/aB3kR9mQ → aB3kR9mQ)
+          final rawToken = data['token'] as String? ?? '';
+          final uri = Uri.tryParse(rawToken);
+          final code = (uri != null && uri.pathSegments.isNotEmpty)
+              ? uri.pathSegments.lastWhere((s) => s.isNotEmpty, orElse: () => rawToken)
+              : rawToken;
           return Success(UploadFilesSuccess(
-            token: data['token'],
-            deleteToken: data['deleteToken'],
+            token: code,
+            deleteToken: data['deleteToken'] as String?,
           ));
         } else {
-          return Failure(UploadFilesFailure(message: response.data));
+          final data = response.data;
+          final message = data is Map ? (data['error'] ?? 'Upload failed') : data?.toString() ?? 'Upload failed';
+          return Failure(UploadFilesFailure(message: message));
         }
       } else {
         return Failure(UploadFilesFailure(message: 'Client is null'));
@@ -139,24 +147,21 @@ class OdinRepositoryImpl implements OdinRepository {
           final filesMetadata = FilesMetadata.fromJson(data);
           return Success(FetchFilesMetadataSuccess(filesMetadata: filesMetadata));
         } else {
-          return Failure(FetchFilesMetadataFailure(message: response.data));
+          final data = response.data;
+          final message = data is Map ? (data['error'] ?? 'Token not found or expired') : data?.toString() ?? 'Token not found or expired';
+          return Failure(FetchFilesMetadataFailure(message: message));
         }
       } else {
         return Failure(FetchFilesMetadataFailure(message: 'Client is null'));
       }
     } on DioException catch (dioError) {
-      final exception = Exception(
-        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
-      );
-      logger.e(
-        '[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}',
-        error: exception,
-        stackTrace: dioError.stackTrace,
-      );
-      return Failure(FetchFilesMetadataFailure(message: dioError.response.toString()));
+      final data = dioError.response?.data;
+      final message = data is Map ? (data['error'] ?? 'Token not found or expired') : data?.toString() ?? 'Token not found or expired';
+      logger.e('[DioService]: fetchFilesMetadata ${dioError.response?.statusCode}', error: dioError, stackTrace: dioError.stackTrace);
+      return Failure(FetchFilesMetadataFailure(message: message));
     } catch (e, st) {
       logger.e('[DioService]: fetchFilesMetadata', error: e, stackTrace: st);
-      return Failure(FetchFilesMetadataFailure(message: e.toString()));
+      return Failure(FetchFilesMetadataFailure(message: 'Something went wrong. Try again.'));
     }
   }
 
