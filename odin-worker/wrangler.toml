@@ -13,6 +13,8 @@ preview_bucket_name = "odin-files-preview"
 
 [[kv_namespaces]]
 binding = "KV_METADATA"
+# TODO (Task 13): Replace with real IDs from: npx wrangler kv namespace create odin-metadata
+# Until then, `wrangler dev` will fail — use `npm test` (miniflare) for local development.
 id = "REPLACE_WITH_KV_NAMESPACE_ID"
 preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
 
