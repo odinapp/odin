@@ -7,14 +7,14 @@ part of 'create_file.dart';
 // **************************************************************************
 
 CreateFile _$CreateFileFromJson(Map<String, dynamic> json) => CreateFile(
-      path: json['path'] as String?,
-      content: json['content'] as String?,
-      message: json['message'] as String?,
-      branch: json['branch'] as String?,
-      committer: json['committer'] == null
-          ? null
-          : CommitUser.fromJson(json['committer'] as Map<String, dynamic>),
-    );
+  path: json['path'] as String?,
+  content: json['content'] as String?,
+  message: json['message'] as String?,
+  branch: json['branch'] as String?,
+  committer: json['committer'] == null
+      ? null
+      : CommitUser.fromJson(json['committer'] as Map<String, dynamic>),
+);
 
 Map<String, dynamic> _$CreateFileToJson(CreateFile instance) =>
     <String, dynamic>{

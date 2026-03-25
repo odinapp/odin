@@ -1,3 +1,4 @@
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/services/file_service.dart';
 import 'package:odin/services/locator.dart';
@@ -11,18 +12,19 @@ class FileNotifier with ChangeNotifier {
   String get zipfileName => _fileService.zipfileName;
 
   Future<void> getLinkFromFilePicker() async {
-    await _fileService.getLinkFromFilePicker();
+    // await _fileService.getLinkFromFilePicker();
     notifyListeners();
   }
 
-  Future<void> getLinkFromDroppedFiles(List<Uri> urls) async {
-    await _fileService.getLinkFromDroppedFiles(urls);
+  Future<void> getLinkFromDroppedFiles(List<XFile> xfiles) async {
+    // await _fileService.getLinkFromDroppedFiles(xfiles);
     notifyListeners();
   }
 
   Future<String> getFileFromToken(String token) async {
-    final _filePath = await _fileService.getFileFromToken(token);
+    // final filePath = await _fileService.getFileFromToken(token);
     notifyListeners();
-    return _filePath;
+    // return filePath;
+    return '';
   }
 }

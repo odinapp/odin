@@ -7,7 +7,7 @@
 
 
 <p align="center">
-<a href="https://flutter.dev/"><img src="https://img.shields.io/badge/Flutter-v2.5.1-blue?logo=flutter"></a>
+<a href="https://flutter.dev/"><img src="https://img.shields.io/badge/Flutter-stable-blue?logo=flutter"></a>
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/stars/odinapp/odin.svg?style=flat&logo=github&colorB=deeppink&label=stars"></a>
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/v/release/odinapp/odin.svg"></a>
 <a href="https://github.com/odinapp/odin"><img src="https://img.shields.io/github/license/odinapp/odin.svg" alt="License: AGPL"></a>
@@ -39,7 +39,43 @@ Cross-platform hassle-free file sharing with AES-256 encryption made with Flutte
 https://user-images.githubusercontent.com/42910433/143038817-cb935815-aea7-41c1-8b56-131cb99b0a20.mp4
 
 </details>
-    
+
+### Screenshots (mobile)
+
+Captured from a connected Android device via ADB (debug build). Paths are from the repo root. After large UI changes, recapture with the same flow and replace the files in [`docs/screenshots/`](docs/screenshots/).
+
+**Home**
+
+| Step | Preview |
+| --- | --- |
+| Home | ![Odin home](docs/screenshots/01_home_mobile.png) |
+
+**Send files**
+
+| Pick file | Uploading | Uploaded |
+| --- | --- | --- |
+| ![Pick file](docs/screenshots/02_send_pick_file.png) | ![Uploading](docs/screenshots/03_send_uploading.png) | ![Upload success](docs/screenshots/04_send_upload_success.png) |
+
+**Your uploads**
+
+| Bottom sheet |
+| --- |
+| ![Your uploads sheet](docs/screenshots/05_your_uploads_sheet.png) |
+
+**Receive files**
+
+| Valid token | Wrong token | Downloading | Downloaded |
+| --- | --- | --- | --- |
+| ![Valid token](docs/screenshots/06_download_right_token.png) | ![Wrong token](docs/screenshots/07_download_wrong_token.png) | ![Downloading](docs/screenshots/08_downloading.png) | ![Download complete](docs/screenshots/09_download_success.png) |
+
+### Screen recordings
+
+Short screen captures of the same flows live in [`docs/videos/`](docs/videos/) (recorded with `adb shell screenrecord` on device, then pulled to the repo).
+
+| Recording | File |
+| --- | --- |
+| Send flow (pick file → success) and **Your uploads** sheet | [01_flow_send_and_uploads.mp4](docs/videos/01_flow_send_and_uploads.mp4) |
+| Receive flow (wrong token → valid token → download complete) | [02_flow_download_receive.mp4](docs/videos/02_flow_download_receive.mp4) |
 
 ## Built With
 
@@ -49,7 +85,7 @@ https://user-images.githubusercontent.com/42910433/143038817-cb935815-aea7-41c1-
 
 ## Getting Started
 
-To build on MacOS or Windows, please follow these simple steps.
+To build on MacOS, Windows, Linux, Android, or iOS follow these steps.
 
 **Step 1:**
 
@@ -62,53 +98,68 @@ git clone https://github.com/odinapp/odin.git
 ```shell
 cd odin
 ```
+
+Create the `.env` file:
+
 ```shell
-touch .env
-```
-```shell
-echo 'GITHUB_TOKEN=**GITHUB_ACCESS_TOKEN**' >> .env
-```
-```shell
-echo 'GITHUB_USERNAME=**GITHUB_USERNAME**' >> .env
-```
-```shell
-echo 'GITHUB_TOKEN=**GITHUB_TOKEN**' >> .env
+cat > .env <<'EOF'
+API_URL=https://<your-worker>.workers.dev/
+API_VERSION=v1
+SUCCESSFUL_STATUS_CODE=200
+EOF
 ```
 
->
->
-> These environment variables are required as Odin uses a GitHub Repo to store the uploaded files. 
-> You may read GitHub docs to access these secrets.
+> **Backend:** Odin uses a Cloudflare Workers backend. Deploy your own using the code in `odin-worker/`,
+> then set `API_URL` to your deployment URL. The `.env` file is gitignored — never commit it.
+> No GitHub credentials are required.
 
 **Step 3:**
 
-Follow the instructions [here](https://flutter.dev/docs/get-started/install) to install Flutter. As Odin uses the `stable` channel, you need to switch the channel if you are on `dev` or `beta` channels. Just type:
+Install [FVM](https://fvm.app/) (Flutter Version Management), then from the repository root install the SDK pinned for this project:
 
 ```shell
-flutter channel stable
+fvm install
 ```
+
+Odin pins the **stable** Flutter channel via `.fvmrc`. Use `fvm flutter` / `fvm dart` for all Flutter and Dart commands so you use that SDK (not a mismatched global install).
 
 **Step 4:**
 
-You should enable the specified platform first if you don't enable it before and then select the desktop device.
+Enable the desktop embedder for your OS if you have not already, then pick the desktop device when running.
+
 ```shell
 # for windows
-flutter config --enable-windows-desktop
+fvm flutter config --enable-windows-desktop
 
 # for macos
-flutter config --enable-macos-desktop
+fvm flutter config --enable-macos-desktop
 
 # for linux
-flutter config --enable-linux-desktop
+fvm flutter config --enable-linux-desktop
 ```
 
 **Step 5:**
 
-To run the app just type these commands in terminal or use the Run and Debug option from your editor of choice.
+To fetch packages and run the app (from the repo root):
+
 ```shell
-flutter pub get
-flutter run
+fvm flutter pub get
+fvm flutter run
 ```
+
+**Editor tip:** Point your IDE’s Flutter SDK path to `.fvm/flutter_sdk` inside this repo so analysis and device selection match FVM.
+
+### Verify your setup
+
+From the repo root:
+
+```shell
+fvm flutter analyze --no-fatal-infos
+fvm flutter test
+```
+
+For Android: `fvm flutter build apk` (debug or release). For Linux desktop, install the [Flutter Linux prerequisites](https://docs.flutter.dev/platform-integration/linux/setup) (for example `cmake`, `ninja-build`, and GTK development packages), then run `fvm flutter build linux` or `fvm flutter run -d linux`.
+
 ## Roadmap
 
 ```

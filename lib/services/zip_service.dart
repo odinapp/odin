@@ -6,23 +6,21 @@ import 'package:odin/services/logger.dart';
 import 'package:odin/services/random_service.dart';
 import 'package:odin/utilities/byte_formatter.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ZipService {
   final RandomService _randomService = locator<RandomService>();
   String linkTitle = "";
   String linkDesc = "";
 
-  Future<File> zipFile({
-    required List<File> fileToZips,
-  }) async {
+  Future<File> zipFile({required List<File> fileToZips}) async {
     logger.d('Started Zipping Files');
     final ZipFileEncoder encoder = ZipFileEncoder();
-    final Directory zipFileSaveDirectory = await getTemporaryDirectory();
-    final zipFileSavePath = zipFileSaveDirectory.path;
+    final zipFileSavePath = Directory.systemTemp.path;
     // Manually create a zip at the zipFilePath
-    final String zipFilePath = join(zipFileSavePath,
-        "${basename(fileToZips.first.path).replaceAll('.', '_')}_${_randomService.getRandomString(15)}.zip");
+    final String zipFilePath = join(
+      zipFileSavePath,
+      "${basename(fileToZips.first.path).replaceAll('.', '_')}_${_randomService.getRandomString(15)}.zip",
+    );
     encoder.create(zipFilePath);
     // Add all the files to the zip file
     for (final File fileToZip in fileToZips) {
@@ -59,5 +57,23 @@ class ZipService {
     }
     file.deleteSync(); // Delete the original ZIP file
     return Directory(outDirectory).path;
+  }
+
+  Future<File?> convertMultipleFilesIntoZip(List<File> files) async {
+    try {
+      File zippedFile;
+      if (files.length > 1) {
+        zippedFile = await zipFile(fileToZips: files);
+      } else {
+        zippedFile = files[0];
+        zippedFile = zippedFile.copySync(
+          join(Directory.systemTemp.path, basename(files[0].path)),
+        );
+      }
+      return zippedFile;
+    } catch (e, st) {
+      logger.e('$e', error: e, stackTrace: st);
+      return null;
+    }
   }
 }

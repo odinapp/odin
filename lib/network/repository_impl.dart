@@ -1,0 +1,290 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:odin/model/config.dart';
+import 'package:odin/model/files_metadata.dart';
+import 'package:odin/network/networking_box/networking_box.dart';
+import 'package:odin/network/repository.dart';
+import 'package:odin/services/locator.dart';
+import 'package:odin/services/logger.dart';
+import 'package:odin/services/random_service.dart';
+import 'package:odin/utilities/networking.dart';
+
+part './end_points.dart';
+
+class OdinRepositoryImpl implements OdinRepository {
+  static final randomService = locator<RandomService>();
+
+  @override
+  Future<Result<UploadFilesSuccess, UploadFilesFailure>> uploadFilesAnonymous({
+    required UploadFilesRequest request,
+  }) async {
+    final client = await ONetworkingBox.unsecureClient();
+    try {
+      if (client != null) {
+        final formData = FormData();
+        final totalFileSizeInBytes = request.totalFileSize;
+
+        for (var file in request.files) {
+          logger.d('[DioService]: fileName: ${file.path.split('/').last}');
+          formData.files.addAll([
+            MapEntry(
+              "file",
+              await MultipartFile.fromFile(
+                file.path,
+                filename: file.path.split('/').last,
+              ),
+            ),
+          ]);
+        }
+
+        final directoryName = randomService.getRandomString(10);
+
+        formData.fields.add(MapEntry("directoryName", directoryName));
+        formData.fields.add(
+          MapEntry("totalFileSize", totalFileSizeInBytes.toString()),
+        );
+
+        final response = await client.post(
+          _EndPoint.uploadFiles,
+          cancelToken: request.cancelToken,
+          onSendProgress: request.onSendProgress,
+          data: formData,
+        );
+        final statusCode = response.statusCode;
+
+        if (statusCode.isSuccess) {
+          final data = response.data as Map<String, dynamic>;
+          // Extract just the 8-char code from the full URL (e.g. https://.../d/aB3kR9mQ → aB3kR9mQ)
+          final rawToken = data['token'] as String? ?? '';
+          final uri = Uri.tryParse(rawToken);
+          final code = (uri != null && uri.pathSegments.isNotEmpty)
+              ? uri.pathSegments.lastWhere(
+                  (s) => s.isNotEmpty,
+                  orElse: () => rawToken,
+                )
+              : rawToken;
+          return Success(
+            UploadFilesSuccess(
+              token: code,
+              deleteToken: data['deleteToken'] as String?,
+            ),
+          );
+        } else {
+          final data = response.data;
+          final message = data is Map
+              ? (data['error'] ?? 'Upload failed')
+              : data?.toString() ?? 'Upload failed';
+          return Failure(UploadFilesFailure(message: message));
+        }
+      } else {
+        return Failure(UploadFilesFailure(message: 'Client is null'));
+      }
+    } on DioException catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}',
+        error: exception,
+        stackTrace: dioError.stackTrace,
+      );
+      return Failure(UploadFilesFailure(message: dioError.response.toString()));
+    } catch (e, st) {
+      logger.e('[DioService]: uploadFilesAnonymous', error: e, stackTrace: st);
+      return Failure(UploadFilesFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<UploadFileSuccess, UploadFileFailure>> uploadFileAnonymous({
+    required UploadFileRequest request,
+  }) async {
+    final client = await ONetworkingBox.unsecureClient();
+
+    if (client != null) {
+      String fileName = request.file.path.split('/').last;
+      final directoryName = randomService.getRandomString(10);
+      final fileSize = request.fileSize;
+
+      final multipartFile = await MultipartFile.fromFile(
+        request.file.path,
+        filename: fileName,
+      );
+      final requestJson = <String, dynamic>{
+        'directoryName': directoryName,
+        'totalFileSize': fileSize.toString(),
+      };
+
+      requestJson['media'] = multipartFile;
+
+      logger.d('[DioService]: fileName: $fileName');
+      logger.d('[DioService]: requestJson: $requestJson');
+      FormData formData = FormData.fromMap(requestJson);
+
+      final response = await client.post(
+        _EndPoint.uploadFiles,
+        cancelToken: request.cancelToken,
+        onSendProgress: request.onSendProgress,
+        data: formData,
+      );
+      final statusCode = response.statusCode;
+
+      if (statusCode.isSuccess) {
+        return Success(UploadFileSuccess());
+      } else {
+        return Failure(UploadFileFailure());
+      }
+    } else {
+      return Failure(UploadFileFailure());
+    }
+  }
+
+  @override
+  Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>>
+  fetchFilesMetadata({required FetchFilesMetadataRequest request}) async {
+    final client = await ONetworkingBox.unsecureClient();
+
+    try {
+      if (client != null) {
+        final response = await client.get(
+          _EndPoint.fetchFilesMetadata,
+          cancelToken: request.cancelToken,
+          onReceiveProgress: request.onReceiveProgress,
+          queryParameters: {'token': request.token},
+        );
+
+        final statusCode = response.statusCode;
+
+        if (statusCode.isSuccess) {
+          final data = response.data;
+          final filesMetadata = FilesMetadata.fromJson(data);
+          return Success(
+            FetchFilesMetadataSuccess(filesMetadata: filesMetadata),
+          );
+        } else {
+          final data = response.data;
+          final message = data is Map
+              ? (data['error'] ?? 'Token not found or expired')
+              : data?.toString() ?? 'Token not found or expired';
+          return Failure(FetchFilesMetadataFailure(message: message));
+        }
+      } else {
+        return Failure(FetchFilesMetadataFailure(message: 'Client is null'));
+      }
+    } on DioException catch (dioError) {
+      final data = dioError.response?.data;
+      final message = data is Map
+          ? (data['error'] ?? 'Token not found or expired')
+          : data?.toString() ?? 'Token not found or expired';
+      logger.e(
+        '[DioService]: fetchFilesMetadata ${dioError.response?.statusCode}',
+        error: dioError,
+        stackTrace: dioError.stackTrace,
+      );
+      return Failure(FetchFilesMetadataFailure(message: message));
+    } catch (e, st) {
+      logger.e('[DioService]: fetchFilesMetadata', error: e, stackTrace: st);
+      return Failure(
+        FetchFilesMetadataFailure(message: 'Something went wrong. Try again.'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<FetchConfigSuccess, FetchConfigFailure>> fetchConfig({
+    required FetchConfigRequest request,
+  }) async {
+    final client = await ONetworkingBox.unsecureClient();
+
+    try {
+      if (client != null) {
+        final response = await client.get(
+          _EndPoint.config,
+          cancelToken: request.cancelToken,
+          onReceiveProgress: request.onReceiveProgress,
+          queryParameters: {},
+        );
+
+        final statusCode = response.statusCode;
+
+        if (statusCode.isSuccess) {
+          final data = response.data;
+          final config = Config.fromJson(data);
+          return Success(FetchConfigSuccess(config: config));
+        } else {
+          return Failure(FetchConfigFailure(message: response.data));
+        }
+      } else {
+        return Failure(FetchConfigFailure(message: 'Client is null'));
+      }
+    } on DioException catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}',
+        error: exception,
+        stackTrace: dioError.stackTrace,
+      );
+      return Failure(FetchConfigFailure(message: dioError.response.toString()));
+    } catch (e, st) {
+      logger.e('[DioService]: fetchConfig', error: e, stackTrace: st);
+      return Failure(FetchConfigFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<DownloadFileSuccess, DownloadFileFailure>> downloadFile({
+    required DownloadFileRequest request,
+  }) async {
+    final client = await ONetworkingBox.unsecureClient(
+      options: ONetworkingOptions(responseType: ResponseType.bytes),
+    );
+
+    try {
+      if (client != null) {
+        final response = await client.get(
+          _EndPoint.downloadFiles,
+          cancelToken: request.cancelToken,
+          onReceiveProgress: request.onReceiveProgress,
+          queryParameters: {"token": request.token},
+        );
+
+        final statusCode = response.statusCode;
+
+        if (statusCode.isSuccess) {
+          final filename =
+              response.headers.value('Filename') ?? 'defaultFile.txt';
+          final filePath = '${request.savePath}/$filename';
+          logger.d('filePath: $filePath');
+          File file = File(filePath);
+          var raf = file.openSync(mode: FileMode.write);
+          final data = response.data;
+          raf.writeFromSync(data);
+          await raf.close();
+          return Success(DownloadFileSuccess(file: file));
+        } else {
+          return Failure(DownloadFileFailure(message: response.data));
+        }
+      } else {
+        return Failure(DownloadFileFailure(message: 'Client is null'));
+      }
+    } on DioException catch (dioError) {
+      final exception = Exception(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.message}',
+      );
+      logger.e(
+        '[${dioError.response?.statusCode ?? 0}]: ${dioError.response?.data ?? dioError.message}',
+        error: exception,
+        stackTrace: dioError.stackTrace,
+      );
+      return Failure(
+        DownloadFileFailure(message: dioError.response.toString()),
+      );
+    } catch (e, st) {
+      logger.e('[DioService]: downloadFile', error: e, stackTrace: st);
+      return Failure(DownloadFileFailure(message: e.toString()));
+    }
+  }
+}

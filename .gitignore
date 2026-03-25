@@ -20,6 +20,8 @@
 # is commented out by default.
 #.vscode/
 
+# FVM (keep .fvm/fvm_config.json committed; ignore SDK symlink/cache)
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -56,3 +58,14 @@ odin-release-key.keystore
 android/app/google-services.json
 android/app/build/*
 macos/GoogleService-Info.plist
+.vscode/settings.json
+
+# FVM Version Cache
+.fvm/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example

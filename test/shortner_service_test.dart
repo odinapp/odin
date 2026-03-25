@@ -3,11 +3,13 @@ import 'package:odin/services/shortener_service.dart';
 
 void main() {
   group("Shortener -", () {
-    test("Url should contain shrtco.de", () async {
-      final ShortenerService _shortnerService = ShortenerService();
-      const String url = "https://www.google.com";
-      final String? shortUrl = await _shortnerService.getFileCode(url, "test");
-      expect(shortUrl, stringContainsInOrder(["https://", "shrtco.de"]));
+    test("Built short URL contains shrtco.de", () {
+      final ShortenerService shortenerService = ShortenerService();
+      final built = shortenerService.getShortUrlFromFileCode("abc123test");
+      expect(
+        built,
+        stringContainsInOrder(["https://", "shrtco.de", "abc123test"]),
+      );
     });
   });
 }

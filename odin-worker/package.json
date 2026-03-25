@@ -1,0 +1,21 @@
+{
+  "name": "odin-worker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.12.0",
+    "@cloudflare/workers-types": "^4.20250321.0",
+    "typescript": "^5.4.5",
+    "vitest": "^3.2.0",
+    "wrangler": "^4.77.0"
+  }
+}

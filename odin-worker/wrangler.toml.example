@@ -1,0 +1,20 @@
+name = "odin"
+main = "src/index.ts"
+compatibility_date = "2025-03-24"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+PUBLIC_URL = "https://<your-worker>.workers.dev"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "<your-r2-bucket-name>"
+preview_bucket_name = "<your-r2-bucket-name>-preview"
+
+[[kv_namespaces]]
+binding = "KV_METADATA"
+id = "<your-kv-namespace-id>"
+preview_id = "<your-kv-preview-namespace-id>"
+
+[triggers]
+crons = ["0 * * * *"]

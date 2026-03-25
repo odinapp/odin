@@ -4,16 +4,18 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
-final printer = LogOutputPrinter();
-final logger = Logger(
+Logger? _logger;
+Logger get logger => _logger ??= Logger(
   level: Level.debug,
   printer: printer,
   filter: kDebugMode
       ? PassThroughFilter()
       : PassThroughFilter(), //!ProductionFilter(), Add before final release
 );
+
+LogOutputPrinter? _printer;
+LogOutputPrinter get printer => _printer ??= LogOutputPrinter();
 
 class PassThroughFilter extends LogFilter {
   @override
@@ -23,55 +25,20 @@ class PassThroughFilter extends LogFilter {
 }
 
 class LogOutputPrinter extends PrettyPrinter {
-  late String _logFolderPath;
+  late final String _logFolderPath;
   RandomAccessFile? _logFile;
 
-  LogOutputPrinter() {
-    if (Platform.isWindows) {
-      getTemporaryDirectory().then((cacheDir) async {
-        if (!cacheDir.existsSync()) {
-          getDownloadsDirectory().then((cDir) async {
-            _logFolderPath = join(cDir?.path ?? '', "logs");
-            try {
-              await Directory(_logFolderPath).create();
-            } catch (e) {
-              // Ignore if it already exists
-            }
-            await setLogCapture(true);
-          });
-        } else {
-          _logFolderPath = join(cacheDir.path, "logs");
-          try {
-            await Directory(_logFolderPath).create();
-          } catch (e) {
-            // Ignore if it already exists
-          }
-          await setLogCapture(true);
-        }
-        developer.log(cacheDir.path);
-      });
+  LogOutputPrinter() : super(dateTimeFormat: DateTimeFormat.onlyTime) {
+    if (!kIsWeb) {
+      _logFolderPath = join(Directory.systemTemp.path, 'odin_logs');
+      try {
+        Directory(_logFolderPath).createSync(recursive: true);
+      } catch (_) {
+        // Ignore if it already exists
+      }
+      setLogCapture(true);
     } else {
-      getExternalStorageDirectory().then((cacheDir) async {
-        if (cacheDir == null) {
-          getApplicationDocumentsDirectory().then((cDir) async {
-            _logFolderPath = join(cDir.path, "logs");
-            try {
-              await Directory(_logFolderPath).create();
-            } catch (e) {
-              // Ignore if it already exists
-            }
-            await setLogCapture(true);
-          });
-        } else {
-          _logFolderPath = join(cacheDir.path, "logs");
-          try {
-            await Directory(_logFolderPath).create();
-          } catch (e) {
-            // Ignore if it already exists
-          }
-          await setLogCapture(true);
-        }
-      });
+      _logFolderPath = '';
     }
   }
 
@@ -81,32 +48,34 @@ class LogOutputPrinter extends PrettyPrinter {
     final logLvl = event.level;
     final logStrace = event.stackTrace;
     final logError = event.error;
-    final color = PrettyPrinter.levelColors[logLvl];
-    final prefix = SimplePrinter.levelPrefixes[logLvl];
+    final color = PrettyPrinter.defaultLevelColors[logLvl]!;
+    final prefix = SimplePrinter.levelPrefixes[logLvl]!;
     final str =
         "---------------------------------------------------------------------------\nLEVEL : $logLvl\nMESSAGE : ${DateTime.now().toString().substring(11, 22)} :: $logMsg\nERROR : $logError\nSTACKTRACE : $logStrace";
-    Future.delayed(const Duration(seconds: 1))
-        .then((value) => _logFile?.writeStringSync('$str\n'));
-    final timeStr = getTime().substring(0, 12);
+    Future.delayed(
+      const Duration(seconds: 1),
+    ).then((value) => _logFile?.writeStringSync('$str\n'));
+    final timeStr = getTime(event.time).substring(0, 12);
     if (logStrace != null) {
-      // print(color!('$timeStr $prefix - $logMsg \n$logStrace'));
       developer.log(
-        color!('$logMsg \n$logError'),
-        name: "$timeStr :: ${prefix!.replaceAll("[", "").replaceAll("]", "")}",
+        color('$logMsg \n$logError'),
+        name: "$timeStr :: ${prefix.replaceAll("[", "").replaceAll("]", "")}",
         stackTrace: logStrace,
         level: 2000,
       );
     } else {
-      // print(color!('$timeStr $prefix - $logMsg'));
       developer.log(
-        color!('$logMsg'),
-        name: "$timeStr :: ${prefix!.replaceAll("[", "").replaceAll("]", "")}",
+        color('$logMsg'),
+        name: "$timeStr :: ${prefix.replaceAll("[", "").replaceAll("]", "")}",
       );
     }
     return [];
   }
 
   Future<void> setLogCapture(bool state) async {
+    if (kIsWeb || _logFolderPath.isEmpty) {
+      return;
+    }
     if (state) {
       final today = DateTime.now().toString().substring(0, 10);
       final logFilePath = join(_logFolderPath, '$today.txt');
@@ -132,11 +101,7 @@ class LogOutputPrinter extends PrettyPrinter {
     final DateTime today = DateTime.now();
     final l = <String>[];
     for (var i = 0; i < n; i++) {
-      final String fp = filePathForDate(
-        today.subtract(
-          Duration(days: i),
-        ),
-      );
+      final String fp = filePathForDate(today.subtract(Duration(days: i)));
       if (File(fp).existsSync()) {
         l.add(fp);
       } else {
@@ -167,22 +132,3 @@ class LogOutputPrinter extends PrettyPrinter {
     }
   }
 }
-
-// Future<String> zipLogs() async {
-//   logger.v("Zipping Logs");
-//   final sourceDir = Directory(printer.logsFolderPath());
-//   final files = printer.filePathsForDates(2).map((e) => File(e)).toList();
-//   final zipFile = File(join(printer.logsFolderPath(), 'logs.zip'));
-//   try {
-//     logger.v("Zipping Started");
-//     await ZipFile.createFromFiles(
-//         sourceDir: sourceDir, files: files, zipFile: zipFile);
-//     logger.v("Zipping Finished Successfully");
-//     logger.v("Renaming Zip File");
-//     await zipFile.rename(join(printer.logsFolderPath(), 'logs'));
-//     logger.v("Renaming Done");
-//   } catch (e, strace) {
-//     logger.e(e, e, strace);
-//   }
-//   return join(printer.logsFolderPath(), 'logs');
-// }

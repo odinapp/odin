@@ -5,8 +5,13 @@ part 'create_file.g.dart';
 
 @JsonSerializable()
 class CreateFile {
-  CreateFile(
-      {this.path, this.content, this.message, this.branch, this.committer});
+  CreateFile({
+    this.path,
+    this.content,
+    this.message,
+    this.branch,
+    this.committer,
+  });
 
   String? path;
   String? message;
