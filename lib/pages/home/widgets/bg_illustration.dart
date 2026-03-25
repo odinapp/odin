@@ -1,9 +1,7 @@
 part of '../home_page.dart';
 
 class BGIllustration extends StatelessWidget {
-  const BGIllustration({
-    Key? key,
-  }) : super(key: key);
+  const BGIllustration({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

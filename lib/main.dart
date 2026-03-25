@@ -18,37 +18,44 @@ import 'package:provider/provider.dart';
 // import 'package:url_launcher/url_launcher_string.dart';
 
 void main() {
-  runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    // Initialize the app
-    setupLocator();
-    await locator<EnvironmentService>().init();
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      // Initialize the app
+      setupLocator();
+      await locator<EnvironmentService>().init();
 
-    runApp(
-      MultiProvider(
-        providers: [
-          // ChangeNotifierProvider<FileNotifier>(create: (_) => FileNotifier()),
-          ChangeNotifierProvider<DioNotifier>(create: (_) => locator<DioNotifier>()),
-          ChangeNotifierProvider<BooterNotifier>(create: (_) => locator<BooterNotifier>()),
-        ],
-        child: const MyApp(),
-      ),
-    );
+      runApp(
+        MultiProvider(
+          providers: [
+            // ChangeNotifierProvider<FileNotifier>(create: (_) => FileNotifier()),
+            ChangeNotifierProvider<DioNotifier>(
+              create: (_) => locator<DioNotifier>(),
+            ),
+            ChangeNotifierProvider<BooterNotifier>(
+              create: (_) => locator<BooterNotifier>(),
+            ),
+          ],
+          child: const MyApp(),
+        ),
+      );
 
-    if (!kIsWeb && (Platform.isWindows || Platform.isMacOS)) {
-      doWhenWindowReady(() {
-        final win = appWindow;
-        const initialSize = Size(720, 512);
-        win.minSize = initialSize;
-        win.size = initialSize;
-        win.alignment = Alignment.center;
-        win.title = "Odin";
-        win.show();
-      });
-    }
-  }, (obj, stacktrace) {
-    logger.e('$obj', error: obj, stackTrace: stacktrace);
-  });
+      if (!kIsWeb && (Platform.isWindows || Platform.isMacOS)) {
+        doWhenWindowReady(() {
+          final win = appWindow;
+          const initialSize = Size(720, 512);
+          win.minSize = initialSize;
+          win.size = initialSize;
+          win.alignment = Alignment.center;
+          win.title = "Odin";
+          win.show();
+        });
+      }
+    },
+    (obj, stacktrace) {
+      logger.e('$obj', error: obj, stackTrace: stacktrace);
+    },
+  );
 }
 
 class MyApp extends StatefulWidget {

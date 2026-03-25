@@ -13,10 +13,11 @@ final buttonColors = WindowButtonColors(
 );
 
 final closeButtonColors = WindowButtonColors(
-    mouseOver: const Color(0x11FFFFFF),
-    mouseDown: const Color(0xFFB71C1C),
-    iconNormal: const Color(0x77FFFFFF),
-    iconMouseOver: const Color(0xFFD32F2F));
+  mouseOver: const Color(0x11FFFFFF),
+  mouseDown: const Color(0xFFB71C1C),
+  iconNormal: const Color(0x77FFFFFF),
+  iconMouseOver: const Color(0xFFD32F2F),
+);
 
 class WindowButtons extends StatefulWidget {
   const WindowButtons({Key? key}) : super(key: key);
@@ -31,10 +32,7 @@ class _WindowButtonsState extends State<WindowButtons> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        MinimizeWindowButton(
-          colors: buttonColors,
-          animate: true,
-        ),
+        MinimizeWindowButton(colors: buttonColors, animate: true),
         Theme(
           data: ThemeData.dark(),
           child: PopupMenuButton(
@@ -58,10 +56,7 @@ class _WindowButtonsState extends State<WindowButtons> {
               PopupMenuItem(
                 height: 32,
                 value: 1,
-                child: Text(
-                  "About",
-                  style: GoogleFonts.poppins(fontSize: 12),
-                ),
+                child: Text("About", style: GoogleFonts.poppins(fontSize: 12)),
               ),
               PopupMenuItem(
                 value: 2,
@@ -74,10 +69,7 @@ class _WindowButtonsState extends State<WindowButtons> {
             ],
           ),
         ),
-        CloseWindowButton(
-          colors: closeButtonColors,
-          animate: true,
-        ),
+        CloseWindowButton(colors: closeButtonColors, animate: true),
       ],
     );
   }

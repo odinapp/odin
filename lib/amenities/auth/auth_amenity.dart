@@ -16,16 +16,16 @@ class AuthAmenityImpl implements AuthAmenity {
       authStatus = AuthStatus.authenticated;
     }
 
-    AuthKeyChain.instance.addListener(
-      () {
-        logger.d('[AuthKeyChain.instance.listener] authenticated : ${authStatus == AuthStatus.authenticated}');
-        if (AuthKeyChain.instance.authenticationDetails != null) {
-          authStatus = AuthStatus.authenticated;
-        } else {
-          authStatus = AuthStatus.unauthenticated;
-        }
-      },
-    );
+    AuthKeyChain.instance.addListener(() {
+      logger.d(
+        '[AuthKeyChain.instance.listener] authenticated : ${authStatus == AuthStatus.authenticated}',
+      );
+      if (AuthKeyChain.instance.authenticationDetails != null) {
+        authStatus = AuthStatus.authenticated;
+      } else {
+        authStatus = AuthStatus.unauthenticated;
+      }
+    });
   }
 
   @override

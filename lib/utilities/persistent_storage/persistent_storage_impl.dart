@@ -34,11 +34,7 @@ class OPersistentStorageImpl implements OPersistentStorage {
         overwrite: true,
       );
     } else if (createIfNotExisting) {
-      await store<T>(
-        key: key,
-        data: updatedData,
-        encoder: encoder,
-      );
+      await store<T>(key: key, data: updatedData, encoder: encoder);
     }
   }
 

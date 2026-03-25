@@ -19,17 +19,17 @@ class AuthDetails {
   });
 
   AuthDetails.fromJson(Map<String, dynamic> json)
-      : this(
-          accessToken: json[_accessTokenKey],
-          refreshToken: json[_refreshTokenKey],
-          chatToken: json[_chatTokenKey],
-        );
+    : this(
+        accessToken: json[_accessTokenKey],
+        refreshToken: json[_refreshTokenKey],
+        chatToken: json[_chatTokenKey],
+      );
 
   Map<String, dynamic> toJson() => {
-        _accessTokenKey: accessToken,
-        _refreshTokenKey: refreshToken,
-        _chatTokenKey: chatToken,
-      };
+    _accessTokenKey: accessToken,
+    _refreshTokenKey: refreshToken,
+    _chatTokenKey: chatToken,
+  };
 }
 
 // TODO: Limit the use of KeyChain to `data` layer only.
@@ -69,9 +69,7 @@ class AuthKeyChain {
     _listeners.add(onChanged);
   }
 
-  Future<void> onLogIn({
-    required AuthDetails authenticationDetails,
-  }) async {
+  Future<void> onLogIn({required AuthDetails authenticationDetails}) async {
     // 1. Store in memory
     _authenticationDetails = authenticationDetails;
 
@@ -93,9 +91,7 @@ class AuthKeyChain {
     _notifyListeners();
   }
 
-  void loginTempDetails({
-    required AuthDetails googleAuthDetails,
-  }) async {
+  void loginTempDetails({required AuthDetails googleAuthDetails}) async {
     _authenticationDetails = googleAuthDetails;
 
     _notifyListeners();
@@ -108,9 +104,7 @@ class AuthKeyChain {
     // 2. Remove from persistent storage
     final persistentStorage = OPersistentStorage();
 
-    await persistentStorage.delete(
-      key: _authenticationDetailsKey,
-    );
+    await persistentStorage.delete(key: _authenticationDetailsKey);
 
     // 3. Inform listeners that change in _authenticationDetails has occurred
     _notifyListeners();

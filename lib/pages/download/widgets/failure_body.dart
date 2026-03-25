@@ -28,10 +28,7 @@ class FailedBody extends StatelessWidget {
 }
 
 class _FailureContent extends StatelessWidget {
-  const _FailureContent({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _FailureContent({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -47,9 +44,7 @@ class _FailureContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 34.0.toAutoScaledHeight,
-              ),
+              padding: EdgeInsets.symmetric(vertical: 34.0.toAutoScaledHeight),
               child: Image.asset(
                 oImage.faliure,
                 width: 264.toAutoScaledWidth,
@@ -59,7 +54,10 @@ class _FailureContent extends StatelessWidget {
             _InfoText(
               color: color,
               text:
-                  Provider.of<DioNotifier>(context).fetchFilesMetadataFailure?.message ?? 'Oops! Something went wrong.',
+                  Provider.of<DioNotifier>(
+                    context,
+                  ).fetchFilesMetadataFailure?.message ??
+                  'Oops! Something went wrong.',
               center: true,
             ),
           ],

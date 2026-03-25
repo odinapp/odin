@@ -55,7 +55,10 @@ class GitHubJson {
   static dynamic _checkObject(dynamic object) {
     if (object is Map) {
       return Map.fromEntries(
-          object.entries.where((e) => e.value != null).map((e) => MapEntry(e.key, _checkObject(e.value))));
+        object.entries
+            .where((e) => e.value != null)
+            .map((e) => MapEntry(e.key, _checkObject(e.value))),
+      );
     }
     if (object is List) {
       return object.map(_checkObject).toList();

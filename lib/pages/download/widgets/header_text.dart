@@ -1,18 +1,19 @@
 part of '../view.dart';
 
 class _HeaderText extends StatelessWidget {
-  const _HeaderText({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _HeaderText({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:
-          EdgeInsets.fromLTRB(60.toAutoScaledWidth, 0.toAutoScaledHeight, 60.toAutoScaledWidth, 24.toAutoScaledHeight),
+      padding: EdgeInsets.fromLTRB(
+        60.toAutoScaledWidth,
+        0.toAutoScaledHeight,
+        60.toAutoScaledWidth,
+        24.toAutoScaledHeight,
+      ),
       child: Text(
         oApp.currentConfig?.token.title ?? 'Enter unique file token.',
         style: color.textStyle(

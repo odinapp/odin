@@ -33,10 +33,7 @@ class SuccessBody extends StatelessWidget {
 }
 
 class _SuccessContent extends StatelessWidget {
-  const _SuccessContent({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _SuccessContent({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -51,9 +48,7 @@ class _SuccessContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 34.0.toAutoScaledHeight,
-              ),
+              padding: EdgeInsets.symmetric(vertical: 34.0.toAutoScaledHeight),
               child: Image.asset(
                 oImage.success,
                 width: 264.toAutoScaledWidth,
@@ -62,7 +57,8 @@ class _SuccessContent extends StatelessWidget {
             ),
             _InfoText(
               color: color,
-              text: 'The files were successfully uploaded!\nPlease share the token below to access these files.',
+              text:
+                  'The files were successfully uploaded!\nPlease share the token below to access these files.',
               center: true,
             ),
           ],
@@ -85,7 +81,10 @@ class _SuccessContent extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.only(left: 40.0.toAutoScaledWidth),
                       child: Text(
-                        Provider.of<DioNotifier>(context).fetchFilesMetadataSuccess?.filesMetadata.basePath ??
+                        Provider.of<DioNotifier>(context)
+                                .fetchFilesMetadataSuccess
+                                ?.filesMetadata
+                                .basePath ??
                             'Cannot fetch token',
                         overflow: TextOverflow.ellipsis,
                         style: color.textStyle(
@@ -99,12 +98,16 @@ class _SuccessContent extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Clipboard.setData(ClipboardData(
-                          text: Provider.of<DioNotifier>(
-                                context,
-                                listen: false,
-                              ).fetchFilesMetadataSuccess?.filesMetadata.basePath ??
-                              'Cannot fetch token'));
+                      Clipboard.setData(
+                        ClipboardData(
+                          text:
+                              Provider.of<DioNotifier>(context, listen: false)
+                                  .fetchFilesMetadataSuccess
+                                  ?.filesMetadata
+                                  .basePath ??
+                              'Cannot fetch token',
+                        ),
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -119,20 +122,24 @@ class _SuccessContent extends StatelessWidget {
                           backgroundColor: color.cardOnBackground,
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.toAutoScaledWidth),
+                            borderRadius: BorderRadius.circular(
+                              20.toAutoScaledWidth,
+                            ),
                           ),
                         ),
                       );
                     },
                     style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(Colors.transparent),
+                      overlayColor: MaterialStateProperty.all(
+                        Colors.transparent,
+                      ),
                     ),
                     child: SvgPicture.asset(
                       oImage.copy,
                       width: 34.toAutoScaledWidth,
                       height: 34.toAutoScaledHeight,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -147,10 +154,7 @@ class _SuccessContent extends StatelessWidget {
 }
 
 class _QRButton extends StatelessWidget {
-  const _QRButton({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _QRButton({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -159,9 +163,7 @@ class _QRButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(right: 60.0.toAutoScaledWidth),
       child: ElevatedButton(
-        style: ButtonStyle(
-          elevation: MaterialStateProperty.all(0),
-        ).merge(
+        style: ButtonStyle(elevation: MaterialStateProperty.all(0)).merge(
           ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF242424),
             foregroundColor: color.primary.withOpacity(0.2),
@@ -172,9 +174,7 @@ class _QRButton extends StatelessWidget {
           ),
         ),
         onPressed: () {},
-        child: SvgPicture.asset(
-          oImage.qr,
-        ),
+        child: SvgPicture.asset(oImage.qr),
       ),
     );
   }

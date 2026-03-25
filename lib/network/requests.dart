@@ -4,20 +4,14 @@ abstract class RepositoryPostRequest {
   final void Function(int, int)? onSendProgress;
   final CancelToken? cancelToken;
 
-  RepositoryPostRequest({
-    this.onSendProgress,
-    this.cancelToken,
-  });
+  RepositoryPostRequest({this.onSendProgress, this.cancelToken});
 }
 
 abstract class RepositoryGetRequest {
   final void Function(int, int)? onReceiveProgress;
   final CancelToken? cancelToken;
 
-  RepositoryGetRequest({
-    this.onReceiveProgress,
-    this.cancelToken,
-  });
+  RepositoryGetRequest({this.onReceiveProgress, this.cancelToken});
 }
 
 class UploadFilesRequest extends RepositoryPostRequest {
@@ -29,10 +23,7 @@ class UploadFilesRequest extends RepositoryPostRequest {
     required this.totalFileSize,
     void Function(int, int)? onSendProgress,
     CancelToken? cancelToken,
-  }) : super(
-          onSendProgress: onSendProgress,
-          cancelToken: cancelToken,
-        );
+  }) : super(onSendProgress: onSendProgress, cancelToken: cancelToken);
 }
 
 class UploadFileRequest extends RepositoryPostRequest {
@@ -44,10 +35,7 @@ class UploadFileRequest extends RepositoryPostRequest {
     required this.fileSize,
     void Function(int, int)? onSendProgress,
     CancelToken? cancelToken,
-  }) : super(
-          onSendProgress: onSendProgress,
-          cancelToken: cancelToken,
-        );
+  }) : super(onSendProgress: onSendProgress, cancelToken: cancelToken);
 }
 
 class FetchFilesMetadataRequest extends RepositoryGetRequest {
@@ -57,20 +45,14 @@ class FetchFilesMetadataRequest extends RepositoryGetRequest {
     required this.token,
     void Function(int, int)? onReceiveProgress,
     CancelToken? cancelToken,
-  }) : super(
-          onReceiveProgress: onReceiveProgress,
-          cancelToken: cancelToken,
-        );
+  }) : super(onReceiveProgress: onReceiveProgress, cancelToken: cancelToken);
 }
 
 class FetchConfigRequest extends RepositoryGetRequest {
   FetchConfigRequest({
     void Function(int, int)? onReceiveProgress,
     CancelToken? cancelToken,
-  }) : super(
-          onReceiveProgress: onReceiveProgress,
-          cancelToken: cancelToken,
-        );
+  }) : super(onReceiveProgress: onReceiveProgress, cancelToken: cancelToken);
 }
 
 class DownloadFileRequest extends RepositoryGetRequest {
@@ -82,8 +64,5 @@ class DownloadFileRequest extends RepositoryGetRequest {
     required this.savePath,
     void Function(int, int)? onReceiveProgress,
     CancelToken? cancelToken,
-  }) : super(
-          onReceiveProgress: onReceiveProgress,
-          cancelToken: cancelToken,
-        );
+  }) : super(onReceiveProgress: onReceiveProgress, cancelToken: cancelToken);
 }

@@ -72,7 +72,8 @@ extension AutoScaledDimensionX on double {
   }
 
   double toAutoScaledWidthByContext(BuildContext context) {
-    final autoScaledDimension = this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
+    final autoScaledDimension =
+        this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
 
     return autoScaledDimension;
   }
@@ -84,7 +85,8 @@ extension AutoScaledDimensionX on double {
   }
 
   double toAutoScaledHeightByContext(BuildContext context) {
-    final autoScaledDimension = this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
+    final autoScaledDimension =
+        this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
 
     return autoScaledDimension;
   }
@@ -98,7 +100,8 @@ extension AutoScaledDimensionIntX on int {
   }
 
   double toAutoScaledWidthForContext(BuildContext context) {
-    final autoScaledDimension = this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
+    final autoScaledDimension =
+        this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
 
     return autoScaledDimension;
   }
@@ -110,7 +113,8 @@ extension AutoScaledDimensionIntX on int {
   }
 
   double toAutoScaledHeightForContext(BuildContext context) {
-    final autoScaledDimension = this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
+    final autoScaledDimension =
+        this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
 
     return autoScaledDimension;
   }
@@ -124,7 +128,8 @@ extension AutoScaledFontX on double {
   }
 
   double toAutoScaledFontForContext(BuildContext context) {
-    final autoScaledFont = this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
+    final autoScaledFont =
+        this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
 
     return autoScaledFont;
   }
@@ -138,7 +143,8 @@ extension AutoScaledFontIntX on int {
   }
 
   double toAutoScaledFontForContext(BuildContext context) {
-    final autoScaledFont = this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
+    final autoScaledFont =
+        this * DimensionalPolicies.getPolicyRatioForWidthWithContext(context);
 
     return autoScaledFont;
   }
@@ -159,9 +165,11 @@ extension PaddingX on double {
 }
 
 extension PaddingIntX on int {
-  EdgeInsets get toHorizontalPadding => EdgeInsets.symmetric(horizontal: toDouble());
+  EdgeInsets get toHorizontalPadding =>
+      EdgeInsets.symmetric(horizontal: toDouble());
 
-  EdgeInsets get toVerticalPadding => EdgeInsets.symmetric(vertical: toDouble());
+  EdgeInsets get toVerticalPadding =>
+      EdgeInsets.symmetric(vertical: toDouble());
 
   EdgeInsets get toLeftOnlyPadding => EdgeInsets.only(left: toDouble());
 
@@ -187,7 +195,8 @@ extension MarginX on double {
 }
 
 extension MarginIntX on int {
-  EdgeInsets get toHorizontalMargin => EdgeInsets.symmetric(horizontal: toDouble());
+  EdgeInsets get toHorizontalMargin =>
+      EdgeInsets.symmetric(horizontal: toDouble());
 
   EdgeInsets get toVerticalMargin => EdgeInsets.symmetric(vertical: toDouble());
 
@@ -201,33 +210,21 @@ extension MarginIntX on int {
 }
 
 extension SizedBoxX on double {
-  SizedBox get toHorizontalSizedBox => SizedBox(
-        width: this,
-      );
+  SizedBox get toHorizontalSizedBox => SizedBox(width: this);
 
-  SizedBox get toVerticalSizedBox => SizedBox(
-        height: this,
-      );
+  SizedBox get toVerticalSizedBox => SizedBox(height: this);
 }
 
 extension SizedBoxIntX on int {
-  SizedBox get toHorizontalSizedBox => SizedBox(
-        width: toDouble(),
-      );
+  SizedBox get toHorizontalSizedBox => SizedBox(width: toDouble());
 
-  SizedBox get toVerticalSizedBox => SizedBox(
-        height: toDouble(),
-      );
+  SizedBox get toVerticalSizedBox => SizedBox(height: toDouble());
 }
 
 extension TextStyleX on double {
-  TextStyle get toTextStyle => TextStyle(
-        fontSize: this,
-      );
+  TextStyle get toTextStyle => TextStyle(fontSize: this);
 }
 
 extension TextStyleIntX on int {
-  TextStyle get toTextStyle => TextStyle(
-        fontSize: toDouble(),
-      );
+  TextStyle get toTextStyle => TextStyle(fontSize: toDouble());
 }

@@ -98,7 +98,7 @@ class _MobileBody extends StatelessWidget {
             const SizedBox(height: 24),
             // Wordmark
             Text(
-              'odin',
+              oApp.currentConfig?.home.title ?? 'odin',
               style: GoogleFonts.inter(
                 color: color.primary,
                 fontSize: 18,
@@ -109,8 +109,7 @@ class _MobileBody extends StatelessWidget {
             const Spacer(),
             // Headline
             Text(
-              oApp.currentConfig?.home.title ??
-                  'Open-source\neasy file\nsharing for\neveryone.',
+              'Open-source\neasy file\nsharing for\neveryone.',
               style: GoogleFonts.inter(
                 color: color.secondary,
                 fontSize: 40,
@@ -132,7 +131,10 @@ class _MobileBody extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             // Send files button (primary)
-            _MobilePrimaryButton(color: color, onPressed: () => _onSend(context)),
+            _MobilePrimaryButton(
+              color: color,
+              onPressed: () => _onSend(context),
+            ),
             const SizedBox(height: 12),
             // Receive files button (secondary)
             _MobileSecondaryButton(color: color, onPressed: _onReceive),
@@ -164,7 +166,9 @@ class _MobilePrimaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: color.primary,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           elevation: 0,
         ),
         child: Row(
@@ -182,7 +186,10 @@ class _MobilePrimaryButton extends StatelessWidget {
               oImage.arrowRight,
               width: 20,
               height: 20,
-              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
             ),
           ],
         ),
@@ -211,7 +218,9 @@ class _MobileSecondaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: color.cardOnBackground,
           foregroundColor: color.secondary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           elevation: 0,
         ),
         child: Row(
@@ -229,7 +238,10 @@ class _MobileSecondaryButton extends StatelessWidget {
               oImage.cloudDownload,
               width: 20,
               height: 20,
-              colorFilter: ColorFilter.mode(color.secondaryOnBackground, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(
+                color.secondaryOnBackground,
+                BlendMode.srcIn,
+              ),
             ),
           ],
         ),

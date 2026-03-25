@@ -4,9 +4,7 @@ class ODebounce {
   Duration delay;
   Timer? _timer;
 
-  ODebounce(
-    this.delay,
-  );
+  ODebounce(this.delay);
 
   void call(void Function() callback) {
     _timer?.cancel();

@@ -25,9 +25,7 @@ abstract class OPersistentStorage {
     required PersistentStorageDecoder<T> decoder,
   });
 
-  Future<void> delete({
-    required String key,
-  });
+  Future<void> delete({required String key});
 
   Future<bool> exists({required String key});
 }

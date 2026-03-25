@@ -15,8 +15,12 @@ class _ClickableInfoText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:
-          EdgeInsets.fromLTRB(60.toAutoScaledWidth, 0.toAutoScaledHeight, 60.toAutoScaledWidth, 24.toAutoScaledHeight),
+      padding: EdgeInsets.fromLTRB(
+        60.toAutoScaledWidth,
+        0.toAutoScaledHeight,
+        60.toAutoScaledWidth,
+        24.toAutoScaledHeight,
+      ),
       child: RichText(
         text: TextSpan(
           children: [
@@ -39,9 +43,7 @@ class _ClickableInfoText extends StatelessWidget {
                     fontWeight: FontWeight.w300,
                     height: 34.toAutoScaledFont / 22.toAutoScaledFont,
                   )
-                  .copyWith(
-                    decoration: TextDecoration.underline,
-                  ),
+                  .copyWith(decoration: TextDecoration.underline),
             ),
           ],
         ),

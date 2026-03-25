@@ -113,7 +113,9 @@ class DioNotifier with ChangeNotifier {
       logger.d('[DioService]: UploadFilesFailure ${failure.message}');
     }
 
-    final response = await oNetwork<UploadFilesSuccess, UploadFilesFailure>(uploadFiles);
+    final response = await oNetwork<UploadFilesSuccess, UploadFilesFailure>(
+      uploadFiles,
+    );
 
     response.resolve(onSuccess, onFailure);
   }
@@ -171,7 +173,9 @@ class DioNotifier with ChangeNotifier {
       logger.d('[DioService]: UploadFilesFailure ${failure.message}');
     }
 
-    final response = await oNetwork<UploadFileSuccess, UploadFileFailure>(uploadFile);
+    final response = await oNetwork<UploadFileSuccess, UploadFileFailure>(
+      uploadFile,
+    );
 
     response.resolve(onSuccess, onFailure);
   }
@@ -182,7 +186,8 @@ class DioNotifier with ChangeNotifier {
   ) async {
     miniApiStatus = ApiStatus.loading;
     notifyListeners();
-    Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>> _fetchFilesMetadata() async {
+    Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>>
+    _fetchFilesMetadata() async {
       final odinRepository = OdinRepository();
 
       final response = await odinRepository.fetchFilesMetadata(
@@ -220,16 +225,18 @@ class DioNotifier with ChangeNotifier {
       logger.d('[DioService]: FetchFilesMetadataFailure ${failure.message}');
     }
 
-    final response = await oNetwork<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>(_fetchFilesMetadata);
+    final response =
+        await oNetwork<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>(
+          _fetchFilesMetadata,
+        );
 
     response.resolve(onSuccess, onFailure);
   }
 
-  Future<void> fetchConfig(
-    void Function(int, int)? onReceiveProgress,
-  ) async {
+  Future<void> fetchConfig(void Function(int, int)? onReceiveProgress) async {
     notifyListeners();
-    Future<Result<FetchConfigSuccess, FetchConfigFailure>> _fetchConfig() async {
+    Future<Result<FetchConfigSuccess, FetchConfigFailure>>
+    _fetchConfig() async {
       final odinRepository = OdinRepository();
 
       final response = await odinRepository.fetchConfig(
@@ -264,7 +271,9 @@ class DioNotifier with ChangeNotifier {
       logger.d('[DioService]: FetchConfigFailure ${failure.message}');
     }
 
-    final response = await oNetwork<FetchConfigSuccess, FetchConfigFailure>(_fetchConfig);
+    final response = await oNetwork<FetchConfigSuccess, FetchConfigFailure>(
+      _fetchConfig,
+    );
 
     response.resolve(onSuccess, onFailure);
   }
@@ -277,7 +286,8 @@ class DioNotifier with ChangeNotifier {
     _progress = 0;
     _progressPercentage = 0;
     notifyListeners();
-    Future<Result<DownloadFileSuccess, DownloadFileFailure>> _downloadFile() async {
+    Future<Result<DownloadFileSuccess, DownloadFileFailure>>
+    _downloadFile() async {
       final odinRepository = OdinRepository();
 
       final response = await odinRepository.downloadFile(
@@ -314,7 +324,9 @@ class DioNotifier with ChangeNotifier {
       logger.d('[DioService]: DownloadFileFailure ${failure.message}');
     }
 
-    final response = await oNetwork<DownloadFileSuccess, DownloadFileFailure>(_downloadFile);
+    final response = await oNetwork<DownloadFileSuccess, DownloadFileFailure>(
+      _downloadFile,
+    );
 
     response.resolve(onSuccess, onFailure);
   }

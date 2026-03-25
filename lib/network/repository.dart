@@ -22,9 +22,8 @@ abstract class OdinRepository extends Repository {
     required UploadFileRequest request,
   });
 
-  Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>> fetchFilesMetadata({
-    required FetchFilesMetadataRequest request,
-  });
+  Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>>
+  fetchFilesMetadata({required FetchFilesMetadataRequest request});
 
   Future<Result<FetchConfigSuccess, FetchConfigFailure>> fetchConfig({
     required FetchConfigRequest request,

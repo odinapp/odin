@@ -53,11 +53,16 @@ void main() {
         if (file.existsSync()) file.deleteSync();
         if (file2.existsSync()) file2.deleteSync();
       });
-      final File zippedFile = await zipService.zipFile(fileToZips: [file, file2]);
+      final File zippedFile = await zipService.zipFile(
+        fileToZips: [file, file2],
+      );
       addTearDown(() {
         if (zippedFile.existsSync()) zippedFile.deleteSync();
       });
-      expect(basename(zippedFile.path), stringContainsInOrder(["hello3", "txt", ".zip"]));
+      expect(
+        basename(zippedFile.path),
+        stringContainsInOrder(["hello3", "txt", ".zip"]),
+      );
     });
   });
 }

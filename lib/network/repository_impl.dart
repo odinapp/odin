@@ -30,7 +30,10 @@ class OdinRepositoryImpl implements OdinRepository {
           formData.files.addAll([
             MapEntry(
               "file",
-              await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
+              await MultipartFile.fromFile(
+                file.path,
+                filename: file.path.split('/').last,
+              ),
             ),
           ]);
         }
@@ -38,7 +41,9 @@ class OdinRepositoryImpl implements OdinRepository {
         final directoryName = randomService.getRandomString(10);
 
         formData.fields.add(MapEntry("directoryName", directoryName));
-        formData.fields.add(MapEntry("totalFileSize", totalFileSizeInBytes.toString()));
+        formData.fields.add(
+          MapEntry("totalFileSize", totalFileSizeInBytes.toString()),
+        );
 
         final response = await client.post(
           _EndPoint.uploadFiles,
@@ -54,15 +59,22 @@ class OdinRepositoryImpl implements OdinRepository {
           final rawToken = data['token'] as String? ?? '';
           final uri = Uri.tryParse(rawToken);
           final code = (uri != null && uri.pathSegments.isNotEmpty)
-              ? uri.pathSegments.lastWhere((s) => s.isNotEmpty, orElse: () => rawToken)
+              ? uri.pathSegments.lastWhere(
+                  (s) => s.isNotEmpty,
+                  orElse: () => rawToken,
+                )
               : rawToken;
-          return Success(UploadFilesSuccess(
-            token: code,
-            deleteToken: data['deleteToken'] as String?,
-          ));
+          return Success(
+            UploadFilesSuccess(
+              token: code,
+              deleteToken: data['deleteToken'] as String?,
+            ),
+          );
         } else {
           final data = response.data;
-          final message = data is Map ? (data['error'] ?? 'Upload failed') : data?.toString() ?? 'Upload failed';
+          final message = data is Map
+              ? (data['error'] ?? 'Upload failed')
+              : data?.toString() ?? 'Upload failed';
           return Failure(UploadFilesFailure(message: message));
         }
       } else {
@@ -85,7 +97,9 @@ class OdinRepositoryImpl implements OdinRepository {
   }
 
   @override
-  Future<Result<UploadFileSuccess, UploadFileFailure>> uploadFileAnonymous({required UploadFileRequest request}) async {
+  Future<Result<UploadFileSuccess, UploadFileFailure>> uploadFileAnonymous({
+    required UploadFileRequest request,
+  }) async {
     final client = await ONetworkingBox.unsecureClient();
 
     if (client != null) {
@@ -93,7 +107,10 @@ class OdinRepositoryImpl implements OdinRepository {
       final directoryName = randomService.getRandomString(10);
       final fileSize = request.fileSize;
 
-      final multipartFile = await MultipartFile.fromFile(request.file.path, filename: fileName);
+      final multipartFile = await MultipartFile.fromFile(
+        request.file.path,
+        filename: fileName,
+      );
       final requestJson = <String, dynamic>{
         'directoryName': directoryName,
         'totalFileSize': fileSize.toString(),
@@ -124,9 +141,8 @@ class OdinRepositoryImpl implements OdinRepository {
   }
 
   @override
-  Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>> fetchFilesMetadata({
-    required FetchFilesMetadataRequest request,
-  }) async {
+  Future<Result<FetchFilesMetadataSuccess, FetchFilesMetadataFailure>>
+  fetchFilesMetadata({required FetchFilesMetadataRequest request}) async {
     final client = await ONetworkingBox.unsecureClient();
 
     try {
@@ -135,9 +151,7 @@ class OdinRepositoryImpl implements OdinRepository {
           _EndPoint.fetchFilesMetadata,
           cancelToken: request.cancelToken,
           onReceiveProgress: request.onReceiveProgress,
-          queryParameters: {
-            'token': request.token,
-          },
+          queryParameters: {'token': request.token},
         );
 
         final statusCode = response.statusCode;
@@ -145,10 +159,14 @@ class OdinRepositoryImpl implements OdinRepository {
         if (statusCode.isSuccess) {
           final data = response.data;
           final filesMetadata = FilesMetadata.fromJson(data);
-          return Success(FetchFilesMetadataSuccess(filesMetadata: filesMetadata));
+          return Success(
+            FetchFilesMetadataSuccess(filesMetadata: filesMetadata),
+          );
         } else {
           final data = response.data;
-          final message = data is Map ? (data['error'] ?? 'Token not found or expired') : data?.toString() ?? 'Token not found or expired';
+          final message = data is Map
+              ? (data['error'] ?? 'Token not found or expired')
+              : data?.toString() ?? 'Token not found or expired';
           return Failure(FetchFilesMetadataFailure(message: message));
         }
       } else {
@@ -156,17 +174,27 @@ class OdinRepositoryImpl implements OdinRepository {
       }
     } on DioException catch (dioError) {
       final data = dioError.response?.data;
-      final message = data is Map ? (data['error'] ?? 'Token not found or expired') : data?.toString() ?? 'Token not found or expired';
-      logger.e('[DioService]: fetchFilesMetadata ${dioError.response?.statusCode}', error: dioError, stackTrace: dioError.stackTrace);
+      final message = data is Map
+          ? (data['error'] ?? 'Token not found or expired')
+          : data?.toString() ?? 'Token not found or expired';
+      logger.e(
+        '[DioService]: fetchFilesMetadata ${dioError.response?.statusCode}',
+        error: dioError,
+        stackTrace: dioError.stackTrace,
+      );
       return Failure(FetchFilesMetadataFailure(message: message));
     } catch (e, st) {
       logger.e('[DioService]: fetchFilesMetadata', error: e, stackTrace: st);
-      return Failure(FetchFilesMetadataFailure(message: 'Something went wrong. Try again.'));
+      return Failure(
+        FetchFilesMetadataFailure(message: 'Something went wrong. Try again.'),
+      );
     }
   }
 
   @override
-  Future<Result<FetchConfigSuccess, FetchConfigFailure>> fetchConfig({required FetchConfigRequest request}) async {
+  Future<Result<FetchConfigSuccess, FetchConfigFailure>> fetchConfig({
+    required FetchConfigRequest request,
+  }) async {
     final client = await ONetworkingBox.unsecureClient();
 
     try {
@@ -211,9 +239,7 @@ class OdinRepositoryImpl implements OdinRepository {
     required DownloadFileRequest request,
   }) async {
     final client = await ONetworkingBox.unsecureClient(
-      options: ONetworkingOptions(
-        responseType: ResponseType.bytes,
-      ),
+      options: ONetworkingOptions(responseType: ResponseType.bytes),
     );
 
     try {
@@ -222,15 +248,14 @@ class OdinRepositoryImpl implements OdinRepository {
           _EndPoint.downloadFiles,
           cancelToken: request.cancelToken,
           onReceiveProgress: request.onReceiveProgress,
-          queryParameters: {
-            "token": request.token,
-          },
+          queryParameters: {"token": request.token},
         );
 
         final statusCode = response.statusCode;
 
         if (statusCode.isSuccess) {
-          final filename = response.headers.value('Filename') ?? 'defaultFile.txt';
+          final filename =
+              response.headers.value('Filename') ?? 'defaultFile.txt';
           final filePath = '${request.savePath}/$filename';
           logger.d('filePath: $filePath');
           File file = File(filePath);
@@ -254,7 +279,9 @@ class OdinRepositoryImpl implements OdinRepository {
         error: exception,
         stackTrace: dioError.stackTrace,
       );
-      return Failure(DownloadFileFailure(message: dioError.response.toString()));
+      return Failure(
+        DownloadFileFailure(message: dioError.response.toString()),
+      );
     } catch (e, st) {
       logger.e('[DioService]: downloadFile', error: e, stackTrace: st);
       return Failure(DownloadFileFailure(message: e.toString()));

@@ -91,7 +91,9 @@ class _FailedBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final OColor color = OColor.withContext(context);
     final failure = Provider.of<DioNotifier>(context).fetchFilesMetadataFailure;
-    return Center(child: FailedBody(color: color, fetchFilesMetadataFailure: failure!));
+    return Center(
+      child: FailedBody(color: color, fetchFilesMetadataFailure: failure!),
+    );
   }
 }
 
@@ -102,7 +104,9 @@ class _SuccessBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final OColor color = OColor.withContext(context);
     final success = Provider.of<DioNotifier>(context).fetchFilesMetadataSuccess;
-    return Center(child: SuccessBody(color: color, fetchFilesMetadataSuccess: success!));
+    return Center(
+      child: SuccessBody(color: color, fetchFilesMetadataSuccess: success!),
+    );
   }
 }
 
@@ -185,7 +189,10 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                 oImage.arrowLeft,
                 width: 20,
                 height: 20,
-                colorFilter: ColorFilter.mode(color.secondaryOnBackground, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                  color.secondaryOnBackground,
+                  BlendMode.srcIn,
+                ),
               ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -253,17 +260,23 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: color.primary,
                   disabledBackgroundColor: const Color(0xFF2A2A2A),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 0,
                 ),
                 child: apiStatus == ApiStatus.loading
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : Text(
-                        oApp.currentConfig?.token.primaryButtonText ?? 'Download files',
+                        oApp.currentConfig?.token.primaryButtonText ??
+                            'Download files',
                         style: GoogleFonts.inter(
                           color: miniStatus == ApiStatus.success
                               ? Colors.white
@@ -301,8 +314,9 @@ class _MobileMetadataHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final metadata =
-        Provider.of<DioNotifier>(context).fetchFilesMetadataSuccess?.filesMetadata;
+    final metadata = Provider.of<DioNotifier>(
+      context,
+    ).fetchFilesMetadataSuccess?.filesMetadata;
     if (metadata == null) return const SizedBox.shrink();
 
     final fileCount = metadata.files?.length ?? 0;
@@ -329,7 +343,8 @@ class _MobileMetadataHint extends StatelessWidget {
 // ── Mobile: Download success ─────────────────────────────────────────────────
 
 class _MobileDownloadSuccess extends StatelessWidget {
-  const _MobileDownloadSuccess({Key? key, required this.color}) : super(key: key);
+  const _MobileDownloadSuccess({Key? key, required this.color})
+    : super(key: key);
 
   final OColor color;
 
@@ -350,15 +365,16 @@ class _MobileDownloadSuccess extends StatelessWidget {
                 oImage.arrowLeft,
                 width: 20,
                 height: 20,
-                colorFilter: ColorFilter.mode(color.secondaryOnBackground, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                  color.secondaryOnBackground,
+                  BlendMode.srcIn,
+                ),
               ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
             const Spacer(),
-            Center(
-              child: Image.asset(oImage.success, width: 120, height: 120),
-            ),
+            Center(child: Image.asset(oImage.success, width: 120, height: 120)),
             const SizedBox(height: 24),
             Center(
               child: Text(
@@ -394,7 +410,9 @@ class _MobileDownloadSuccess extends StatelessWidget {
                 onPressed: () => locator<AppRouter>().popUntilRoot(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: color.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 0,
                 ),
                 child: Text(
@@ -449,13 +467,16 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
       vsync: this,
       duration: const Duration(milliseconds: 380),
     );
-    _shakeAnim = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0, end: -10), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: -10, end: 10), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 10, end: -8), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: -8, end: 6), weight: 2),
-      TweenSequenceItem(tween: Tween(begin: 6, end: 0), weight: 1),
-    ]).animate(CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut));
+    _shakeAnim =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 0, end: -10), weight: 1),
+          TweenSequenceItem(tween: Tween(begin: -10, end: 10), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 10, end: -8), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: -8, end: 6), weight: 2),
+          TweenSequenceItem(tween: Tween(begin: 6, end: 0), weight: 1),
+        ]).animate(
+          CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut),
+        );
   }
 
   @override
@@ -516,7 +537,8 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(8, (i) {
                 final hasChar = i < text.length;
-                final isActive = i == text.length && !isSuccess && !isFailed && !isLoading;
+                final isActive =
+                    i == text.length && !isSuccess && !isFailed && !isLoading;
 
                 final Color borderColor;
                 if (isSuccess) {
@@ -533,8 +555,8 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
 
                 final Color bgColor = hasChar
                     ? isSuccess
-                        ? widget.color.primary.withOpacity(0.08)
-                        : const Color(0xFF1E1E1E)
+                          ? widget.color.primary.withOpacity(0.08)
+                          : const Color(0xFF1E1E1E)
                     : const Color(0xFF151515);
 
                 return AnimatedContainer(
@@ -563,10 +585,10 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
                           ),
                         )
                       : isActive
-                          ? _BlinkingCursor(color: widget.color.primary)
-                          : isLoading && i < 8
-                              ? null
-                              : null,
+                      ? _BlinkingCursor(color: widget.color.primary)
+                      : isLoading && i < 8
+                      ? null
+                      : null,
                 );
               }),
             ),
@@ -622,4 +644,3 @@ class _BlinkingCursorState extends State<_BlinkingCursor>
     );
   }
 }
-

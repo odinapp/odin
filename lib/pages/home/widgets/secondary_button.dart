@@ -1,10 +1,7 @@
 part of '../home_page.dart';
 
 class SecondaryButton extends StatelessWidget {
-  const SecondaryButton({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const SecondaryButton({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -17,9 +14,7 @@ class SecondaryButton extends StatelessWidget {
         height: 96.toAutoScaledHeight,
         child: ElevatedButton(
           onPressed: () {
-            locator<AppRouter>().push(
-              const DownloadRoute(),
-            );
+            locator<AppRouter>().push(const DownloadRoute());
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: color.secondaryContainerOnBackground,

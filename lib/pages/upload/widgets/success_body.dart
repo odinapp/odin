@@ -33,10 +33,7 @@ class SuccessBody extends StatelessWidget {
 }
 
 class _SuccessContent extends StatelessWidget {
-  const _SuccessContent({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _SuccessContent({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -51,9 +48,7 @@ class _SuccessContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 34.0.toAutoScaledHeight,
-              ),
+              padding: EdgeInsets.symmetric(vertical: 34.0.toAutoScaledHeight),
               child: Image.asset(
                 oImage.success,
                 width: 264.toAutoScaledWidth,
@@ -62,17 +57,21 @@ class _SuccessContent extends StatelessWidget {
             ),
             _InfoText(
               color: color,
-              text: 'The files were successfully uploaded!\nPlease share the token below to access these files.',
+              text:
+                  'The files were successfully uploaded!\nPlease share the token below to access these files.',
               center: true,
             ),
           ],
         ),
-        if (Provider.of<DioNotifier>(context).uploadFilesSuccess?.deleteToken != null)
+        if (Provider.of<DioNotifier>(context).uploadFilesSuccess?.deleteToken !=
+            null)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 60.0.toAutoScaledWidth),
             child: _DeleteTokenRow(
               color: color,
-              deleteToken: Provider.of<DioNotifier>(context).uploadFilesSuccess!.deleteToken!,
+              deleteToken: Provider.of<DioNotifier>(
+                context,
+              ).uploadFilesSuccess!.deleteToken!,
             ),
           ),
         const Spacer(),
@@ -93,7 +92,10 @@ class _SuccessContent extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.only(left: 40.0.toAutoScaledWidth),
                       child: Text(
-                        Provider.of<DioNotifier>(context).uploadFilesSuccess?.token ?? 'Cannot fetch token',
+                        Provider.of<DioNotifier>(
+                              context,
+                            ).uploadFilesSuccess?.token ??
+                            'Cannot fetch token',
                         style: color.textStyle(
                           color: color.secondaryOnBackground,
                           fontSize: 28.toAutoScaledFont,
@@ -105,12 +107,16 @@ class _SuccessContent extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Clipboard.setData(ClipboardData(
-                          text: Provider.of<DioNotifier>(
+                      Clipboard.setData(
+                        ClipboardData(
+                          text:
+                              Provider.of<DioNotifier>(
                                 context,
                                 listen: false,
                               ).uploadFilesSuccess?.token ??
-                              'Cannot fetch token'));
+                              'Cannot fetch token',
+                        ),
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -125,20 +131,24 @@ class _SuccessContent extends StatelessWidget {
                           backgroundColor: color.cardOnBackground,
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.toAutoScaledWidth),
+                            borderRadius: BorderRadius.circular(
+                              20.toAutoScaledWidth,
+                            ),
                           ),
                         ),
                       );
                     },
                     style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(Colors.transparent),
+                      overlayColor: MaterialStateProperty.all(
+                        Colors.transparent,
+                      ),
                     ),
                     child: SvgPicture.asset(
                       oImage.copy,
                       width: 34.toAutoScaledWidth,
                       height: 34.toAutoScaledHeight,
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -153,7 +163,11 @@ class _SuccessContent extends StatelessWidget {
 }
 
 class _DeleteTokenRow extends StatelessWidget {
-  const _DeleteTokenRow({Key? key, required this.color, required this.deleteToken}) : super(key: key);
+  const _DeleteTokenRow({
+    Key? key,
+    required this.color,
+    required this.deleteToken,
+  }) : super(key: key);
 
   final OColor color;
   final String deleteToken;
@@ -162,7 +176,11 @@ class _DeleteTokenRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.delete_outline_rounded, color: color.error, size: 16.toAutoScaledWidth),
+        Icon(
+          Icons.delete_outline_rounded,
+          color: color.error,
+          size: 16.toAutoScaledWidth,
+        ),
         SizedBox(width: 6.toAutoScaledWidth),
         Expanded(
           child: Text(
@@ -198,7 +216,9 @@ class _DeleteTokenRow extends StatelessWidget {
               ),
             );
           },
-          style: ButtonStyle(overlayColor: MaterialStateProperty.all(Colors.transparent)),
+          style: ButtonStyle(
+            overlayColor: MaterialStateProperty.all(Colors.transparent),
+          ),
           child: Text(
             'Copy delete link',
             style: color.textStyle(
@@ -214,10 +234,7 @@ class _DeleteTokenRow extends StatelessWidget {
 }
 
 class _QRButton extends StatelessWidget {
-  const _QRButton({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _QRButton({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -226,9 +243,7 @@ class _QRButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(right: 60.0.toAutoScaledWidth),
       child: ElevatedButton(
-        style: ButtonStyle(
-          elevation: MaterialStateProperty.all(0),
-        ).merge(
+        style: ButtonStyle(elevation: MaterialStateProperty.all(0)).merge(
           ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF242424),
             foregroundColor: color.primary.withOpacity(0.2),
@@ -239,9 +254,7 @@ class _QRButton extends StatelessWidget {
           ),
         ),
         onPressed: () {},
-        child: SvgPicture.asset(
-          oImage.qr,
-        ),
+        child: SvgPicture.asset(oImage.qr),
       ),
     );
   }

@@ -16,19 +16,18 @@ class OColor {
     TextBaseline? textBaseline,
     double? height,
     Locale? locale,
-  }) =>
-      GoogleFonts.inter(
-        color: color,
-        backgroundColor: backgroundColor,
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        fontStyle: fontStyle,
-        letterSpacing: letterSpacing,
-        wordSpacing: wordSpacing,
-        textBaseline: textBaseline,
-        height: height,
-        locale: locale,
-      );
+  }) => GoogleFonts.inter(
+    color: color,
+    backgroundColor: backgroundColor,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    fontStyle: fontStyle,
+    letterSpacing: letterSpacing,
+    wordSpacing: wordSpacing,
+    textBaseline: textBaseline,
+    height: height,
+    locale: locale,
+  );
 
   // Light Theme Colors
   static const Color _lPrimary = Color(0xFF7D5DEC);
@@ -74,42 +73,54 @@ class OColor {
     if (_context == null) {
       return dPrimary;
     }
-    return Theme.of(_context!).brightness == Brightness.light ? lPrimary : dPrimary;
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lPrimary
+        : dPrimary;
   }
 
   Color get primaryContainer {
     if (_context == null) {
       return dPrimaryContainer;
     }
-    return Theme.of(_context!).brightness == Brightness.light ? lPrimaryContainer : dPrimaryContainer;
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lPrimaryContainer
+        : dPrimaryContainer;
   }
 
   Color get secondary {
     if (_context == null) {
       return dSecondary;
     }
-    return Theme.of(_context!).brightness == Brightness.light ? lSecondary : dSecondary;
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lSecondary
+        : dSecondary;
   }
 
   Color get secondaryContainer {
     if (_context == null) {
       return dSecondaryContainer;
     }
-    return Theme.of(_context!).brightness == Brightness.light ? lSecondaryContainer : dSecondaryContainer;
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lSecondaryContainer
+        : dSecondaryContainer;
   }
 
   Color get background {
     if (_context == null) {
       return dBackground;
     }
-    return Theme.of(_context!).brightness == Brightness.light ? lBackground : dBackground;
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lBackground
+        : dBackground;
   }
 
   Color get backgroundContainer {
     if (_context == null) {
       return dBackgroundContainer;
     }
-    return Theme.of(_context!).brightness == Brightness.light ? lBackgroundContainer : dBackgroundContainer;
+    return Theme.of(_context!).brightness == Brightness.light
+        ? lBackgroundContainer
+        : dBackgroundContainer;
   }
 
   Color get error {

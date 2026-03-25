@@ -1,10 +1,7 @@
 part of '../view.dart';
 
 class MainContainer extends StatelessWidget {
-  const MainContainer({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const MainContainer({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -31,10 +28,7 @@ class MainContainer extends StatelessWidget {
 }
 
 class MainContent extends StatefulWidget {
-  const MainContent({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const MainContent({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -57,10 +51,7 @@ class _MainContentState extends State<MainContent> {
   Future<void> _fetchMetadata() async {
     final dioNotifier = locator<DioNotifier>();
 
-    await dioNotifier.fetchFilesMetadata(
-      token,
-      (count, total) {},
-    );
+    await dioNotifier.fetchFilesMetadata(token, (count, total) {});
   }
 
   Future<void> _downloadFile() async {
@@ -69,13 +60,9 @@ class _MainContentState extends State<MainContent> {
 
     final filePath = await dioService.getTempFilePath();
 
-    await dioNotifier.downloadFile(
-      token,
-      filePath,
-      (count, total) {
-        logger.d('Downloaded $count/$total');
-      },
-    );
+    await dioNotifier.downloadFile(token, filePath, (count, total) {
+      logger.d('Downloaded $count/$total');
+    });
   }
 
   @override
@@ -92,7 +79,8 @@ class _MainContentState extends State<MainContent> {
             _ClickableInfoText(
               color: widget.color,
               onTap: () {},
-              text: oApp.currentConfig?.token.description ??
+              text:
+                  oApp.currentConfig?.token.description ??
                   'Ask your friend for this unique token to download the shared files. Without it you won’t be able to download the files. ',
             ),
           ],
@@ -106,15 +94,16 @@ class _MainContentState extends State<MainContent> {
             60.toAutoScaledWidth.toHorizontalSizedBox,
             _PrimaryButton(
               color: widget.color,
-              enabled: Provider.of<DioNotifier>(context).miniApiStatus == ApiStatus.success && token.length > 3,
+              enabled:
+                  Provider.of<DioNotifier>(context).miniApiStatus ==
+                      ApiStatus.success &&
+                  token.length > 3,
               onPressed: _downloadFile,
             ),
             60.toAutoScaledWidth.toHorizontalSizedBox,
           ],
         ),
-        _MetadataText(
-          color: widget.color,
-        ),
+        _MetadataText(color: widget.color),
         const Spacer(),
       ],
     );
@@ -150,7 +139,9 @@ class _MainContentState extends State<MainContent> {
                   focusedErrorBorder: InputBorder.none,
                   fillColor: Colors.transparent,
                   hoverColor: Colors.transparent,
-                  hintText: oApp.currentConfig?.token.textFieldHintText ?? 'Enter 21 chars long unique token',
+                  hintText:
+                      oApp.currentConfig?.token.textFieldHintText ??
+                      'Enter 21 chars long unique token',
                   hintStyle: TextStyle(
                     color: widget.color.secondaryOnBackground,
                     fontSize: 22.toAutoScaledFont,
@@ -171,12 +162,16 @@ class _MainContentState extends State<MainContent> {
                   if (token.length > 3) {
                     debounce.call(_fetchMetadata);
                   } else {
-                    Provider.of<DioNotifier>(context, listen: false).miniApiStatus = ApiStatus.init;
+                    Provider.of<DioNotifier>(
+                      context,
+                      listen: false,
+                    ).miniApiStatus = ApiStatus.init;
                   }
                 },
               ),
             ),
-            if (Provider.of<DioNotifier>(context).miniApiStatus == ApiStatus.loading)
+            if (Provider.of<DioNotifier>(context).miniApiStatus ==
+                ApiStatus.loading)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
@@ -187,7 +182,8 @@ class _MainContentState extends State<MainContent> {
                   ),
                 ),
               )
-            else if (Provider.of<DioNotifier>(context).miniApiStatus == ApiStatus.failed)
+            else if (Provider.of<DioNotifier>(context).miniApiStatus ==
+                ApiStatus.failed)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
@@ -196,7 +192,8 @@ class _MainContentState extends State<MainContent> {
                   size: 24.toAutoScaledWidth,
                 ),
               )
-            else if (Provider.of<DioNotifier>(context).miniApiStatus == ApiStatus.success)
+            else if (Provider.of<DioNotifier>(context).miniApiStatus ==
+                ApiStatus.success)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(

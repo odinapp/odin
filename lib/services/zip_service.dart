@@ -12,15 +12,15 @@ class ZipService {
   String linkTitle = "";
   String linkDesc = "";
 
-  Future<File> zipFile({
-    required List<File> fileToZips,
-  }) async {
+  Future<File> zipFile({required List<File> fileToZips}) async {
     logger.d('Started Zipping Files');
     final ZipFileEncoder encoder = ZipFileEncoder();
     final zipFileSavePath = Directory.systemTemp.path;
     // Manually create a zip at the zipFilePath
-    final String zipFilePath = join(zipFileSavePath,
-        "${basename(fileToZips.first.path).replaceAll('.', '_')}_${_randomService.getRandomString(15)}.zip");
+    final String zipFilePath = join(
+      zipFileSavePath,
+      "${basename(fileToZips.first.path).replaceAll('.', '_')}_${_randomService.getRandomString(15)}.zip",
+    );
     encoder.create(zipFilePath);
     // Add all the files to the zip file
     for (final File fileToZip in fileToZips) {
@@ -31,9 +31,11 @@ class ZipService {
     if (fileToZips.length == 1) {
       linkTitle = basename(fileToZips.first.path);
     } else if (fileToZips.length == 2) {
-      linkTitle = "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more file.";
+      linkTitle =
+          "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more file.";
     } else {
-      linkTitle = "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more files.";
+      linkTitle =
+          "${basename(fileToZips.first.path)} & ${fileToZips.length - 1} more files.";
     }
     linkDesc = formatBytes(File(zipFilePath).lengthSync(), 2);
     return File(zipFilePath);
@@ -64,7 +66,9 @@ class ZipService {
         zippedFile = await zipFile(fileToZips: files);
       } else {
         zippedFile = files[0];
-        zippedFile = zippedFile.copySync(join(Directory.systemTemp.path, basename(files[0].path)));
+        zippedFile = zippedFile.copySync(
+          join(Directory.systemTemp.path, basename(files[0].path)),
+        );
       }
       return zippedFile;
     } catch (e, st) {

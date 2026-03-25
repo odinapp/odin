@@ -15,8 +15,10 @@ class BooterNotifier with ChangeNotifier {
     notifyListeners();
   }
 
-  Stream<AppBootStatus> get appBootStatusStream => _booterService.appBootStatusStream;
-  AppBootStatus? get appBootStatus => _booterService.appBootStatusStream.valueOrNull;
+  Stream<AppBootStatus> get appBootStatusStream =>
+      _booterService.appBootStatusStream;
+  AppBootStatus? get appBootStatus =>
+      _booterService.appBootStatusStream.valueOrNull;
 
   Future<void> bootUp() async {
     await _booterService.bootUp();

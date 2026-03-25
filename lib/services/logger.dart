@@ -7,10 +7,12 @@ import 'package:path/path.dart';
 
 Logger? _logger;
 Logger get logger => _logger ??= Logger(
-      level: Level.debug,
-      printer: printer,
-      filter: kDebugMode ? PassThroughFilter() : PassThroughFilter(), //!ProductionFilter(), Add before final release
-    );
+  level: Level.debug,
+  printer: printer,
+  filter: kDebugMode
+      ? PassThroughFilter()
+      : PassThroughFilter(), //!ProductionFilter(), Add before final release
+);
 
 LogOutputPrinter? _printer;
 LogOutputPrinter get printer => _printer ??= LogOutputPrinter();
@@ -50,7 +52,9 @@ class LogOutputPrinter extends PrettyPrinter {
     final prefix = SimplePrinter.levelPrefixes[logLvl]!;
     final str =
         "---------------------------------------------------------------------------\nLEVEL : $logLvl\nMESSAGE : ${DateTime.now().toString().substring(11, 22)} :: $logMsg\nERROR : $logError\nSTACKTRACE : $logStrace";
-    Future.delayed(const Duration(seconds: 1)).then((value) => _logFile?.writeStringSync('$str\n'));
+    Future.delayed(
+      const Duration(seconds: 1),
+    ).then((value) => _logFile?.writeStringSync('$str\n'));
     final timeStr = getTime(event.time).substring(0, 12);
     if (logStrace != null) {
       developer.log(
@@ -97,11 +101,7 @@ class LogOutputPrinter extends PrettyPrinter {
     final DateTime today = DateTime.now();
     final l = <String>[];
     for (var i = 0; i < n; i++) {
-      final String fp = filePathForDate(
-        today.subtract(
-          Duration(days: i),
-        ),
-      );
+      final String fp = filePathForDate(today.subtract(Duration(days: i)));
       if (File(fp).existsSync()) {
         l.add(fp);
       } else {

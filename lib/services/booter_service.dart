@@ -7,9 +7,12 @@ import 'package:odin/services/logger.dart';
 import 'package:rxdart/rxdart.dart';
 
 class BooterService {
-  final _appBootStatusSubject = BehaviorSubject<AppBootStatus>.seeded(AppBootStatus.booting);
+  final _appBootStatusSubject = BehaviorSubject<AppBootStatus>.seeded(
+    AppBootStatus.booting,
+  );
 
-  ValueStream<AppBootStatus> get appBootStatusStream => _appBootStatusSubject.stream;
+  ValueStream<AppBootStatus> get appBootStatusStream =>
+      _appBootStatusSubject.stream;
 
   set appBootStatus(AppBootStatus v) => _appBootStatusSubject.add(v);
 
@@ -17,14 +20,14 @@ class BooterService {
     // Fast booter must be booted before other booters since it' used in other booters
     // Eg, CurrentProfileBooter
     final preBootUpSequence = UnmodifiableListView([
-      AmenitiesBooter.instance.bootUp().then((_) => logger.d('AmenitiesBooter preBoot Finished')),
+      AmenitiesBooter.instance.bootUp().then(
+        (_) => logger.d('AmenitiesBooter preBoot Finished'),
+      ),
     ]);
 
     await Future.wait(preBootUpSequence);
 
-    final bootUpProcesses = [
-      ConfigBooter.instance.bootUp(),
-    ];
+    final bootUpProcesses = [ConfigBooter.instance.bootUp()];
 
     await Future.wait(bootUpProcesses);
 

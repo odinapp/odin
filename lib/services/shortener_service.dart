@@ -5,9 +5,7 @@ import 'package:odin/services/logger.dart';
 
 class ShortenerService {
   String token = "";
-  final _dio = Dio(BaseOptions(
-    baseUrl: 'https://api.shrtco.de/v2/',
-  ));
+  final _dio = Dio(BaseOptions(baseUrl: 'https://api.shrtco.de/v2/'));
 
   Future<Response?> get({
     required String uri,
@@ -18,7 +16,11 @@ class ShortenerService {
       final Stopwatch stopwatch = Stopwatch()..start();
       final Map<String, dynamic> query = {};
       query.addAll(body ?? {});
-      final Response response = await _dio.get(uri, queryParameters: query, options: Options(headers: headers));
+      final Response response = await _dio.get(
+        uri,
+        queryParameters: query,
+        options: Options(headers: headers),
+      );
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
       if (response.statusCode != 201) {
@@ -40,7 +42,11 @@ class ShortenerService {
       final Stopwatch stopwatch = Stopwatch()..start();
       final Map<String, dynamic> query = {};
       query.addAll(body ?? {});
-      final Response response = await _dio.post(uri, queryParameters: query, options: Options(headers: headers));
+      final Response response = await _dio.post(
+        uri,
+        queryParameters: query,
+        options: Options(headers: headers),
+      );
       stopwatch.stop();
       logger.d("Last request took : ${stopwatch.elapsedMilliseconds} ms.");
       if (response.statusCode != 201) {

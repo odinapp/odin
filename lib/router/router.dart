@@ -16,9 +16,9 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
-        RedirectRoute(path: '/home-page', redirectTo: '/'),
-        AutoRoute(page: HomeRoute.page, initial: true),
-        AutoRoute(path: '/upload', page: UploadRoute.page),
-        AutoRoute(path: '/download', page: DownloadRoute.page),
-      ];
+    RedirectRoute(path: '/home-page', redirectTo: '/'),
+    AutoRoute(page: HomeRoute.page, initial: true),
+    AutoRoute(path: '/upload', page: UploadRoute.page),
+    AutoRoute(path: '/download', page: DownloadRoute.page),
+  ];
 }

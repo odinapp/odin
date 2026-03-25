@@ -1,10 +1,7 @@
 part of '../view.dart';
 
 class _ProgressBar extends StatelessWidget {
-  const _ProgressBar({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _ProgressBar({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -19,7 +16,10 @@ class _ProgressBar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
-            children: [_FileIcon(color: color), _FileDataText(color: color)],
+            children: [
+              _FileIcon(color: color),
+              _FileDataText(color: color),
+            ],
           ),
         ],
       ),
@@ -28,10 +28,7 @@ class _ProgressBar extends StatelessWidget {
 }
 
 class _FileIcon extends StatelessWidget {
-  const _FileIcon({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _FileIcon({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -53,7 +50,9 @@ class _FileIcon extends StatelessWidget {
         child: Center(
           child: Text(
             Provider.of<DioNotifier>(context).selectedFiles.isNotEmpty
-                ? Provider.of<DioNotifier>(context).selectedFiles.first.path.split('/').last[0].toUpperCase()
+                ? Provider.of<DioNotifier>(
+                    context,
+                  ).selectedFiles.first.path.split('/').last[0].toUpperCase()
                 : '\$',
             style: color.textStyle(
               color: color.secondaryOnBackground,
@@ -69,10 +68,7 @@ class _FileIcon extends StatelessWidget {
 }
 
 class _FileDataText extends StatelessWidget {
-  const _FileDataText({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _FileDataText({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -92,10 +88,7 @@ class _FileDataText extends StatelessWidget {
 }
 
 class _FileSizeText extends StatelessWidget {
-  const _FileSizeText({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _FileSizeText({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -116,10 +109,7 @@ class _FileSizeText extends StatelessWidget {
 }
 
 class _FileNameText extends StatelessWidget {
-  const _FileNameText({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _FileNameText({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -128,8 +118,10 @@ class _FileNameText extends StatelessWidget {
     return Text(
       Provider.of<DioNotifier>(context).selectedFiles.isNotEmpty
           ? Provider.of<DioNotifier>(context).selectedFiles.length == 1
-              ? Provider.of<DioNotifier>(context).selectedFiles.first.path.split('/').last
-              : '${Provider.of<DioNotifier>(context).selectedFiles.first.path.split('/').last} + ${Provider.of<DioNotifier>(context).selectedFiles.length - 1} more'
+                ? Provider.of<DioNotifier>(
+                    context,
+                  ).selectedFiles.first.path.split('/').last
+                : '${Provider.of<DioNotifier>(context).selectedFiles.first.path.split('/').last} + ${Provider.of<DioNotifier>(context).selectedFiles.length - 1} more'
           : 'File name does not exists.',
       style: color.textStyle(
         color: color.secondaryOnBackground,
@@ -142,10 +134,7 @@ class _FileNameText extends StatelessWidget {
 }
 
 class _ProgressBarBG extends StatelessWidget {
-  const _ProgressBarBG({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _ProgressBarBG({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -164,14 +153,11 @@ class _ProgressBarBG extends StatelessWidget {
         child: Align(
           alignment: Alignment.centerLeft,
           child: AnimatedContainer(
-            duration: const Duration(
-              milliseconds: 100,
-            ),
+            duration: const Duration(milliseconds: 100),
             height: 96.toAutoScaledHeight,
-            width: (Provider.of<DioNotifier>(context).progress * 780).toAutoScaledWidth,
-            decoration: BoxDecoration(
-              color: color.primary.withOpacity(0.2),
-            ),
+            width: (Provider.of<DioNotifier>(context).progress * 780)
+                .toAutoScaledWidth,
+            decoration: BoxDecoration(color: color.primary.withOpacity(0.2)),
           ),
         ),
       ),

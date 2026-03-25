@@ -30,10 +30,7 @@ part 'widgets/failure_body.dart';
 
 @RoutePage()
 class UploadPage extends StatefulWidget {
-  const UploadPage({
-    Key? key,
-    required this.uploadFiles,
-  }) : super(key: key);
+  const UploadPage({Key? key, required this.uploadFiles}) : super(key: key);
 
   final List<File> uploadFiles;
 
@@ -50,7 +47,10 @@ class _UploadPageState extends State<UploadPage> {
 
   Future<void> _uploadFiles() async {
     final dioNotifier = locator<DioNotifier>();
-    await dioNotifier.uploadFilesAnonymous(widget.uploadFiles, (count, total) {});
+    await dioNotifier.uploadFilesAnonymous(
+      widget.uploadFiles,
+      (count, total) {},
+    );
   }
 
   @override
@@ -109,7 +109,9 @@ class _FailedBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final OColor color = OColor.withContext(context);
     final failure = Provider.of<DioNotifier>(context).uploadFilesFailure;
-    return Center(child: FailedBody(color: color, uploadFilesFailure: failure!));
+    return Center(
+      child: FailedBody(color: color, uploadFilesFailure: failure!),
+    );
   }
 }
 
@@ -120,7 +122,9 @@ class _SuccessBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final OColor color = OColor.withContext(context);
     final success = Provider.of<DioNotifier>(context).uploadFilesSuccess;
-    return Center(child: SuccessBody(color: color, uploadFilesSuccess: success!));
+    return Center(
+      child: SuccessBody(color: color, uploadFilesSuccess: success!),
+    );
   }
 }
 
@@ -136,8 +140,8 @@ class _MobileLoadingBody extends StatelessWidget {
     final notifier = Provider.of<DioNotifier>(context);
     final fileName = notifier.selectedFiles.isNotEmpty
         ? (notifier.selectedFiles.length == 1
-            ? notifier.selectedFiles.first.path.split('/').last
-            : '${notifier.selectedFiles.first.path.split('/').last} + ${notifier.selectedFiles.length - 1} more')
+              ? notifier.selectedFiles.first.path.split('/').last
+              : '${notifier.selectedFiles.first.path.split('/').last} + ${notifier.selectedFiles.length - 1} more')
         : '';
     final fileSize = notifier.selectedFiles.isNotEmpty
         ? formatBytes(notifier.selectedFilesSize, 0)
@@ -162,7 +166,10 @@ class _MobileLoadingBody extends StatelessWidget {
                 oImage.arrowLeft,
                 width: 20,
                 height: 20,
-                colorFilter: ColorFilter.mode(color.secondaryOnBackground, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                  color.secondaryOnBackground,
+                  BlendMode.srcIn,
+                ),
               ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -257,8 +264,12 @@ class _MobileLoadingBody extends StatelessWidget {
                 },
                 style: OutlinedButton.styleFrom(
                   foregroundColor: color.secondaryOnBackground,
-                  side: BorderSide(color: color.secondaryOnBackground.withOpacity(0.2)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  side: BorderSide(
+                    color: color.secondaryOnBackground.withOpacity(0.2),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: Text(
                   oApp.currentConfig?.upload.cancelDefaultText ?? 'Cancel',
@@ -304,20 +315,17 @@ class _MobileSuccessBody extends StatelessWidget {
                 oImage.arrowLeft,
                 width: 20,
                 height: 20,
-                colorFilter: ColorFilter.mode(color.secondaryOnBackground, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                  color.secondaryOnBackground,
+                  BlendMode.srcIn,
+                ),
               ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
             const Spacer(),
             // Success illustration
-            Center(
-              child: Image.asset(
-                oImage.success,
-                width: 120,
-                height: 120,
-              ),
-            ),
+            Center(child: Image.asset(oImage.success, width: 120, height: 120)),
             const SizedBox(height: 24),
             Center(
               child: Text(
@@ -352,11 +360,17 @@ class _MobileSuccessBody extends StatelessWidget {
                   SnackBar(
                     content: Text(
                       'Token copied',
-                      style: GoogleFonts.inter(color: color.secondary, fontSize: 14, fontWeight: FontWeight.w500),
+                      style: GoogleFonts.inter(
+                        color: color.secondary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     backgroundColor: color.cardOnBackground,
                     behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -367,7 +381,10 @@ class _MobileSuccessBody extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFF1A1A1A),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: color.primary.withOpacity(0.25), width: 1),
+                  border: Border.all(
+                    color: color.primary.withOpacity(0.25),
+                    width: 1,
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -385,7 +402,11 @@ class _MobileSuccessBody extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.touch_app_rounded, color: color.secondaryOnBackground, size: 13),
+                        Icon(
+                          Icons.touch_app_rounded,
+                          color: color.secondaryOnBackground,
+                          size: 13,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Tap to copy',
@@ -426,18 +447,25 @@ class _MobileSuccessBody extends StatelessWidget {
                     SnackBar(
                       content: Text(
                         'Token copied',
-                        style: GoogleFonts.inter(color: color.secondary, fontSize: 14),
+                        style: GoogleFonts.inter(
+                          color: color.secondary,
+                          fontSize: 14,
+                        ),
                       ),
                       backgroundColor: color.cardOnBackground,
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       duration: const Duration(seconds: 2),
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: color.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 0,
                 ),
                 child: Text(
@@ -459,8 +487,12 @@ class _MobileSuccessBody extends StatelessWidget {
                 onPressed: () => locator<AppRouter>().popUntilRoot(),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: color.secondaryOnBackground,
-                  side: BorderSide(color: color.secondaryOnBackground.withOpacity(0.2)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  side: BorderSide(
+                    color: color.secondaryOnBackground.withOpacity(0.2),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: Text(
                   'Back to home',
@@ -478,7 +510,11 @@ class _MobileSuccessBody extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(Icons.delete_outline_rounded, color: color.error, size: 16),
+                  Icon(
+                    Icons.delete_outline_rounded,
+                    color: color.error,
+                    size: 16,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Need to delete early?',
@@ -503,11 +539,17 @@ class _MobileSuccessBody extends StatelessWidget {
               const SizedBox(height: 10),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: color.error.withOpacity(0.25), width: 1),
+                  border: Border.all(
+                    color: color.error.withOpacity(0.25),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -531,11 +573,16 @@ class _MobileSuccessBody extends StatelessWidget {
                           SnackBar(
                             content: Text(
                               'Delete link copied',
-                              style: GoogleFonts.inter(color: color.secondary, fontSize: 14),
+                              style: GoogleFonts.inter(
+                                color: color.secondary,
+                                fontSize: 14,
+                              ),
                             ),
                             backgroundColor: color.cardOnBackground,
                             behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         );
                       },
@@ -545,7 +592,11 @@ class _MobileSuccessBody extends StatelessWidget {
                           color: color.error.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(Icons.copy_rounded, color: color.error, size: 16),
+                        child: Icon(
+                          Icons.copy_rounded,
+                          color: color.error,
+                          size: 16,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -553,7 +604,10 @@ class _MobileSuccessBody extends StatelessWidget {
                       onTap: () async {
                         final uri = Uri.tryParse(deleteToken);
                         if (uri != null && await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          );
                         }
                       },
                       child: Container(
@@ -562,7 +616,11 @@ class _MobileSuccessBody extends StatelessWidget {
                           color: color.error.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(Icons.open_in_new_rounded, color: color.error, size: 16),
+                        child: Icon(
+                          Icons.open_in_new_rounded,
+                          color: color.error,
+                          size: 16,
+                        ),
                       ),
                     ),
                   ],
@@ -586,8 +644,9 @@ class _MobileFailedBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final message = Provider.of<DioNotifier>(context).uploadFilesFailure?.message
-        ?? 'Something went wrong.';
+    final message =
+        Provider.of<DioNotifier>(context).uploadFilesFailure?.message ??
+        'Something went wrong.';
 
     return SafeArea(
       child: Padding(
@@ -602,19 +661,16 @@ class _MobileFailedBody extends StatelessWidget {
                 oImage.arrowLeft,
                 width: 20,
                 height: 20,
-                colorFilter: ColorFilter.mode(color.secondaryOnBackground, BlendMode.srcIn),
+                colorFilter: ColorFilter.mode(
+                  color.secondaryOnBackground,
+                  BlendMode.srcIn,
+                ),
               ),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
             const Spacer(),
-            Center(
-              child: Image.asset(
-                oImage.faliure,
-                width: 120,
-                height: 120,
-              ),
-            ),
+            Center(child: Image.asset(oImage.faliure, width: 120, height: 120)),
             const SizedBox(height: 24),
             Center(
               child: Text(
@@ -647,7 +703,9 @@ class _MobileFailedBody extends StatelessWidget {
                 onPressed: () => locator<AppRouter>().pop(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: color.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   elevation: 0,
                 ),
                 child: Text(

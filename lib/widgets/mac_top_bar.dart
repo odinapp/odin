@@ -3,9 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MacTopBar extends StatelessWidget {
-  const MacTopBar({
-    Key? key,
-  }) : super(key: key);
+  const MacTopBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +11,7 @@ class MacTopBar extends StatelessWidget {
       height: 26,
       child: Row(
         children: [
-          const Expanded(
-            child: TitleBar(),
-          ),
+          const Expanded(child: TitleBar()),
           Theme(
             data: ThemeData.dark(),
             child: PopupMenuButton(
@@ -64,10 +60,7 @@ class TitleBar extends StatelessWidget {
     return Center(
       child: Text(
         "Odin",
-        style: GoogleFonts.poppins(
-          fontSize: 10,
-          color: Colors.white60,
-        ),
+        style: GoogleFonts.poppins(fontSize: 10, color: Colors.white60),
       ),
     );
   }

@@ -58,9 +58,7 @@ abstract class ONetworkingBox {
             options,
             timezone: currentTimezoneRegion,
           )
-        : ONetworkingClient(
-            timezone: currentTimezoneRegion,
-          );
+        : ONetworkingClient(timezone: currentTimezoneRegion);
 
     if (loggingEnabled) {
       client.addLoggingIntercept();

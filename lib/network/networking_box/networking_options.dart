@@ -5,9 +5,5 @@ class ONetworkingOptions {
   final ResponseType? responseType;
   final Map<String, String>? headers;
 
-  ONetworkingOptions({
-    this.baseUrl,
-    this.headers,
-    this.responseType,
-  });
+  ONetworkingOptions({this.baseUrl, this.headers, this.responseType});
 }

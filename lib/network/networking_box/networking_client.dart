@@ -17,25 +17,26 @@ class ONetworkingClient {
   Interceptors get interceptors => dio.interceptors;
 
   static final envService = locator<EnvironmentService>();
-  static final String _baseUrl = '${envService.environment.API_URL}api/${envService.environment.API_VERSION}/';
+  static final String _baseUrl =
+      '${envService.environment.API_URL}api/${envService.environment.API_VERSION}/';
 
   static final Map<String, String> _defaultHeaders = {
     _ONetworkHeaderKeys.contentType: 'application/json',
     _ONetworkHeaderKeys.appVersion: AppInfoAmenity.instance.info.version,
     _ONetworkHeaderKeys.deviceOs: DeviceInfoAmenity.instance.info.osName,
-    _ONetworkHeaderKeys.deviceOsVersion: DeviceInfoAmenity.instance.info.osVersion,
+    _ONetworkHeaderKeys.deviceOsVersion:
+        DeviceInfoAmenity.instance.info.osVersion,
   };
 
-  factory ONetworkingClient({
-    String? authorizationToken,
-    String? timezone,
-  }) {
+  factory ONetworkingClient({String? authorizationToken, String? timezone}) {
     final d = Dio(
       BaseOptions(
         baseUrl: _baseUrl,
         headers: {
           ..._defaultHeaders,
-          if (authorizationToken != null) ...{'Authorization': 'Bearer $authorizationToken'},
+          if (authorizationToken != null) ...{
+            'Authorization': 'Bearer $authorizationToken',
+          },
           if (timezone != null) ...{'Timezone': timezone},
         },
         validateStatus: (_) => true,
@@ -58,7 +59,9 @@ class ONetworkingClient {
         headers: {
           ..._defaultHeaders,
           if (options.headers != null) ...options.headers!,
-          if (authorizationToken != null) ...{'Authorization': 'Bearer $authorizationToken'},
+          if (authorizationToken != null) ...{
+            'Authorization': 'Bearer $authorizationToken',
+          },
           if (timezone != null) ...{'Timezone': timezone},
         },
         responseType: options.responseType ?? ResponseType.json,

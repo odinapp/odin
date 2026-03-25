@@ -1,9 +1,6 @@
 part of './repository.dart';
 
-enum OdinFailureReason {
-  unknown,
-  invalidRequest,
-}
+enum OdinFailureReason { unknown, invalidRequest }
 
 class UploadFilesFailure extends RepositoryFailure {
   final OdinFailureReason odinFailureReason;
@@ -18,11 +15,8 @@ class UploadFilesFailure extends RepositoryFailure {
 class UploadFilesSuccess extends RepositorySuccess {
   final String token;
   final String? deleteToken;
-  UploadFilesSuccess({
-    String? message,
-    required this.token,
-    this.deleteToken,
-  }) : super(message: message);
+  UploadFilesSuccess({String? message, required this.token, this.deleteToken})
+    : super(message: message);
 }
 
 class UploadFileFailure extends RepositoryFailure {
@@ -36,9 +30,7 @@ class UploadFileFailure extends RepositoryFailure {
 }
 
 class UploadFileSuccess extends RepositorySuccess {
-  UploadFileSuccess({
-    String? message,
-  }) : super(message: message);
+  UploadFileSuccess({String? message}) : super(message: message);
 }
 
 class FetchFilesMetadataFailure extends RepositoryFailure {
@@ -54,10 +46,8 @@ class FetchFilesMetadataFailure extends RepositoryFailure {
 class FetchFilesMetadataSuccess extends RepositorySuccess {
   final FilesMetadata filesMetadata;
 
-  FetchFilesMetadataSuccess({
-    String? message,
-    required this.filesMetadata,
-  }) : super(message: message);
+  FetchFilesMetadataSuccess({String? message, required this.filesMetadata})
+    : super(message: message);
 }
 
 class FetchConfigFailure extends RepositoryFailure {
@@ -73,10 +63,8 @@ class FetchConfigFailure extends RepositoryFailure {
 class FetchConfigSuccess extends RepositorySuccess {
   final Config config;
 
-  FetchConfigSuccess({
-    String? message,
-    required this.config,
-  }) : super(message: message);
+  FetchConfigSuccess({String? message, required this.config})
+    : super(message: message);
 }
 
 class DownloadFileFailure extends RepositoryFailure {
@@ -92,8 +80,6 @@ class DownloadFileFailure extends RepositoryFailure {
 class DownloadFileSuccess extends RepositorySuccess {
   final File file;
 
-  DownloadFileSuccess({
-    String? message,
-    required this.file,
-  }) : super(message: message);
+  DownloadFileSuccess({String? message, required this.file})
+    : super(message: message);
 }

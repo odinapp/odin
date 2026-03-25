@@ -12,8 +12,11 @@ class DioService {
   static final dio = Dio();
   static final envService = locator<EnvironmentService>();
   static final randomService = locator<RandomService>();
-  static final baseUrl = '${envService.environment.API_URL}api/${envService.environment.API_VERSION}';
-  static final successfulStatusCode = int.parse(envService.environment.SUCCESSFUL_STATUS_CODE);
+  static final baseUrl =
+      '${envService.environment.API_URL}api/${envService.environment.API_VERSION}';
+  static final successfulStatusCode = int.parse(
+    envService.environment.SUCCESSFUL_STATUS_CODE,
+  );
 
   final _apiStatusSubject = BehaviorSubject<ApiStatus>.seeded(ApiStatus.init);
 
@@ -21,9 +24,12 @@ class DioService {
 
   set apiStatus(ApiStatus v) => _apiStatusSubject.add(v);
 
-  final _miniApiStatusSubject = BehaviorSubject<ApiStatus>.seeded(ApiStatus.init);
+  final _miniApiStatusSubject = BehaviorSubject<ApiStatus>.seeded(
+    ApiStatus.init,
+  );
 
-  ValueStream<ApiStatus> get miniApiStatusStream => _miniApiStatusSubject.stream;
+  ValueStream<ApiStatus> get miniApiStatusStream =>
+      _miniApiStatusSubject.stream;
 
   set miniApiStatus(ApiStatus v) => _miniApiStatusSubject.add(v);
 

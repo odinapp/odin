@@ -5,13 +5,16 @@ import 'package:odin/amenities/connectivity/amenity.dart';
 import 'package:odin/services/logger.dart';
 
 class ConnectivityAmenityImpl implements ConnectivityAmenity {
-  final StreamController<ConnectivityStatus> _connectivityStatusStreamController =
+  final StreamController<ConnectivityStatus>
+  _connectivityStatusStreamController =
       StreamController<ConnectivityStatus>.broadcast();
 
-  late StreamSubscription<List<ConnectivityResult>> _connectivityResultStreamSubscription;
+  late StreamSubscription<List<ConnectivityResult>>
+  _connectivityResultStreamSubscription;
 
   @override
-  Stream<ConnectivityStatus> get onConnectivityStatusChanged => _connectivityStatusStreamController.stream;
+  Stream<ConnectivityStatus> get onConnectivityStatusChanged =>
+      _connectivityStatusStreamController.stream;
 
   @override
   Future<ConnectivityStatus> get currentConnectivityStatus async {
@@ -32,17 +35,20 @@ class ConnectivityAmenityImpl implements ConnectivityAmenity {
     logger.d('[Connectivity.bootUp]');
 
     final connectivity = Connectivity();
-    _connectivityResultStreamSubscription = connectivity.onConnectivityChanged.listen(
-      (List<ConnectivityResult> results) {
-        if (results.isEmpty || results.contains(ConnectivityResult.none)) {
-          logger.d('[connectivity.onConnectivityChanged] disconnected');
-          _connectivityStatusStreamController.add(ConnectivityStatus.disconnected);
-        } else {
-          logger.d('[connectivity.onConnectivityChanged] connected');
-          _connectivityStatusStreamController.add(ConnectivityStatus.connected);
-        }
-      },
-    );
+    _connectivityResultStreamSubscription = connectivity.onConnectivityChanged
+        .listen((List<ConnectivityResult> results) {
+          if (results.isEmpty || results.contains(ConnectivityResult.none)) {
+            logger.d('[connectivity.onConnectivityChanged] disconnected');
+            _connectivityStatusStreamController.add(
+              ConnectivityStatus.disconnected,
+            );
+          } else {
+            logger.d('[connectivity.onConnectivityChanged] connected');
+            _connectivityStatusStreamController.add(
+              ConnectivityStatus.connected,
+            );
+          }
+        });
   }
 
   @override

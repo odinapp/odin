@@ -2,14 +2,16 @@ import 'package:odin/services/logger.dart';
 
 final oNetwork = ONetworking._();
 
-typedef Caller<S extends RepositorySuccess, F extends RepositoryFailure> = Future<Result<S, F>> Function();
+typedef Caller<S extends RepositorySuccess, F extends RepositoryFailure> =
+    Future<Result<S, F>> Function();
 
 class ONetworking {
   ONetworking._();
 
   /// If [dealWithCommonErrorsAutomatically] is set to true,
   /// deals with client error codes [400-499] and server error codes [500-599] automatically.
-  Future<Result<S, F>> call<S extends RepositorySuccess, F extends RepositoryFailure>(
+  Future<Result<S, F>>
+  call<S extends RepositorySuccess, F extends RepositoryFailure>(
     Caller<S, F> caller, {
     bool dealWithCommonErrorsAutomatically = true,
   }) async {
@@ -62,9 +64,7 @@ abstract class RepositoryRequest {
 abstract class RepositorySuccess {
   String? message;
 
-  RepositorySuccess({
-    this.message,
-  }) {
+  RepositorySuccess({this.message}) {
     message ??= '😃 Success';
   }
 }
@@ -74,11 +74,7 @@ abstract class RepositoryFailure {
   final int? statusCode;
   final dynamic data;
 
-  RepositoryFailure({
-    this.statusCode,
-    this.message,
-    this.data,
-  }) {
+  RepositoryFailure({this.statusCode, this.message, this.data}) {
     message ??= '😯 Oops! Something went wrong.';
   }
 }
@@ -130,7 +126,8 @@ class Failure<S, F> extends Result<S, F> {
   F get value => _f;
 
   @override
-  B resolve<B>(B Function(S s) onSuccess, B Function(F f) onFailure) => onFailure(_f);
+  B resolve<B>(B Function(S s) onSuccess, B Function(F f) onFailure) =>
+      onFailure(_f);
 }
 
 class Success<S, F> extends Result<S, F> {
@@ -141,5 +138,6 @@ class Success<S, F> extends Result<S, F> {
   S get value => _s;
 
   @override
-  B resolve<B>(B Function(S s) onSuccess, B Function(F f) onFailure) => onSuccess(_s);
+  B resolve<B>(B Function(S s) onSuccess, B Function(F f) onFailure) =>
+      onSuccess(_s);
 }

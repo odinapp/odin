@@ -1,10 +1,7 @@
 part of '../view.dart';
 
 class MainContainer extends StatelessWidget {
-  const MainContainer({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const MainContainer({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -31,10 +28,7 @@ class MainContainer extends StatelessWidget {
 }
 
 class MainContent extends StatelessWidget {
-  const MainContent({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const MainContent({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
@@ -51,7 +45,8 @@ class MainContent extends StatelessWidget {
             _HeaderText(color: color),
             _InfoText(
               color: color,
-              text: oApp.currentConfig?.upload.description ??
+              text:
+                  oApp.currentConfig?.upload.description ??
                   'The files are protected with end to end AES-256 encryption and can only be accessed using a unique token.',
             ),
           ],

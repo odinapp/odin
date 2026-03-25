@@ -1,17 +1,19 @@
 part of '../home_page.dart';
 
 class PrimaryButton extends StatelessWidget {
-  const PrimaryButton({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const PrimaryButton({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(60.toAutoScaledWidth, 0, 0, 60.toAutoScaledHeight),
+      padding: EdgeInsets.fromLTRB(
+        60.toAutoScaledWidth,
+        0,
+        0,
+        60.toAutoScaledHeight,
+      ),
       child: SizedBox(
         width: 276.toAutoScaledWidth,
         height: 96.toAutoScaledHeight,
@@ -19,16 +21,10 @@ class PrimaryButton extends StatelessWidget {
           onPressed: () async {
             final dummyFiles = await locator<FileService>().pickMultipleFiles();
             if (dummyFiles != null) {
-              locator<AppRouter>().push(
-                UploadRoute(
-                  uploadFiles: dummyFiles,
-                ),
-              );
+              locator<AppRouter>().push(UploadRoute(uploadFiles: dummyFiles));
             }
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color.secondary,
-          ),
+          style: ElevatedButton.styleFrom(backgroundColor: color.secondary),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,

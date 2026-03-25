@@ -1,10 +1,7 @@
 part of '../view.dart';
 
 class _BackButton extends StatelessWidget {
-  const _BackButton({
-    Key? key,
-    required this.color,
-  }) : super(key: key);
+  const _BackButton({Key? key, required this.color}) : super(key: key);
 
   final OColor color;
 

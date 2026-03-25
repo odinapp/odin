@@ -5,17 +5,14 @@ import 'package:json_annotation/json_annotation.dart';
 /// Model class for the config
 @JsonSerializable()
 class Config {
-  Config({
-    required this.home,
-    required this.upload,
-    required this.token,
-  });
+  Config({required this.home, required this.upload, required this.token});
 
   final HomeConfig home;
   final UploadConfig upload;
   final TokenConfig token;
 
-  factory Config.fromJson(Map<String, dynamic> input) => _$ConfigFromJson(input);
+  factory Config.fromJson(Map<String, dynamic> input) =>
+      _$ConfigFromJson(input);
 
   Map<String, dynamic> toJson() => _$ConfigToJson(this);
 }
@@ -32,7 +29,8 @@ class HomeConfig {
   final String primaryButtonText;
   final String secondaryButtonText;
 
-  factory HomeConfig.fromJson(Map<String, dynamic> input) => _$HomeConfigFromJson(input);
+  factory HomeConfig.fromJson(Map<String, dynamic> input) =>
+      _$HomeConfigFromJson(input);
 
   Map<String, dynamic> toJson() => _$HomeConfigToJson(this);
 }
@@ -57,7 +55,8 @@ class UploadConfig {
   final String errorDefaultText;
   final String successDefaultText;
 
-  factory UploadConfig.fromJson(Map<String, dynamic> input) => _$UploadConfigFromJson(input);
+  factory UploadConfig.fromJson(Map<String, dynamic> input) =>
+      _$UploadConfigFromJson(input);
 
   Map<String, dynamic> toJson() => _$UploadConfigToJson(this);
 }
@@ -78,46 +77,64 @@ class TokenConfig {
   final String backButtonText;
   final String primaryButtonText;
 
-  factory TokenConfig.fromJson(Map<String, dynamic> input) => _$TokenConfigFromJson(input);
+  factory TokenConfig.fromJson(Map<String, dynamic> input) =>
+      _$TokenConfigFromJson(input);
 
   Map<String, dynamic> toJson() => _$TokenConfigToJson(this);
 }
 
 Config _$ConfigFromJson(Map<String, dynamic> json) => Config(
-      home: HomeConfig.fromJson(json['home'] as Map<String, dynamic>),
-      upload: UploadConfig.fromJson(json['upload'] as Map<String, dynamic>),
-      token: TokenConfig.fromJson(json['token'] as Map<String, dynamic>),
-    );
+  home: HomeConfig.fromJson(json['home'] as Map<String, dynamic>),
+  upload: UploadConfig.fromJson(json['upload'] as Map<String, dynamic>),
+  token: TokenConfig.fromJson(json['token'] as Map<String, dynamic>),
+);
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
-      'home': instance.home,
-      'upload': instance.upload,
-      'token': instance.token,
-    };
+  'home': instance.home,
+  'upload': instance.upload,
+  'token': instance.token,
+};
 
 HomeConfig _$HomeConfigFromJson(Map<String, dynamic> json) => HomeConfig(
-      title: (json['title'] as String).replaceAll('\\n', '\n'),
-      primaryButtonText: (json['primaryButtonText'] as String).replaceAll('\\n', '\n'),
-      secondaryButtonText: (json['secondaryButtonText'] as String).replaceAll('\\n', '\n'),
-    );
+  title: (json['title'] as String).replaceAll('\\n', '\n'),
+  primaryButtonText: (json['primaryButtonText'] as String).replaceAll(
+    '\\n',
+    '\n',
+  ),
+  secondaryButtonText: (json['secondaryButtonText'] as String).replaceAll(
+    '\\n',
+    '\n',
+  ),
+);
 
-Map<String, dynamic> _$HomeConfigToJson(HomeConfig instance) => <String, dynamic>{
+Map<String, dynamic> _$HomeConfigToJson(HomeConfig instance) =>
+    <String, dynamic>{
       'title': instance.title,
       'primaryButtonText': instance.primaryButtonText,
       'secondaryButtonText': instance.secondaryButtonText,
     };
 
 UploadConfig _$UploadConfigFromJson(Map<String, dynamic> json) => UploadConfig(
-      title: (json['title'] as String).replaceAll('\\n', '\n'),
-      description: (json['description'] as String).replaceAll('\\n', '\n'),
-      backButtonText: (json['backButtonText'] as String).replaceAll('\\n', '\n'),
-      cancelDefaultText: (json['cancelDefaultText'] as String).replaceAll('\\n', '\n'),
-      errorButtonText: (json['errorButtonText'] as String).replaceAll('\\n', '\n'),
-      errorDefaultText: (json['errorDefaultText'] as String).replaceAll('\\n', '\n'),
-      successDefaultText: (json['successDefaultText'] as String).replaceAll('\\n', '\n'),
-    );
+  title: (json['title'] as String).replaceAll('\\n', '\n'),
+  description: (json['description'] as String).replaceAll('\\n', '\n'),
+  backButtonText: (json['backButtonText'] as String).replaceAll('\\n', '\n'),
+  cancelDefaultText: (json['cancelDefaultText'] as String).replaceAll(
+    '\\n',
+    '\n',
+  ),
+  errorButtonText: (json['errorButtonText'] as String).replaceAll('\\n', '\n'),
+  errorDefaultText: (json['errorDefaultText'] as String).replaceAll(
+    '\\n',
+    '\n',
+  ),
+  successDefaultText: (json['successDefaultText'] as String).replaceAll(
+    '\\n',
+    '\n',
+  ),
+);
 
-Map<String, dynamic> _$UploadConfigToJson(UploadConfig instance) => <String, dynamic>{
+Map<String, dynamic> _$UploadConfigToJson(UploadConfig instance) =>
+    <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
       'backButtonText': instance.backButtonText,
@@ -128,14 +145,21 @@ Map<String, dynamic> _$UploadConfigToJson(UploadConfig instance) => <String, dyn
     };
 
 TokenConfig _$TokenConfigFromJson(Map<String, dynamic> json) => TokenConfig(
-      title: (json['title'] as String).replaceAll('\\n', '\n'),
-      description: (json['description'] as String).replaceAll('\\n', '\n'),
-      textFieldHintText: (json['textFieldHintText'] as String).replaceAll('\\n', '\n'),
-      backButtonText: (json['backButtonText'] as String).replaceAll('\\n', '\n'),
-      primaryButtonText: (json['primaryButtonText'] as String).replaceAll('\\n', '\n'),
-    );
+  title: (json['title'] as String).replaceAll('\\n', '\n'),
+  description: (json['description'] as String).replaceAll('\\n', '\n'),
+  textFieldHintText: (json['textFieldHintText'] as String).replaceAll(
+    '\\n',
+    '\n',
+  ),
+  backButtonText: (json['backButtonText'] as String).replaceAll('\\n', '\n'),
+  primaryButtonText: (json['primaryButtonText'] as String).replaceAll(
+    '\\n',
+    '\n',
+  ),
+);
 
-Map<String, dynamic> _$TokenConfigToJson(TokenConfig instance) => <String, dynamic>{
+Map<String, dynamic> _$TokenConfigToJson(TokenConfig instance) =>
+    <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
       'textFieldHintText': instance.textFieldHintText,
