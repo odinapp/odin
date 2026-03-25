@@ -14,14 +14,20 @@ class HeaderTitle extends StatelessWidget {
         0,
         0,
       ),
-      child: Text(
-        oApp.currentConfig?.home.title ??
-            'Open-source\neasy file sharing\nfor everyone.',
-        style: color.textStyle(
-          color: color.secondary,
-          fontSize: 68.toAutoScaledFont,
-          fontWeight: FontWeight.w900,
-          height: 82.toAutoScaledFont / 68.toAutoScaledFont,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 720.toAutoScaledWidth),
+        child: Text(
+          oApp.currentConfig?.home.title ??
+              'Open-source\neasy file sharing\nfor everyone.',
+          textAlign: TextAlign.start,
+          softWrap: true,
+          style: color.textStyle(
+            color: color.secondary,
+            fontSize: 68.toAutoScaledFont,
+            fontWeight: FontWeight.w900,
+            height: 1.12,
+            letterSpacing: -1.2,
+          ),
         ),
       ),
     );

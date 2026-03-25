@@ -19,13 +19,19 @@ class MainContainer extends StatelessWidget {
         child: Stack(
           children: [
             const BGIllustration(),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HeaderTitle(color: color),
-                PrimaryButton(color: color),
-              ],
+            Positioned.fill(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(right: 40.toAutoScaledWidth),
+                      child: HeaderTitle(color: color),
+                    ),
+                  ),
+                  PrimaryButton(color: color),
+                ],
+              ),
             ),
           ],
         ),

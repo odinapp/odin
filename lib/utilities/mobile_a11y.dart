@@ -14,6 +14,20 @@ Widget mobileClampedTextScale(BuildContext context, {required Widget child}) {
   );
 }
 
+/// Desktop home: allow slightly larger text than mobile while avoiding layout
+/// blowouts in fixed-scale cards (still respects accessibility up to ~1.55×).
+Widget desktopClampedTextScale(BuildContext context, {required Widget child}) {
+  final mq = MediaQuery.of(context);
+  final clamped = mq.textScaler.clamp(
+    minScaleFactor: 0.88,
+    maxScaleFactor: 1.55,
+  );
+  return MediaQuery(
+    data: mq.copyWith(textScaler: clamped),
+    child: child,
+  );
+}
+
 /// Minimum 48×48 touch target; [tooltip] drives the accessibility label on
 /// platforms that use it.
 Widget mobileToolbarIconButton({

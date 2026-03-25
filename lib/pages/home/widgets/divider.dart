@@ -5,10 +5,15 @@ class OrDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      oImage.orDivider,
-      width: 258.toAutoScaledWidth,
-      height: 22.toAutoScaledHeight,
+    return Semantics(
+      label: 'Or',
+      child: ExcludeSemantics(
+        child: SvgPicture.asset(
+          oImage.orDivider,
+          width: 258.toAutoScaledWidth,
+          height: 22.toAutoScaledHeight,
+        ),
+      ),
     );
   }
 }

@@ -24,6 +24,31 @@ part 'widgets/header_title.dart';
 part 'widgets/divider.dart';
 part 'widgets/secondary_button.dart';
 
+void showOdinHomeSnackBar(BuildContext context, String message) {
+  if (!context.mounted) return;
+  final color = OColor.withContext(context);
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final snackBg = isDark ? color.cardOnBackground : color.lBackgroundContainer;
+  final snackFg = isDark ? color.secondary : color.lSecondary;
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.all(16),
+      backgroundColor: snackBg,
+      content: Text(
+        message,
+        style: color.textStyle(
+          color: snackFg,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          height: 1.45,
+        ),
+      ),
+    ),
+  );
+}
+
 @RoutePage()
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -60,22 +85,62 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final OColor color = OColor.withContext(context);
 
-    return Center(
-      child: Column(
+    return desktopClampedTextScale(
+      context,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MainContainer(color: color),
+            54.toVerticalSizedBox,
+            const OrDivider(),
+            SecondaryButton(color: color),
+            16.toVerticalSizedBox,
+            _DesktopPolicyStrip(color: color),
+            32.toVerticalSizedBox,
+            SizedBox(
+              width: 1040.toAutoScaledWidth,
+              child: PendingUploadsHomeSection(
+                color: color,
+                compact: false,
+                maxListHeight: 220,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Policy line aligned with mobile home; visible copy + semantics for desktop.
+class _DesktopPolicyStrip extends StatelessWidget {
+  const _DesktopPolicyStrip({required this.color});
+
+  final OColor color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label:
+          'Files expire after ${SharingPolicy.fileLifetimeHours} hours. '
+          'Maximum upload size ${SharingPolicy.maxUploadShortLabel}.',
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          MainContainer(color: color),
-          54.toVerticalSizedBox,
-          const OrDivider(),
-          SecondaryButton(color: color),
-          32.toVerticalSizedBox,
-          SizedBox(
-            width: 1040.toAutoScaledWidth,
-            child: PendingUploadsHomeSection(
-              color: color,
-              compact: false,
-              maxListHeight: 220,
+          ExcludeSemantics(
+            child: Text(
+              '${SharingPolicy.fileLifetimeHours}h expiry · '
+              '${SharingPolicy.maxUploadShortLabel} max',
+              textAlign: TextAlign.center,
+              style: color.textStyle(
+                color: color.secondaryOnBackground,
+                fontSize: 13.toAutoScaledFont,
+                fontWeight: FontWeight.w500,
+                height: 1.35,
+                letterSpacing: 0.12,
+              ),
             ),
           ),
         ],
@@ -92,7 +157,13 @@ class _MobileBody extends StatelessWidget {
   final OColor color;
 
   Future<void> _onSend(BuildContext context) async {
-    final files = await locator<FileService>().pickMultipleFiles();
+    final pick = await locator<FileService>().pickMultipleFiles();
+    if (!context.mounted) return;
+    if (pick.errorMessage != null) {
+      showOdinHomeSnackBar(context, pick.errorMessage!);
+      return;
+    }
+    final files = pick.files;
     if (files != null) {
       locator<AppRouter>().push(UploadRoute(uploadFiles: files));
     }
@@ -161,8 +232,8 @@ class _MobileBody extends StatelessWidget {
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const Spacer(flex: 2)
-,                  _MobilePrimaryButton(
+                  const Spacer(flex: 2),
+                  _MobilePrimaryButton(
                     color: color,
                     onPressed: () => _onSend(context),
                   ),

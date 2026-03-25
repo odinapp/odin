@@ -49,6 +49,8 @@ class OColor {
   static const Color _dSecondaryOnBackground = Color(0xFF838383);
   static const Color _dSecondaryContainerOnBackground = Color(0xFF181818);
   static const Color _dCardOnBackground = Color(0xFF1E1E1E);
+  /// Visible edge for controls on [background] / [backgroundContainer] (WCAG 1.4.11).
+  static const Color _dBorderSubtleOnBackground = Color(0xFF3D3D3D);
 
   Color get lPrimary => _lPrimary;
   Color get lPrimaryContainer => _lPrimaryContainer;
@@ -68,6 +70,7 @@ class OColor {
   Color get dSecondaryOnBackground => _dSecondaryOnBackground;
   Color get dSecondaryContainerOnBackground => _dSecondaryContainerOnBackground;
   Color get dCardOnBackground => _dCardOnBackground;
+  Color get dBorderSubtleOnBackground => _dBorderSubtleOnBackground;
 
   Color get primary {
     if (_context == null) {
@@ -132,13 +135,24 @@ class OColor {
 
   Color get secondaryContainerOnBackground {
     if (_context == null) {
-      return _dSecondaryOnBackground;
+      return _dSecondaryContainerOnBackground;
     }
     if (Theme.of(_context!).brightness == Brightness.light) {
       throw UnimplementedError();
     } else {
       return dSecondaryContainerOnBackground;
     }
+  }
+
+  /// Subtle border for secondary surfaces (e.g. desktop home “Receive” control).
+  Color get borderSubtleOnBackground {
+    if (_context == null) {
+      return _dBorderSubtleOnBackground;
+    }
+    if (Theme.of(_context!).brightness == Brightness.light) {
+      return const Color(0xFFE0E0E0);
+    }
+    return _dBorderSubtleOnBackground;
   }
 
   Color get secondaryOnBackground {

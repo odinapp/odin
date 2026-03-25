@@ -12,6 +12,33 @@ import 'package:odin/services/logger.dart';
 // import 'package:path/path.dart';
 // import 'package:path_provider/path_provider.dart';
 
+/// Result of [FileService.pickMultipleFiles].
+///
+/// [files] is set on success. Both [files] and [errorMessage] are null when the
+/// user dismissed the dialog. [errorMessage] is set when the picker could not
+/// run (e.g. Linux without zenity/kdialog/qarma).
+class FilePickResult {
+  const FilePickResult({this.files, this.errorMessage});
+
+  final List<File>? files;
+  final String? errorMessage;
+}
+
+Future<bool> _linuxFilePickerAvailable() async {
+  const candidates = ['qarma', 'kdialog', 'zenity'];
+  for (final name in candidates) {
+    try {
+      final result = await Process.run('which', [name]);
+      if (result.exitCode != 0) continue;
+      if (result.stdout.toString().trim().isEmpty) continue;
+      return true;
+    } on Object {
+      continue;
+    }
+  }
+  return false;
+}
+
 class FileService {
   // final _shortenerService = locator<ShortenerService>();
   // final _githubService = locator<GithubService>();
@@ -25,39 +52,72 @@ class FileService {
   String zipfileName = '';
 
   Future<File?> pickSingleFile() async {
+    if (Platform.isLinux) {
+      final ok = await _linuxFilePickerAvailable();
+      if (!ok) {
+        logger.w(
+          'Linux file picker: install zenity, kdialog, or qarma '
+          '(e.g. sudo apt install zenity).',
+        );
+        return null;
+      }
+    }
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.any,
         allowMultiple: false,
       );
-      if (result != null && result.files.single.path != null) {
-        return File(result.files.single.path!);
-      } else {
-        throw Exception('No file selected');
+      if (result == null || result.files.isEmpty) {
+        return null;
       }
+      final path = result.files.single.path;
+      if (path == null || path.isEmpty) {
+        return null;
+      }
+      return File(path);
     } catch (e, st) {
       logger.e('$e', error: e, stackTrace: st);
       return null;
     }
   }
 
-  Future<List<File>?> pickMultipleFiles() async {
+  Future<FilePickResult> pickMultipleFiles() async {
+    if (Platform.isLinux) {
+      final ok = await _linuxFilePickerAvailable();
+      if (!ok) {
+        logger.w(
+          'Linux file picker: no qarma, kdialog, or zenity in PATH. '
+          'Install one (e.g. sudo apt install zenity).',
+        );
+        return const FilePickResult(
+          errorMessage:
+              'Odin needs a file picker on Linux. Install zenity (or kdialog): '
+              'sudo apt install zenity',
+        );
+      }
+    }
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.any,
         allowMultiple: true,
       );
-      if (result != null) {
-        return result.files
-            .where((e) => e.path != null && e.path!.isNotEmpty)
-            .map((e) => File(e.path!))
-            .toList();
-      } else {
-        throw Exception('No file selected');
+      if (result == null) {
+        return const FilePickResult();
       }
+      final files = result.files
+          .where((e) => e.path != null && e.path!.isNotEmpty)
+          .map((e) => File(e.path!))
+          .toList();
+      if (files.isEmpty) {
+        return const FilePickResult();
+      }
+      return FilePickResult(files: files);
     } catch (e, st) {
       logger.e('$e', error: e, stackTrace: st);
-      return null;
+      return const FilePickResult(
+        errorMessage:
+            'Could not open the file picker. Try again, or restart the app.',
+      );
     }
   }
 

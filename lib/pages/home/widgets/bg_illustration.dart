@@ -8,10 +8,12 @@ class BGIllustration extends StatelessWidget {
     return Positioned(
       bottom: 0,
       right: 0,
-      child: Image.asset(
-        oImage.odinBG,
-        width: 492.toAutoScaledWidth,
-        height: 474.toAutoScaledHeight,
+      child: ExcludeSemantics(
+        child: Image.asset(
+          oImage.odinBG,
+          width: 492.toAutoScaledWidth,
+          height: 474.toAutoScaledHeight,
+        ),
       ),
     );
   }
