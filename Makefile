@@ -102,6 +102,12 @@ build-macos: get ## Release macOS app
 build-windows: get ## Release Windows app
 	$(FLUTTER) build windows --release
 
+build-web: get ## Release Web build
+	$(FLUTTER) build web --release
+
+deploy-web: ## Deploy `build/web` to Vercel (production)
+	npx vercel@latest build/web --prod
+
 # --- CI-style pipeline ---
 
 check: format-check analyze test ## format (check only) + analyze + test
