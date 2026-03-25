@@ -39,7 +39,43 @@ Cross-platform hassle-free file sharing with AES-256 encryption made with Flutte
 https://user-images.githubusercontent.com/42910433/143038817-cb935815-aea7-41c1-8b56-131cb99b0a20.mp4
 
 </details>
-    
+
+### Screenshots (mobile)
+
+Captured from a connected Android device via ADB (debug build). Paths are from the repo root. After large UI changes, recapture with the same flow and replace the files in [`docs/screenshots/`](docs/screenshots/).
+
+**Home**
+
+| Step | Preview |
+| --- | --- |
+| Home | ![Odin home](docs/screenshots/01_home_mobile.png) |
+
+**Send files**
+
+| Pick file | Uploading | Uploaded |
+| --- | --- | --- |
+| ![Pick file](docs/screenshots/02_send_pick_file.png) | ![Uploading](docs/screenshots/03_send_uploading.png) | ![Upload success](docs/screenshots/04_send_upload_success.png) |
+
+**Your uploads**
+
+| Bottom sheet |
+| --- |
+| ![Your uploads sheet](docs/screenshots/05_your_uploads_sheet.png) |
+
+**Receive files**
+
+| Valid token | Wrong token | Downloading | Downloaded |
+| --- | --- | --- | --- |
+| ![Valid token](docs/screenshots/06_download_right_token.png) | ![Wrong token](docs/screenshots/07_download_wrong_token.png) | ![Downloading](docs/screenshots/08_downloading.png) | ![Download complete](docs/screenshots/09_download_success.png) |
+
+### Screen recordings
+
+Short screen captures of the same flows live in [`docs/videos/`](docs/videos/) (recorded with `adb shell screenrecord` on device, then pulled to the repo).
+
+| Recording | File |
+| --- | --- |
+| Send flow (pick file → success) and **Your uploads** sheet | [01_flow_send_and_uploads.mp4](docs/videos/01_flow_send_and_uploads.mp4) |
+| Receive flow (wrong token → valid token → download complete) | [02_flow_download_receive.mp4](docs/videos/02_flow_download_receive.mp4) |
 
 ## Built With
 
