@@ -16,6 +16,7 @@ import 'package:odin/constants/size.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/utilities/debounce.dart';
 import 'package:odin/utilities/networking.dart';
+import 'package:odin/utilities/mobile_a11y.dart';
 import 'package:odin/utilities/responsive.dart';
 import 'package:provider/provider.dart';
 
@@ -176,119 +177,122 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
       return _MobileDownloadSuccess(color: color);
     }
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            IconButton(
-              onPressed: () => locator<AppRouter>().pop(),
-              icon: SvgPicture.asset(
-                oImage.arrowLeft,
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                  color.secondaryOnBackground,
-                  BlendMode.srcIn,
-                ),
-              ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              oApp.currentConfig?.token.title ?? 'Receive files',
-              style: GoogleFonts.inter(
-                color: color.secondary,
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-                height: 1.1,
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              oApp.currentConfig?.token.description ??
-                  'Enter the 8-character token shared with you.',
-              style: GoogleFonts.inter(
-                color: color.secondaryOnBackground,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 28),
-            // Token input — 8-box OTP style
-            _TokenBoxInput(
-              color: color,
-              controller: _controller,
-              focusNode: _focusNode,
-              miniStatus: miniStatus,
-              onChanged: (value) {
-                setState(() => _token = value);
-                if (value.length >= 6) {
-                  _debounce.call(_fetchMetadata);
-                } else {
-                  locator<DioNotifier>().miniApiStatus = ApiStatus.init;
-                }
-              },
-            ),
-            // Metadata / error hint
-            if (miniStatus == ApiStatus.success) ...[
-              const SizedBox(height: 10),
-              _MobileMetadataHint(color: color),
-            ] else if (miniStatus == ApiStatus.failed) ...[
-              const SizedBox(height: 8),
-              Text(
-                _friendlyError(notifier.fetchFilesMetadataFailure?.message),
-                style: GoogleFonts.inter(
-                  color: color.error,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-            const Spacer(),
-            // Download button
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: miniStatus == ApiStatus.success ? _download : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: color.primary,
-                  disabledBackgroundColor: const Color(0xFF2A2A2A),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+    return mobileClampedTextScale(
+      context,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              mobileToolbarIconButton(
+                context: context,
+                onPressed: () => locator<AppRouter>().pop(),
+                tooltip: oApp.currentConfig?.token.backButtonText ?? 'Back',
+                icon: SvgPicture.asset(
+                  oImage.arrowLeft,
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    color.secondaryOnBackground,
+                    BlendMode.srcIn,
                   ),
-                  elevation: 0,
                 ),
-                child: apiStatus == ApiStatus.loading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Text(
-                        oApp.currentConfig?.token.primaryButtonText ??
-                            'Download files',
-                        style: GoogleFonts.inter(
-                          color: miniStatus == ApiStatus.success
-                              ? Colors.white
-                              : color.secondaryOnBackground,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 32),
+              Text(
+                oApp.currentConfig?.token.title ?? 'Receive files',
+                style: GoogleFonts.inter(
+                  color: color.secondary,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                oApp.currentConfig?.token.description ??
+                    'Enter the 8-character token shared with you.',
+                style: GoogleFonts.inter(
+                  color: color.secondaryOnBackground,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 28),
+              // Token input — 8-box OTP style
+              _TokenBoxInput(
+                color: color,
+                controller: _controller,
+                focusNode: _focusNode,
+                miniStatus: miniStatus,
+                onChanged: (value) {
+                  setState(() => _token = value);
+                  if (value.length >= 6) {
+                    _debounce.call(_fetchMetadata);
+                  } else {
+                    locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+                  }
+                },
+              ),
+              // Metadata / error hint
+              if (miniStatus == ApiStatus.success) ...[
+                const SizedBox(height: 10),
+                _MobileMetadataHint(color: color),
+              ] else if (miniStatus == ApiStatus.failed) ...[
+                const SizedBox(height: 8),
+                Text(
+                  _friendlyError(notifier.fetchFilesMetadataFailure?.message),
+                  style: GoogleFonts.inter(
+                    color: color.error,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+              const Spacer(),
+              // Download button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: miniStatus == ApiStatus.success ? _download : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color.primary,
+                    disabledBackgroundColor: const Color(0xFF2A2A2A),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: apiStatus == ApiStatus.loading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          oApp.currentConfig?.token.primaryButtonText ??
+                              'Download files',
+                          style: GoogleFonts.inter(
+                            color: miniStatus == ApiStatus.success
+                                ? Colors.white
+                                : color.secondaryOnBackground,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -352,81 +356,91 @@ class _MobileDownloadSuccess extends StatelessWidget {
   Widget build(BuildContext context) {
     final file = Provider.of<DioNotifier>(context).downloadFileSuccess?.file;
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            IconButton(
-              onPressed: () => locator<AppRouter>().popUntilRoot(),
-              icon: SvgPicture.asset(
-                oImage.arrowLeft,
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                  color.secondaryOnBackground,
-                  BlendMode.srcIn,
+    return mobileClampedTextScale(
+      context,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              mobileToolbarIconButton(
+                context: context,
+                onPressed: () => locator<AppRouter>().popUntilRoot(),
+                tooltip: oApp.currentConfig?.token.backButtonText ?? 'Back',
+                icon: SvgPicture.asset(
+                  oImage.arrowLeft,
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    color.secondaryOnBackground,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-            const Spacer(),
-            Center(child: Image.asset(oImage.success, width: 120, height: 120)),
-            const SizedBox(height: 24),
-            Center(
-              child: Text(
-                'Download complete!',
-                style: GoogleFonts.inter(
-                  color: color.secondary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.3,
+              const Spacer(),
+              Center(
+                child: Image.asset(
+                  oImage.success,
+                  width: 120,
+                  height: 120,
+                  excludeFromSemantics: true,
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            if (file != null)
+              const SizedBox(height: 24),
               Center(
                 child: Text(
-                  file.path.split('/').last,
-                  textAlign: TextAlign.center,
+                  'Download complete!',
                   style: GoogleFonts.inter(
-                    color: color.secondaryOnBackground,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: () => locator<AppRouter>().popUntilRoot(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: color.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Back to home',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                    color: color.secondary,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 8),
+              if (file != null)
+                Center(
+                  child: Text(
+                    file.path.split('/').last,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      color: color.secondaryOnBackground,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () => locator<AppRouter>().popUntilRoot(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Back to home',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -483,7 +497,8 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
   void didUpdateWidget(_TokenBoxInput oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.miniStatus == ApiStatus.failed &&
-        _prevStatus != ApiStatus.failed) {
+        _prevStatus != ApiStatus.failed &&
+        !MediaQuery.disableAnimationsOf(context)) {
       _shakeController.forward(from: 0);
     }
     _prevStatus = widget.miniStatus;
@@ -508,92 +523,109 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
         offset: Offset(_shakeAnim.value, 0),
         child: child,
       ),
-      child: GestureDetector(
-        onTap: () => widget.focusNode.requestFocus(),
-        behavior: HitTestBehavior.opaque,
-        child: Stack(
-          children: [
-            // Invisible text field — captures keyboard input
-            SizedBox(
-              height: 0,
-              child: TextField(
-                controller: widget.controller,
-                focusNode: widget.focusNode,
-                textCapitalization: TextCapitalization.none,
-                autocorrect: false,
-                enableSuggestions: false,
-                showCursor: false,
-                style: const TextStyle(color: Colors.transparent, fontSize: 1),
-                decoration: const InputDecoration.collapsed(hintText: ''),
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(8),
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
-                ],
-                onChanged: widget.onChanged,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Visual boxes only — taps hit the real TextField layered above.
+          ExcludeSemantics(
+            child: IgnorePointer(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(8, (i) {
+                  final hasChar = i < text.length;
+                  final isActive =
+                      i == text.length && !isSuccess && !isFailed && !isLoading;
+
+                  final Color borderColor;
+                  if (isSuccess) {
+                    borderColor = widget.color.primary;
+                  } else if (isFailed) {
+                    borderColor = widget.color.error;
+                  } else if (isActive) {
+                    borderColor = widget.color.primary.withOpacity(0.6);
+                  } else if (hasChar) {
+                    borderColor = const Color(0xFF3A3A3A);
+                  } else {
+                    borderColor = const Color(0xFF242424);
+                  }
+
+                  final Color bgColor = hasChar
+                      ? isSuccess
+                            ? widget.color.primary.withOpacity(0.08)
+                            : const Color(0xFF1E1E1E)
+                      : const Color(0xFF151515);
+
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 120),
+                    curve: Curves.easeOut,
+                    width: 36,
+                    height: 54,
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: borderColor,
+                        width: isActive || isSuccess ? 1.5 : 1,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: hasChar
+                        ? Text(
+                            text[i].toUpperCase(),
+                            style: GoogleFonts.inter(
+                              color: isSuccess
+                                  ? widget.color.primary
+                                  : widget.color.secondary,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          )
+                        : isActive
+                        ? _BlinkingCursor(color: widget.color.primary)
+                        : isLoading && i < 8
+                        ? null
+                        : null,
+                  );
+                }),
               ),
             ),
-            // 8 character boxes
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(8, (i) {
-                final hasChar = i < text.length;
-                final isActive =
-                    i == text.length && !isSuccess && !isFailed && !isLoading;
-
-                final Color borderColor;
-                if (isSuccess) {
-                  borderColor = widget.color.primary;
-                } else if (isFailed) {
-                  borderColor = widget.color.error;
-                } else if (isActive) {
-                  borderColor = widget.color.primary.withOpacity(0.6);
-                } else if (hasChar) {
-                  borderColor = const Color(0xFF3A3A3A);
-                } else {
-                  borderColor = const Color(0xFF242424);
-                }
-
-                final Color bgColor = hasChar
-                    ? isSuccess
-                          ? widget.color.primary.withOpacity(0.08)
-                          : const Color(0xFF1E1E1E)
-                    : const Color(0xFF151515);
-
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 120),
-                  curve: Curves.easeOut,
-                  width: 36,
-                  height: 54,
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: borderColor,
-                      width: isActive || isSuccess ? 1.5 : 1,
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            height: 54,
+            child: Opacity(
+              opacity: 0,
+              child: Semantics(
+                textField: true,
+                label: oApp.currentConfig?.token.title ?? 'Share token',
+                hint: 'Enter 8 letters or numbers',
+                value: text,
+                child: ExcludeSemantics(
+                  child: TextField(
+                    controller: widget.controller,
+                    focusNode: widget.focusNode,
+                    textCapitalization: TextCapitalization.none,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    showCursor: false,
+                    style: const TextStyle(
+                      color: Colors.transparent,
+                      fontSize: 1,
                     ),
+                    decoration: const InputDecoration.collapsed(hintText: ''),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(8),
+                      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+                    ],
+                    onChanged: widget.onChanged,
                   ),
-                  alignment: Alignment.center,
-                  child: hasChar
-                      ? Text(
-                          text[i].toUpperCase(),
-                          style: GoogleFonts.inter(
-                            color: isSuccess
-                                ? widget.color.primary
-                                : widget.color.secondary,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        )
-                      : isActive
-                      ? _BlinkingCursor(color: widget.color.primary)
-                      : isLoading && i < 8
-                      ? null
-                      : null,
-                );
-              }),
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -617,7 +649,17 @@ class _BlinkingCursorState extends State<_BlinkingCursor>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 530),
-    )..repeat(reverse: true);
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat(reverse: true);
+    }
   }
 
   @override
@@ -628,6 +670,16 @@ class _BlinkingCursorState extends State<_BlinkingCursor>
 
   @override
   Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return Container(
+        width: 2,
+        height: 22,
+        decoration: BoxDecoration(
+          color: widget.color,
+          borderRadius: BorderRadius.circular(1),
+        ),
+      );
+    }
     return AnimatedBuilder(
       animation: _controller,
       builder: (_, __) => Opacity(

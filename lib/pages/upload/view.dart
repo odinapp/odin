@@ -16,6 +16,7 @@ import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
 import 'package:odin/utilities/byte_formatter.dart';
 import 'package:odin/utilities/networking.dart';
+import 'package:odin/utilities/mobile_a11y.dart';
 import 'package:odin/utilities/responsive.dart';
 import 'package:provider/provider.dart';
 
@@ -149,140 +150,144 @@ class _MobileLoadingBody extends StatelessWidget {
     final progress = notifier.progress;
     final percent = notifier.progressPercentage;
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            // Back / cancel row
-            IconButton(
-              onPressed: () {
-                locator<DioNotifier>().cancelCurrentRequest();
-                locator<AppRouter>().pop();
-              },
-              icon: SvgPicture.asset(
-                oImage.arrowLeft,
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                  color.secondaryOnBackground,
-                  BlendMode.srcIn,
-                ),
-              ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-            const Spacer(),
-            // Heading
-            Text(
-              oApp.currentConfig?.upload.title ?? 'Uploading...',
-              style: GoogleFonts.inter(
-                color: color.secondary,
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-                height: 1.1,
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            if (fileName.isNotEmpty)
-              Text(
-                fileName,
-                style: GoogleFonts.inter(
-                  color: color.secondaryOnBackground,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            if (fileSize.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                fileSize,
-                style: GoogleFonts.inter(
-                  color: color.secondaryOnBackground,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-            const Spacer(),
-            // Description
-            Text(
-              oApp.currentConfig?.upload.description ??
-                  'Protected with end-to-end AES-256 encryption.',
-              style: GoogleFonts.inter(
-                color: color.secondaryOnBackground,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Progress bar
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Stack(
-                children: [
-                  Container(
-                    height: 6,
-                    width: double.infinity,
-                    color: const Color(0xFF2A2A2A),
-                  ),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    height: 6,
-                    width: (MediaQuery.of(context).size.width - 48) * progress,
-                    decoration: BoxDecoration(
-                      color: color.primary,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              '$percent%',
-              style: GoogleFonts.inter(
-                color: color.secondaryOnBackground,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: OutlinedButton(
+    return mobileClampedTextScale(
+      context,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              // Back / cancel row
+              mobileToolbarIconButton(
+                context: context,
                 onPressed: () {
                   locator<DioNotifier>().cancelCurrentRequest();
                   locator<AppRouter>().pop();
                 },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: color.secondaryOnBackground,
-                  side: BorderSide(
-                    color: color.secondaryOnBackground.withOpacity(0.2),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  oApp.currentConfig?.upload.cancelDefaultText ?? 'Cancel',
-                  style: GoogleFonts.inter(
-                    color: color.secondaryOnBackground,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                tooltip: oApp.currentConfig?.upload.backButtonText ?? 'Back',
+                icon: SvgPicture.asset(
+                  oImage.arrowLeft,
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    color.secondaryOnBackground,
+                    BlendMode.srcIn,
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const Spacer(),
+              // Heading
+              Text(
+                oApp.currentConfig?.upload.title ?? 'Uploading...',
+                style: GoogleFonts.inter(
+                  color: color.secondary,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (fileName.isNotEmpty)
+                Text(
+                  fileName,
+                  style: GoogleFonts.inter(
+                    color: color.secondaryOnBackground,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              if (fileSize.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  fileSize,
+                  style: GoogleFonts.inter(
+                    color: color.secondaryOnBackground,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+              const Spacer(),
+              // Description
+              Text(
+                oApp.currentConfig?.upload.description ??
+                    'Protected with end-to-end AES-256 encryption.',
+                style: GoogleFonts.inter(
+                  color: color.secondaryOnBackground,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Progress bar
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 6,
+                      width: double.infinity,
+                      color: const Color(0xFF2A2A2A),
+                    ),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 100),
+                      height: 6,
+                      width:
+                          (MediaQuery.of(context).size.width - 48) * progress,
+                      decoration: BoxDecoration(
+                        color: color.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '$percent%',
+                style: GoogleFonts.inter(
+                  color: color.secondaryOnBackground,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton(
+                  onPressed: () {
+                    locator<DioNotifier>().cancelCurrentRequest();
+                    locator<AppRouter>().pop();
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: color.secondaryOnBackground,
+                    side: BorderSide(
+                      color: color.secondaryOnBackground.withOpacity(0.2),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    oApp.currentConfig?.upload.cancelDefaultText ?? 'Cancel',
+                    style: GoogleFonts.inter(
+                      color: color.secondaryOnBackground,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -302,333 +307,315 @@ class _MobileSuccessBody extends StatelessWidget {
     final token = success?.token ?? '';
     final deleteToken = success?.deleteToken;
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            IconButton(
-              onPressed: () => locator<AppRouter>().pop(),
-              icon: SvgPicture.asset(
-                oImage.arrowLeft,
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                  color.secondaryOnBackground,
-                  BlendMode.srcIn,
-                ),
-              ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+    void copyShareToken() {
+      Clipboard.setData(ClipboardData(text: token));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Token copied',
+            style: GoogleFonts.inter(
+              color: color.secondary,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
-            const Spacer(),
-            // Success illustration
-            Center(child: Image.asset(oImage.success, width: 120, height: 120)),
-            const SizedBox(height: 24),
-            Center(
-              child: Text(
-                'Files uploaded!',
-                style: GoogleFonts.inter(
-                  color: color.secondary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.3,
-                ),
-              ),
-            ),
-            const Spacer(),
-            // Token label
-            Center(
-              child: Text(
-                'SHARE TOKEN',
-                style: GoogleFonts.inter(
-                  color: color.primary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 2.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Token — bold and large, tap to copy
-            GestureDetector(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: token));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Token copied',
-                      style: GoogleFonts.inter(
-                        color: color.secondary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    backgroundColor: color.cardOnBackground,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 22),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: color.primary.withOpacity(0.25),
-                    width: 1,
+          ),
+          backgroundColor: color.cardOnBackground,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+
+    return mobileClampedTextScale(
+      context,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              mobileToolbarIconButton(
+                context: context,
+                onPressed: () => locator<AppRouter>().pop(),
+                tooltip: oApp.currentConfig?.upload.backButtonText ?? 'Back',
+                icon: SvgPicture.asset(
+                  oImage.arrowLeft,
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    color.secondaryOnBackground,
+                    BlendMode.srcIn,
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Text(
-                      token,
-                      style: GoogleFonts.inter(
-                        color: color.secondary,
-                        fontSize: 38,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 6,
+              ),
+              const Spacer(),
+              // Success illustration
+              Center(
+                child: Image.asset(
+                  oImage.success,
+                  width: 120,
+                  height: 120,
+                  excludeFromSemantics: true,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: Text(
+                  'Files uploaded!',
+                  style: GoogleFonts.inter(
+                    color: color.secondary,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              // Token label
+              Center(
+                child: Text(
+                  'SHARE TOKEN',
+                  style: GoogleFonts.inter(
+                    color: color.primary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Token — bold and large, tap to copy
+              Semantics(
+                button: true,
+                label: 'Copy share token',
+                hint: 'Copies the token to the clipboard',
+                value: token,
+                onTap: copyShareToken,
+                child: GestureDetector(
+                  onTap: copyShareToken,
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 22),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A1A),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: color.primary.withOpacity(0.25),
+                        width: 1,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Column(
                       children: [
-                        Icon(
-                          Icons.touch_app_rounded,
-                          color: color.secondaryOnBackground,
-                          size: 13,
-                        ),
-                        const SizedBox(width: 4),
                         Text(
-                          'Tap to copy',
+                          token,
                           style: GoogleFonts.inter(
-                            color: color.secondaryOnBackground,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
+                            color: color.secondary,
+                            fontSize: 38,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 6,
                           ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.touch_app_rounded,
+                              color: color.secondaryOnBackground,
+                              size: 13,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Tap to copy',
+                              style: GoogleFonts.inter(
+                                color: color.secondaryOnBackground,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Center(
-              child: Text(
-                'Send this token to anyone you want to share with.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: color.secondaryOnBackground,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  height: 1.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Copy button
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: token));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Token copied',
-                        style: GoogleFonts.inter(
-                          color: color.secondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                      backgroundColor: color.cardOnBackground,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: color.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
                   ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Copy token',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Back to home button
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: OutlinedButton(
-                onPressed: () => locator<AppRouter>().popUntilRoot(),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: color.secondaryOnBackground,
-                  side: BorderSide(
-                    color: color.secondaryOnBackground.withOpacity(0.2),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Back to home',
-                  style: GoogleFonts.inter(
-                    color: color.secondaryOnBackground,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            if (deleteToken != null) ...[
-              const SizedBox(height: 20),
-              const Divider(color: Color(0xFF2A2A2A), thickness: 1),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.delete_outline_rounded,
-                    color: color.error,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Need to delete early?',
-                    style: GoogleFonts.inter(
-                      color: color.error,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Files auto-delete after 15 hours. To remove them sooner, save your delete link.',
-                style: GoogleFonts.inter(
-                  color: color.secondaryOnBackground,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  height: 1.4,
                 ),
               ),
               const SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: color.error.withOpacity(0.25),
-                    width: 1,
+              Center(
+                child: Text(
+                  'Send this token to anyone you want to share with.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    color: color.secondaryOnBackground,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    height: 1.5,
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        deleteToken,
-                        style: GoogleFonts.inter(
-                          color: color.secondaryOnBackground,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+              ),
+              const SizedBox(height: 16),
+              // Copy button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: copyShareToken,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: deleteToken));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Delete link copied',
-                              style: GoogleFonts.inter(
-                                color: color.secondary,
-                                fontSize: 14,
-                              ),
-                            ),
-                            backgroundColor: color.cardOnBackground,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          color: color.error.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.copy_rounded,
-                          color: color.error,
-                          size: 16,
-                        ),
-                      ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Copy token',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              if (deleteToken != null) ...[
+                const SizedBox(height: 20),
+                const Divider(color: Color(0xFF2A2A2A), thickness: 1),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.delete_outline_rounded,
+                      color: color.error,
+                      size: 16,
                     ),
                     const SizedBox(width: 6),
-                    GestureDetector(
-                      onTap: () async {
-                        final uri = Uri.tryParse(deleteToken);
-                        if (uri != null && await canLaunchUrl(uri)) {
-                          await launchUrl(
-                            uri,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          color: color.error.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.open_in_new_rounded,
-                          color: color.error,
-                          size: 16,
-                        ),
+                    Text(
+                      'Need to delete early?',
+                      style: GoogleFonts.inter(
+                        color: color.error,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 6),
+                Text(
+                  'Files auto-delete after 15 hours. To remove them sooner, save your delete link.',
+                  style: GoogleFonts.inter(
+                    color: color.secondaryOnBackground,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E1E1E),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: color.error.withOpacity(0.25),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          deleteToken,
+                          style: GoogleFonts.inter(
+                            color: color.secondaryOnBackground,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        tooltip: 'Copy delete link',
+                        style: IconButton.styleFrom(
+                          minimumSize: const Size(48, 48),
+                          padding: const EdgeInsets.all(8),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          backgroundColor: color.error.withOpacity(0.12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: deleteToken));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Delete link copied',
+                                style: GoogleFonts.inter(
+                                  color: color.secondary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              backgroundColor: color.cardOnBackground,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.copy_rounded,
+                          color: color.error,
+                          size: 20,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Open delete link',
+                        style: IconButton.styleFrom(
+                          minimumSize: const Size(48, 48),
+                          padding: const EdgeInsets.all(8),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          backgroundColor: color.error.withOpacity(0.12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () async {
+                          final uri = Uri.tryParse(deleteToken);
+                          if (uri != null && await canLaunchUrl(uri)) {
+                            await launchUrl(
+                              uri,
+                              mode: LaunchMode.externalApplication,
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          Icons.open_in_new_rounded,
+                          color: color.error,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 24),
             ],
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
       ),
     );
@@ -648,78 +635,88 @@ class _MobileFailedBody extends StatelessWidget {
         Provider.of<DioNotifier>(context).uploadFilesFailure?.message ??
         'Something went wrong.';
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            IconButton(
-              onPressed: () => locator<AppRouter>().pop(),
-              icon: SvgPicture.asset(
-                oImage.arrowLeft,
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                  color.secondaryOnBackground,
-                  BlendMode.srcIn,
-                ),
-              ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-            const Spacer(),
-            Center(child: Image.asset(oImage.faliure, width: 120, height: 120)),
-            const SizedBox(height: 24),
-            Center(
-              child: Text(
-                'Upload failed',
-                style: GoogleFonts.inter(
-                  color: color.secondary,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.3,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Center(
-              child: Text(
-                message,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: color.secondaryOnBackground,
-                  fontSize: 14,
-                  height: 1.5,
-                ),
-              ),
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
+    return mobileClampedTextScale(
+      context,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              mobileToolbarIconButton(
+                context: context,
                 onPressed: () => locator<AppRouter>().pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: color.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  oApp.currentConfig?.upload.errorButtonText ?? 'Try again',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                tooltip: oApp.currentConfig?.upload.backButtonText ?? 'Back',
+                icon: SvgPicture.asset(
+                  oImage.arrowLeft,
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    color.secondaryOnBackground,
+                    BlendMode.srcIn,
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const Spacer(),
+              Center(
+                child: Image.asset(
+                  oImage.faliure,
+                  width: 120,
+                  height: 120,
+                  excludeFromSemantics: true,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: Text(
+                  'Upload failed',
+                  style: GoogleFonts.inter(
+                    color: color.secondary,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Center(
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    color: color.secondaryOnBackground,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () => locator<AppRouter>().pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    oApp.currentConfig?.upload.errorButtonText ?? 'Try again',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

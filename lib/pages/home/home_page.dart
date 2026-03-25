@@ -9,6 +9,7 @@ import 'package:odin/router/router.dart';
 import 'package:odin/services/file_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
+import 'package:odin/utilities/mobile_a11y.dart';
 import 'package:odin/utilities/responsive.dart';
 
 part 'widgets/main_container.dart';
@@ -89,57 +90,61 @@ class _MobileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 24),
-            // Wordmark
-            Text(
-              oApp.currentConfig?.home.title ?? 'odin',
-              style: GoogleFonts.inter(
-                color: color.primary,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 2,
+    return mobileClampedTextScale(
+      context,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              // Wordmark
+              Text(
+                oApp.currentConfig?.home.title ?? 'odin',
+                style: GoogleFonts.inter(
+                  color: color.primary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
               ),
-            ),
-            const Spacer(),
-            // Headline
-            Text(
-              'Open-source\neasy file\nsharing for\neveryone.',
-              style: GoogleFonts.inter(
-                color: color.secondary,
-                fontSize: 40,
-                fontWeight: FontWeight.w900,
-                height: 1.1,
-                letterSpacing: -0.5,
+              const Spacer(),
+              // Headline
+              Text(
+                'Open-source\neasy file\nsharing for\neveryone.',
+                style: GoogleFonts.inter(
+                  color: color.secondary,
+                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                  letterSpacing: -0.5,
+                ),
               ),
-            ),
-            const Spacer(),
-            // Background illustration — smaller on mobile, bottom-right texture
-            Align(
-              alignment: Alignment.centerRight,
-              child: Image.asset(
-                oImage.odinBG,
-                width: 180,
-                height: 180,
-                fit: BoxFit.contain,
+              const Spacer(),
+              // Background illustration — smaller on mobile, bottom-right texture
+              Align(
+                alignment: Alignment.centerRight,
+                child: Image.asset(
+                  oImage.odinBG,
+                  width: 180,
+                  height: 180,
+                  fit: BoxFit.contain,
+                  excludeFromSemantics: true,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            // Send files button (primary)
-            _MobilePrimaryButton(
-              color: color,
-              onPressed: () => _onSend(context),
-            ),
-            const SizedBox(height: 12),
-            // Receive files button (secondary)
-            _MobileSecondaryButton(color: color, onPressed: _onReceive),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 16),
+              // Send files button (primary)
+              _MobilePrimaryButton(
+                color: color,
+                onPressed: () => _onSend(context),
+              ),
+              const SizedBox(height: 12),
+              // Receive files button (secondary)
+              _MobileSecondaryButton(color: color, onPressed: _onReceive),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
