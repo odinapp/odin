@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:odin/constants/app.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/images.dart';
-import 'package:odin/network/repository.dart';
 import 'package:odin/providers/dio_notifier.dart';
 import 'package:odin/router/router.dart';
 import 'package:odin/services/dio_service.dart';
@@ -20,15 +18,22 @@ import 'package:odin/utilities/mobile_a11y.dart';
 import 'package:odin/utilities/responsive.dart';
 import 'package:provider/provider.dart';
 
-part 'widgets/main_container.dart';
-part 'widgets/back_button.dart';
-part 'widgets/primary_button.dart';
-part 'widgets/header_text.dart';
-part 'widgets/info_text.dart';
-part 'widgets/clickable_info_text.dart';
-part 'widgets/success_body.dart';
-part 'widgets/failure_body.dart';
-part 'widgets/metadata_text.dart';
+part 'widgets/desktop_download_flow.dart';
+
+/// Plain-language hint for token lookup failures (mobile + desktop).
+String friendlyDownloadMetadataError(String? raw) {
+  if (raw == null || raw.isEmpty) {
+    return 'That token does not match anything we have. Check for typos and try again.';
+  }
+  final lower = raw.toLowerCase();
+  if (lower.contains('not found') || lower.contains('expired')) {
+    return 'This link or token is wrong or has expired. Ask the sender for a new one.';
+  }
+  if (lower.contains('network') || lower.contains('connection')) {
+    return 'No internet connection. Check your network and try again.';
+  }
+  return raw;
+}
 
 @RoutePage()
 class DownloadPage extends StatefulWidget {
@@ -56,57 +61,8 @@ class _DownloadPageState extends State<DownloadPage> {
         ),
         child: isMobileLayout(context)
             ? _MobileDownloadBody(color: color)
-            : () {
-                switch (Provider.of<DioNotifier>(context).apiStatus) {
-                  case ApiStatus.init:
-                  case ApiStatus.loading:
-                    return const _Body();
-                  case ApiStatus.failed:
-                    return const _FailedBody();
-                  case ApiStatus.success:
-                    return const _SuccessBody();
-                  default:
-                }
-              }(),
+            : _DesktopDownloadBody(color: color),
       ),
-    );
-  }
-}
-
-// ── Desktop bodies (unchanged) ───────────────────────────────────────────────
-
-class _Body extends StatelessWidget {
-  const _Body({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final OColor color = OColor.withContext(context);
-    return Center(child: MainContainer(color: color));
-  }
-}
-
-class _FailedBody extends StatelessWidget {
-  const _FailedBody({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final OColor color = OColor.withContext(context);
-    final failure = Provider.of<DioNotifier>(context).fetchFilesMetadataFailure;
-    return Center(
-      child: FailedBody(color: color, fetchFilesMetadataFailure: failure!),
-    );
-  }
-}
-
-class _SuccessBody extends StatelessWidget {
-  const _SuccessBody({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final OColor color = OColor.withContext(context);
-    final success = Provider.of<DioNotifier>(context).fetchFilesMetadataSuccess;
-    return Center(
-      child: SuccessBody(color: color, fetchFilesMetadataSuccess: success!),
     );
   }
 }
@@ -153,9 +109,9 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
 
   @override
   void dispose() {
+    _debounce.dispose();
     _controller.dispose();
     _focusNode.dispose();
-    _debounce.dispose();
     super.dispose();
   }
 
@@ -220,7 +176,8 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
               const SizedBox(height: 10),
               Text(
                 oApp.currentConfig?.token.description ??
-                    'Enter the 8-character token shared with you.',
+                    'Enter the 8-character token someone shared with you. '
+                    'We verify it before you download.',
                 style: GoogleFonts.inter(
                   color: color.secondaryOnBackground,
                   fontSize: 14,
@@ -251,7 +208,9 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
               ] else if (miniStatus == ApiStatus.failed) ...[
                 const SizedBox(height: 8),
                 Text(
-                  _friendlyError(notifier.fetchFilesMetadataFailure?.message),
+                  friendlyDownloadMetadataError(
+                    notifier.fetchFilesMetadataFailure?.message,
+                  ),
                   style: GoogleFonts.inter(
                     color: color.error,
                     fontSize: 12,
@@ -304,17 +263,6 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
     );
   }
 
-  String _friendlyError(String? raw) {
-    if (raw == null || raw.isEmpty) return 'Token not found or expired.';
-    final lower = raw.toLowerCase();
-    if (lower.contains('not found') || lower.contains('expired')) {
-      return 'Token not found or expired. Check it and try again.';
-    }
-    if (lower.contains('network') || lower.contains('connection')) {
-      return 'No internet connection. Check your network and try again.';
-    }
-    return raw;
-  }
 }
 
 class _MobileMetadataHint extends StatelessWidget {
@@ -386,18 +334,13 @@ class _MobileDownloadSuccess extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Center(
-                child: Image.asset(
-                  oImage.success,
-                  width: 120,
-                  height: 120,
-                  excludeFromSemantics: true,
-                ),
+              const Center(
+                child: _SuccessMarkWithDelight(),
               ),
               const SizedBox(height: 24),
               Center(
                 child: Text(
-                  'Download complete!',
+                  'Download complete',
                   style: GoogleFonts.inter(
                     color: color.secondary,
                     fontSize: 28,
@@ -407,20 +350,22 @@ class _MobileDownloadSuccess extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              if (file != null)
-                Center(
-                  child: Text(
-                    file.path.split('/').last,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: color.secondaryOnBackground,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+              Center(
+                child: Text(
+                  file != null
+                      ? 'Saved as ${file.path.split(RegExp(r'[/\\]')).last}'
+                      : 'Your files are saved on this device.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    color: color.secondaryOnBackground,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    height: 1.45,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
@@ -462,6 +407,11 @@ class _TokenBoxInput extends StatefulWidget {
     required this.focusNode,
     required this.miniStatus,
     required this.onChanged,
+    this.boxWidth = 36,
+    this.boxHeight = 54,
+    this.glyphFontSize = 20,
+    this.boxRadius = 10,
+    this.boxGap = 10,
   });
 
   final OColor color;
@@ -469,6 +419,15 @@ class _TokenBoxInput extends StatefulWidget {
   final FocusNode focusNode;
   final ApiStatus? miniStatus;
   final ValueChanged<String> onChanged;
+  final double boxWidth;
+  final double boxHeight;
+  final double glyphFontSize;
+  final double boxRadius;
+  final double boxGap;
+
+  static double totalRowWidth({required double boxWidth, required double gap}) {
+    return 8 * boxWidth + 7 * gap;
+  }
 
   @override
   State<_TokenBoxInput> createState() => _TokenBoxInputState();
@@ -548,27 +507,27 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
                   } else if (isFailed) {
                     borderColor = widget.color.error;
                   } else if (isActive) {
-                    borderColor = widget.color.primary.withOpacity(0.6);
+                    borderColor = widget.color.primary.withValues(alpha: 0.55);
                   } else if (hasChar) {
-                    borderColor = const Color(0xFF3A3A3A);
+                    borderColor = widget.color.borderSubtleOnBackground;
                   } else {
-                    borderColor = const Color(0xFF242424);
+                    borderColor = widget.color.secondaryContainerOnBackground;
                   }
 
                   final Color bgColor = hasChar
                       ? isSuccess
-                            ? widget.color.primary.withOpacity(0.08)
-                            : const Color(0xFF1E1E1E)
-                      : const Color(0xFF151515);
+                            ? widget.color.primary.withValues(alpha: 0.1)
+                            : widget.color.secondaryContainerOnBackground
+                      : widget.color.cardOnBackground;
 
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 120),
                     curve: Curves.easeOut,
-                    width: 36,
-                    height: 54,
+                    width: widget.boxWidth,
+                    height: widget.boxHeight,
                     decoration: BoxDecoration(
                       color: bgColor,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(widget.boxRadius),
                       border: Border.all(
                         color: borderColor,
                         width: isActive || isSuccess ? 1.5 : 1,
@@ -582,7 +541,7 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
                               color: isSuccess
                                   ? widget.color.primary
                                   : widget.color.secondary,
-                              fontSize: 20,
+                              fontSize: widget.glyphFontSize,
                               fontWeight: FontWeight.w800,
                             ),
                           )
@@ -600,13 +559,13 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
             left: 0,
             right: 0,
             top: 0,
-            height: 54,
+            height: widget.boxHeight,
             child: Opacity(
               opacity: 0,
               child: Semantics(
                 textField: true,
                 label: oApp.currentConfig?.token.title ?? 'Share token',
-                hint: 'Enter 8 letters or numbers',
+                hint: 'Eight letters or numbers',
                 value: text,
                 child: ExcludeSemantics(
                   child: TextField(
