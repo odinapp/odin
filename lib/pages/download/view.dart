@@ -119,6 +119,7 @@ class _MobileDownloadBody extends StatefulWidget {
 
 class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   late final TextEditingController _controller;
+  late final FocusNode _focusNode;
   String _token = '';
   final ODebounce _debounce = ODebounce(const Duration(milliseconds: 400));
 
@@ -128,12 +129,14 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _focusNode = FocusNode();
     // Reset stale status from a previous upload/download — deferred to avoid
     // calling notifyListeners() during an ongoing build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         locator<DioNotifier>().apiStatus = ApiStatus.init;
         locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+        _focusNode.requestFocus();
       }
     });
   }
@@ -141,6 +144,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     _debounce.dispose();
     super.dispose();
   }
@@ -209,83 +213,20 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
               ),
             ),
             const SizedBox(height: 28),
-            // Token input
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: miniStatus == ApiStatus.success
-                      ? color.primary
-                      : miniStatus == ApiStatus.failed
-                          ? color.error
-                          : Colors.transparent,
-                  width: 1.5,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      style: GoogleFonts.inter(
-                        color: color.secondary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 2,
-                      ),
-                      textCapitalization: TextCapitalization.none,
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                        hintText: oApp.currentConfig?.token.textFieldHintText ?? 'e.g. aB3kR9mQ',
-                        hintStyle: GoogleFonts.inter(
-                          color: color.secondaryOnBackground,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(8),
-                        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
-                      ],
-                      onChanged: (value) {
-                        setState(() => _token = value);
-                        if (value.length >= 6) {
-                          _debounce.call(_fetchMetadata);
-                        } else {
-                          locator<DioNotifier>().miniApiStatus = ApiStatus.init;
-                        }
-                      },
-                    ),
-                  ),
-                  // Status indicator
-                  if (miniStatus == ApiStatus.loading)
-                    const Padding(
-                      padding: EdgeInsets.only(right: 14),
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                  else if (miniStatus == ApiStatus.failed)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 14),
-                      child: Icon(Icons.close_rounded, color: color.error, size: 20),
-                    )
-                  else if (miniStatus == ApiStatus.success)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 14),
-                      child: Icon(Icons.check_circle_rounded, color: color.primary, size: 20),
-                    ),
-                ],
-              ),
+            // Token input — 8-box OTP style
+            _TokenBoxInput(
+              color: color,
+              controller: _controller,
+              focusNode: _focusNode,
+              miniStatus: miniStatus,
+              onChanged: (value) {
+                setState(() => _token = value);
+                if (value.length >= 6) {
+                  _debounce.call(_fetchMetadata);
+                } else {
+                  locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+                }
+              },
             ),
             // Metadata / error hint
             if (miniStatus == ApiStatus.success) ...[
@@ -473,3 +414,212 @@ class _MobileDownloadSuccess extends StatelessWidget {
     );
   }
 }
+
+// ── Token box input ───────────────────────────────────────────────────────────
+
+class _TokenBoxInput extends StatefulWidget {
+  const _TokenBoxInput({
+    required this.color,
+    required this.controller,
+    required this.focusNode,
+    required this.miniStatus,
+    required this.onChanged,
+  });
+
+  final OColor color;
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final ApiStatus? miniStatus;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<_TokenBoxInput> createState() => _TokenBoxInputState();
+}
+
+class _TokenBoxInputState extends State<_TokenBoxInput>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _shakeController;
+  late final Animation<double> _shakeAnim;
+  ApiStatus? _prevStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 380),
+    );
+    _shakeAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0, end: -10), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -10, end: 10), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 10, end: -8), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: -8, end: 6), weight: 2),
+      TweenSequenceItem(tween: Tween(begin: 6, end: 0), weight: 1),
+    ]).animate(CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut));
+  }
+
+  @override
+  void didUpdateWidget(_TokenBoxInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.miniStatus == ApiStatus.failed &&
+        _prevStatus != ApiStatus.failed) {
+      _shakeController.forward(from: 0);
+    }
+    _prevStatus = widget.miniStatus;
+  }
+
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final text = widget.controller.text;
+    final isSuccess = widget.miniStatus == ApiStatus.success;
+    final isFailed = widget.miniStatus == ApiStatus.failed;
+    final isLoading = widget.miniStatus == ApiStatus.loading;
+
+    return AnimatedBuilder(
+      animation: _shakeAnim,
+      builder: (context, child) => Transform.translate(
+        offset: Offset(_shakeAnim.value, 0),
+        child: child,
+      ),
+      child: GestureDetector(
+        onTap: () => widget.focusNode.requestFocus(),
+        behavior: HitTestBehavior.opaque,
+        child: Stack(
+          children: [
+            // Invisible text field — captures keyboard input
+            SizedBox(
+              height: 0,
+              child: TextField(
+                controller: widget.controller,
+                focusNode: widget.focusNode,
+                textCapitalization: TextCapitalization.none,
+                autocorrect: false,
+                enableSuggestions: false,
+                showCursor: false,
+                style: const TextStyle(color: Colors.transparent, fontSize: 1),
+                decoration: const InputDecoration.collapsed(hintText: ''),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(8),
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+                ],
+                onChanged: widget.onChanged,
+              ),
+            ),
+            // 8 character boxes
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(8, (i) {
+                final hasChar = i < text.length;
+                final isActive = i == text.length && !isSuccess && !isFailed && !isLoading;
+
+                final Color borderColor;
+                if (isSuccess) {
+                  borderColor = widget.color.primary;
+                } else if (isFailed) {
+                  borderColor = widget.color.error;
+                } else if (isActive) {
+                  borderColor = widget.color.primary.withOpacity(0.6);
+                } else if (hasChar) {
+                  borderColor = const Color(0xFF3A3A3A);
+                } else {
+                  borderColor = const Color(0xFF242424);
+                }
+
+                final Color bgColor = hasChar
+                    ? isSuccess
+                        ? widget.color.primary.withOpacity(0.08)
+                        : const Color(0xFF1E1E1E)
+                    : const Color(0xFF151515);
+
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 120),
+                  curve: Curves.easeOut,
+                  width: 36,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: borderColor,
+                      width: isActive || isSuccess ? 1.5 : 1,
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  child: hasChar
+                      ? Text(
+                          text[i].toUpperCase(),
+                          style: GoogleFonts.inter(
+                            color: isSuccess
+                                ? widget.color.primary
+                                : widget.color.secondary,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        )
+                      : isActive
+                          ? _BlinkingCursor(color: widget.color.primary)
+                          : isLoading && i < 8
+                              ? null
+                              : null,
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BlinkingCursor extends StatefulWidget {
+  const _BlinkingCursor({required this.color});
+  final Color color;
+
+  @override
+  State<_BlinkingCursor> createState() => _BlinkingCursorState();
+}
+
+class _BlinkingCursorState extends State<_BlinkingCursor>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 530),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (_, __) => Opacity(
+        opacity: _controller.value > 0.5 ? 1.0 : 0.0,
+        child: Container(
+          width: 2,
+          height: 22,
+          decoration: BoxDecoration(
+            color: widget.color,
+            borderRadius: BorderRadius.circular(1),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
