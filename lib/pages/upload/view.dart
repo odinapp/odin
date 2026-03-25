@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:odin/constants/app.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/images.dart';
+import 'package:odin/constants/sharing_policy.dart';
 import 'package:odin/network/repository.dart';
 import 'package:odin/providers/dio_notifier.dart';
 import 'package:odin/router/router.dart';
@@ -485,128 +485,38 @@ class _MobileSuccessBody extends StatelessWidget {
               ),
               if (deleteToken != null) ...[
                 const SizedBox(height: 20),
-                const Divider(color: Color(0xFF2A2A2A), thickness: 1),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.delete_outline_rounded,
-                      color: color.error,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Need to delete early?',
-                      style: GoogleFonts.inter(
-                        color: color.error,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Files auto-delete after 15 hours. To remove them sooner, save your delete link.',
-                  style: GoogleFonts.inter(
-                    color: color.secondaryOnBackground,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 10),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
-                    borderRadius: BorderRadius.circular(10),
+                    color: color.cardOnBackground,
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: color.error.withOpacity(0.25),
-                      width: 1,
+                      color: color.secondaryOnBackground.withValues(
+                        alpha: 0.14,
+                      ),
                     ),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Icon(
+                        Icons.info_outline_rounded,
+                        color: color.primary,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          deleteToken,
+                          'These files are removed automatically after '
+                          '${SharingPolicy.fileLifetimeHours} hours. To delete '
+                          'them sooner, go to Home and open Your uploads.',
                           style: GoogleFonts.inter(
                             color: color.secondaryOnBackground,
-                            fontSize: 11,
+                            fontSize: 13,
                             fontWeight: FontWeight.w400,
+                            height: 1.45,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        tooltip: 'Copy delete link',
-                        style: IconButton.styleFrom(
-                          minimumSize: const Size(48, 48),
-                          padding: const EdgeInsets.all(8),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                          backgroundColor: color.error.withOpacity(0.12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: deleteToken));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Delete link copied',
-                                style: GoogleFonts.inter(
-                                  color: color.secondary,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              backgroundColor: color.cardOnBackground,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                          Icons.copy_rounded,
-                          color: color.error,
-                          size: 20,
-                        ),
-                      ),
-                      IconButton(
-                        tooltip: 'Open delete link',
-                        style: IconButton.styleFrom(
-                          minimumSize: const Size(48, 48),
-                          padding: const EdgeInsets.all(8),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                          backgroundColor: color.error.withOpacity(0.12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () async {
-                          final uri = Uri.tryParse(deleteToken);
-                          if (uri != null && await canLaunchUrl(uri)) {
-                            await launchUrl(
-                              uri,
-                              mode: LaunchMode.externalApplication,
-                            );
-                          }
-                        },
-                        icon: Icon(
-                          Icons.open_in_new_rounded,
-                          color: color.error,
-                          size: 20,
                         ),
                       ),
                     ],

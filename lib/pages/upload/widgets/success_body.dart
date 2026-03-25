@@ -67,11 +67,28 @@ class _SuccessContent extends StatelessWidget {
             null)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 60.0.toAutoScaledWidth),
-            child: _DeleteTokenRow(
-              color: color,
-              deleteToken: Provider.of<DioNotifier>(
-                context,
-              ).uploadFilesSuccess!.deleteToken!,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: color.primary,
+                  size: 22.toAutoScaledWidth,
+                ),
+                SizedBox(width: 10.toAutoScaledWidth),
+                Expanded(
+                  child: Text(
+                    'These files are removed after ${SharingPolicy.fileLifetimeHours} hours. '
+                    'To delete them sooner, use Home, then Your uploads, then Delete.',
+                    style: color.textStyle(
+                      color: color.secondaryOnBackground,
+                      fontSize: 13.toAutoScaledFont,
+                      fontWeight: FontWeight.w400,
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         const Spacer(),
@@ -157,77 +174,6 @@ class _SuccessContent extends StatelessWidget {
           ],
         ),
         const Spacer(),
-      ],
-    );
-  }
-}
-
-class _DeleteTokenRow extends StatelessWidget {
-  const _DeleteTokenRow({
-    Key? key,
-    required this.color,
-    required this.deleteToken,
-  }) : super(key: key);
-
-  final OColor color;
-  final String deleteToken;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(
-          Icons.delete_outline_rounded,
-          color: color.error,
-          size: 16.toAutoScaledWidth,
-        ),
-        SizedBox(width: 6.toAutoScaledWidth),
-        Expanded(
-          child: Text(
-            deleteToken,
-            style: color.textStyle(
-              color: color.secondaryOnBackground,
-              fontSize: 13.toAutoScaledFont,
-              fontWeight: FontWeight.w400,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        SizedBox(width: 8.toAutoScaledWidth),
-        TextButton(
-          onPressed: () {
-            Clipboard.setData(ClipboardData(text: deleteToken));
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Delete link copied',
-                  style: color.textStyle(
-                    color: color.secondaryOnBackground,
-                    fontSize: 14.toAutoScaledFont,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                backgroundColor: color.cardOnBackground,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.toAutoScaledWidth),
-                ),
-              ),
-            );
-          },
-          style: ButtonStyle(
-            overlayColor: MaterialStateProperty.all(Colors.transparent),
-          ),
-          child: Text(
-            'Copy delete link',
-            style: color.textStyle(
-              color: color.error,
-              fontSize: 13.toAutoScaledFont,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
       ],
     );
   }

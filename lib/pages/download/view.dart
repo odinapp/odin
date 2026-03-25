@@ -135,6 +135,11 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
     super.initState();
     _controller = TextEditingController();
     _focusNode = FocusNode();
+    // Clear download result immediately so the first frame never shows a stale
+    // success UI from a prior session on the same [DioNotifier].
+    final n = locator<DioNotifier>();
+    n.downloadFileSuccess = null;
+    n.downloadFileFailure = null;
     // Reset stale status from a previous upload/download — deferred to avoid
     // calling notifyListeners() during an ongoing build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -172,8 +177,9 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
     final miniStatus = notifier.miniApiStatus;
     final apiStatus = notifier.apiStatus;
 
-    // Download completed — show success screen
-    if (apiStatus == ApiStatus.success) {
+    // Download completed — [downloadFile] never sets [apiStatus.success] (that
+    // would swap desktop into the metadata success layout); use result state.
+    if (notifier.downloadFileSuccess != null) {
       return _MobileDownloadSuccess(color: color);
     }
 

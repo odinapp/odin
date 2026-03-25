@@ -3,6 +3,7 @@ import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/theme.dart';
 import 'package:odin/providers/booter_notifier.dart';
 import 'package:odin/providers/dio_notifier.dart';
+import 'package:odin/providers/pending_uploads_notifier.dart';
 import 'package:odin/router/router.dart';
 import 'package:odin/services/dio_service.dart';
 // import 'package:odin/services/download_service.dart';
@@ -35,6 +36,9 @@ void setupLocator() {
   locator.registerLazySingleton<FileService>(() => FileService());
   locator.registerLazySingleton<ToastService>(() => ToastService());
   locator.registerLazySingleton<PreferencesService>(() => PreferencesService());
+  locator.registerLazySingleton<PendingUploadsNotifier>(
+    () => PendingUploadsNotifier(),
+  );
   locator.registerLazySingleton<EncryptionService>(() => EncryptionService());
   // locator.registerLazySingleton<DownloadService>(() => DownloadService());
   locator.registerLazySingleton<DioService>(() => DioService());

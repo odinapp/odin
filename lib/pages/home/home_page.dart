@@ -1,16 +1,21 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:odin/constants/app.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/images.dart';
+import 'package:odin/constants/sharing_policy.dart';
 import 'package:odin/router/router.dart';
 import 'package:odin/services/file_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
 import 'package:odin/utilities/mobile_a11y.dart';
 import 'package:odin/utilities/responsive.dart';
+import 'package:odin/widgets/pending_uploads_home_section.dart';
+import 'package:provider/provider.dart';
+import 'package:odin/providers/pending_uploads_notifier.dart';
 
 part 'widgets/main_container.dart';
 part 'widgets/bg_illustration.dart';
@@ -64,6 +69,15 @@ class _Body extends StatelessWidget {
           54.toVerticalSizedBox,
           const OrDivider(),
           SecondaryButton(color: color),
+          32.toVerticalSizedBox,
+          SizedBox(
+            width: 1040.toAutoScaledWidth,
+            child: PendingUploadsHomeSection(
+              color: color,
+              compact: false,
+              maxListHeight: 220,
+            ),
+          ),
         ],
       ),
     );
@@ -92,60 +106,235 @@ class _MobileBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return mobileClampedTextScale(
       context,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
-              // Wordmark
-              Text(
-                oApp.currentConfig?.home.title ?? 'odin',
-                style: GoogleFonts.inter(
-                  color: color.primary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2,
-                ),
-              ),
-              const Spacer(),
-              // Headline
-              Text(
-                'Open-source\neasy file\nsharing for\neveryone.',
-                style: GoogleFonts.inter(
-                  color: color.secondary,
-                  fontSize: 40,
-                  fontWeight: FontWeight.w900,
-                  height: 1.1,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const Spacer(),
-              // Background illustration — smaller on mobile, bottom-right texture
-              Align(
-                alignment: Alignment.centerRight,
+      child: Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.none,
+        children: [
+          // Brand texture behind copy — subdued, upper-right (.impeccable: not hero).
+          Positioned(
+            bottom: 40,
+            right: 0,
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: 0.36,
                 child: Image.asset(
                   oImage.odinBG,
-                  width: 180,
-                  height: 180,
+                  width: MediaQuery.sizeOf(context).width*0.85,
                   fit: BoxFit.contain,
                   excludeFromSemantics: true,
                 ),
               ),
-              const SizedBox(height: 16),
-              // Send files button (primary)
-              _MobilePrimaryButton(
-                color: color,
-                onPressed: () => _onSend(context),
-              ),
-              const SizedBox(height: 12),
-              // Receive files button (secondary)
-              _MobileSecondaryButton(color: color, onPressed: _onReceive),
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 12),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          oApp.currentConfig?.home.title ?? 'odin',
+                          style: GoogleFonts.inter(
+                            color: color.primary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ),
+                      _MobilePendingUploadsAction(color: color),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    'Open-source\neasy file\nsharing for\neveryone.',
+                    style: GoogleFonts.inter(
+                      color: color.secondary,
+                      fontSize: 40,
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const Spacer(flex: 2)
+,                  _MobilePrimaryButton(
+                    color: color,
+                    onPressed: () => _onSend(context),
+                  ),
+                  const SizedBox(height: 12),
+                  _MobileSecondaryButton(
+                    color: color,
+                    onPressed: _onReceive,
+                  ),
+                  const SizedBox(height: 10),
+                  _MobilePolicyStrip(color: color),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Future<void> showMobilePendingUploadsSheet(
+  BuildContext context, {
+  required OColor color,
+}) async {
+  if (!MediaQuery.disableAnimationsOf(context)) {
+    HapticFeedback.lightImpact();
+  }
+  if (!context.mounted) return;
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: color.background,
+    barrierColor: Colors.black.withValues(alpha: 0.5),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    clipBehavior: Clip.antiAlias,
+    builder: (ctx) {
+      final mq = MediaQuery.of(ctx);
+      final listMaxH = (mq.size.height * 0.55).clamp(240.0, 480.0);
+      final bottomInset = mq.padding.bottom;
+      return Padding(
+        padding: EdgeInsets.fromLTRB(20, 10, 12, 20 + bottomInset),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: color.secondaryOnBackground.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Your uploads',
+                        style: GoogleFonts.inter(
+                          color: color.secondary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.35,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Delete early or copy a share token.',
+                        style: GoogleFonts.inter(
+                          color: color.secondaryOnBackground,
+                          fontSize: 13,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  tooltip: 'Close',
+                  style: IconButton.styleFrom(
+                    foregroundColor: color.secondaryOnBackground,
+                    minimumSize: const Size(48, 48),
+                  ),
+                  icon: const Icon(Icons.close_rounded, size: 24),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            PendingUploadsHomeSection(
+              color: color,
+              showHeader: false,
+              maxListHeight: listMaxH,
+            ),
+          ],
         ),
+      );
+    },
+  );
+}
+
+class _MobilePendingUploadsAction extends StatelessWidget {
+  const _MobilePendingUploadsAction({required this.color});
+
+  final OColor color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<PendingUploadsNotifier>(
+      builder: (context, pending, _) {
+        final n = pending.items.length;
+        final icon = Icon(
+          Icons.upload_outlined,
+          size: 24,
+          color: n > 0 ? color.primary : color.secondaryOnBackground,
+        );
+        final button = mobileToolbarIconButton(
+          context: context,
+          tooltip: n == 0
+              ? 'Your uploads'
+              : 'Your uploads, $n active',
+          onPressed: () {
+            showMobilePendingUploadsSheet(context, color: color);
+          },
+          icon: icon,
+        );
+        if (n == 0) return button;
+        return button;
+      },
+    );
+  }
+}
+
+/// Single muted line; full wording in [Semantics] for screen readers.
+class _MobilePolicyStrip extends StatelessWidget {
+  const _MobilePolicyStrip({required this.color});
+
+  final OColor color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label:
+          'Files expire after ${SharingPolicy.fileLifetimeHours} hours. '
+          'Maximum upload size ${SharingPolicy.maxUploadShortLabel}.',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ExcludeSemantics(
+            child: Text(
+              '${SharingPolicy.fileLifetimeHours}h expiry · ${SharingPolicy.maxUploadShortLabel} max',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: color.secondaryOnBackground,
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                height: 1.25,
+                letterSpacing: 0.15,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -167,7 +356,10 @@ class _MobilePrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          onPressed();
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: color.primary,
           foregroundColor: Colors.white,
@@ -219,7 +411,10 @@ class _MobileSecondaryButton extends StatelessWidget {
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: () {
+          HapticFeedback.selectionClick();
+          onPressed();
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: color.cardOnBackground,
           foregroundColor: color.secondary,
@@ -234,7 +429,7 @@ class _MobileSecondaryButton extends StatelessWidget {
             Text(
               oApp.currentConfig?.home.secondaryButtonText ?? 'Receive files',
               style: GoogleFonts.inter(
-                color: color.secondaryOnBackground,
+                color: color.secondary,
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
               ),
@@ -244,7 +439,7 @@ class _MobileSecondaryButton extends StatelessWidget {
               width: 20,
               height: 20,
               colorFilter: ColorFilter.mode(
-                color.secondaryOnBackground,
+                color.secondary,
                 BlendMode.srcIn,
               ),
             ),

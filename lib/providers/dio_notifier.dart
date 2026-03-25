@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/network/repository.dart';
 import 'package:odin/services/dio_service.dart';
+import 'package:odin/providers/pending_uploads_notifier.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
 import 'package:odin/utilities/networking.dart';
@@ -97,12 +99,16 @@ class DioNotifier with ChangeNotifier {
       return response;
     }
 
-    void onSuccess(UploadFilesSuccess success) async {
+    void onSuccess(UploadFilesSuccess success) {
       apiStatus = ApiStatus.success;
       uploadFilesSuccess = success;
       uploadFilesFailure = null;
       notifyListeners();
       logger.d('[DioService]: UploadFilesSuccess ${success.message}');
+      final delete = success.deleteToken;
+      if (delete != null && delete.isNotEmpty) {
+        unawaited(_persistPendingUpload(success, delete));
+      }
     }
 
     void onFailure(UploadFilesFailure failure) {
@@ -285,6 +291,7 @@ class DioNotifier with ChangeNotifier {
   ) async {
     _progress = 0;
     _progressPercentage = 0;
+    apiStatus = ApiStatus.loading;
     notifyListeners();
     Future<Result<DownloadFileSuccess, DownloadFileFailure>>
     _downloadFile() async {
@@ -313,6 +320,9 @@ class DioNotifier with ChangeNotifier {
     void onSuccess(DownloadFileSuccess success) async {
       downloadFileSuccess = success;
       downloadFileFailure = null;
+      // Reset main status so desktop stay on the download form; mobile uses
+      // [downloadFileSuccess] for the success screen.
+      apiStatus = ApiStatus.init;
       notifyListeners();
       logger.d('[DioService]: DownloadFileSuccess ${success.message}');
     }
@@ -320,6 +330,7 @@ class DioNotifier with ChangeNotifier {
     void onFailure(DownloadFileFailure failure) {
       downloadFileSuccess = null;
       downloadFileFailure = failure;
+      apiStatus = ApiStatus.init;
       notifyListeners();
       logger.d('[DioService]: DownloadFileFailure ${failure.message}');
     }
@@ -341,5 +352,28 @@ class DioNotifier with ChangeNotifier {
     miniApiStatus = ApiStatus.failed;
     _cancelToken.cancel();
     notifyListeners();
+  }
+
+  Future<void> _persistPendingUpload(
+    UploadFilesSuccess success,
+    String deleteUrl,
+  ) async {
+    try {
+      await locator<PendingUploadsNotifier>().recordPendingUpload(
+        shareToken: success.token,
+        deleteUrl: deleteUrl,
+        fileSummary: _selectedFilesSummaryLabel(),
+      );
+    } catch (e, st) {
+      logger.e('recordPendingUpload', error: e, stackTrace: st);
+    }
+  }
+
+  String? _selectedFilesSummaryLabel() {
+    if (selectedFiles.isEmpty) return null;
+    if (selectedFiles.length == 1) {
+      return selectedFiles.first.path.split(RegExp(r'[/\\]')).last;
+    }
+    return '${selectedFiles.length} files';
   }
 }
