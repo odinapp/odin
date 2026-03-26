@@ -53,6 +53,8 @@ dependencies:
   intl: ^0.20.2
   json_annotation: ^4.6.0
   logger: ^2.7.0
+  odin_core:
+    path: packages/odin_core
   package_info_plus: ^9.0.0
   path: ^1.8.2
   path_provider: ^2.0.11

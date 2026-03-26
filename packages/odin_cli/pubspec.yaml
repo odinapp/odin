@@ -1,0 +1,22 @@
+name: odin_cli
+description: Odin terminal client with TUI and headless modes.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+
+executables:
+  odin:
+
+dependencies:
+  args: ^2.7.0
+  dio: ^5.9.2
+  odin_core:
+    path: ../odin_core
+  path: ^1.9.1
+  dart_tui: ^1.0.0+1
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0
