@@ -55,6 +55,9 @@ coverage/lcov.info
 
 # Secret Files
 odin-release-key.keystore
+# Android Play Store signing (see android/key.properties.example)
+android/key.properties
+android/odin-release.keystore
 android/app/google-services.json
 android/app/build/*
 macos/GoogleService-Info.plist

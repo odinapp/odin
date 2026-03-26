@@ -1,0 +1,12 @@
+# Copy to key.properties and fill in real values (key.properties is gitignored).
+# Keystore path is relative to the android/ directory.
+#
+#   cp android/key.properties.example android/key.properties
+#
+# Or generate a new keystore first:
+#   make android-keystore
+
+storePassword=your-keystore-password
+keyPassword=your-key-password
+keyAlias=odin
+storeFile=odin-release.keystore

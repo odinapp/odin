@@ -69,6 +69,12 @@ build-runner: codegen ## Alias for `codegen`
 codegen-watch: get ## build_runner in watch mode
 	$(DART) run build_runner watch --delete-conflicting-outputs
 
+# --- Android release signing ---
+
+android-keystore: ## Create android/odin-release.keystore (interactive keytool; gitignored)
+	@test ! -f android/odin-release.keystore || (echo "android/odin-release.keystore already exists; remove it first." >&2 && exit 1)
+	keytool -genkey -v -keystore android/odin-release.keystore -keyalg RSA -keysize 2048 -validity 10000 -alias odin
+
 # --- Assets / tooling ---
 
 icons: get ## Regenerate launcher icons (flutter_launcher_icons)
@@ -87,8 +93,16 @@ clean: ## `flutter clean`
 build-apk-debug: get ## Debug APK
 	$(FLUTTER) build apk --debug
 
-build-apk-release: get ## Release APK
+build-apk-release: get ## Release APK (fat APK, all ABIs)
 	$(FLUTTER) build apk --release
+
+build-apk-split-release: get ## Release split APKs (one per ABI, smaller downloads)
+	$(FLUTTER) build apk --release --split-per-abi
+
+build-aab-release: get ## Release App Bundle (AAB) for Google Play
+	$(FLUTTER) build appbundle --release
+
+build-appbundle-release: build-aab-release ## Same as build-aab-release (Play Store bundle)
 
 build-linux-debug: get ## Debug Linux binary
 	$(FLUTTER) build linux --debug
