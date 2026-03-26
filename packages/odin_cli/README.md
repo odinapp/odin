@@ -15,8 +15,9 @@ fvm dart pub get
 # TUI mode (if terminal is interactive)
 fvm dart run bin/odin.dart
 
-# Headless upload
+# Headless upload (files and/or directories)
 fvm dart run bin/odin.dart upload ./file1.txt ./file2.txt
+fvm dart run bin/odin.dart upload ./my-folder ./another-file.txt
 
 # Headless download
 fvm dart run bin/odin.dart download <token> -o ./downloads
@@ -41,9 +42,9 @@ Global overrides:
 ## TUI keys
 
 - `↑/↓` or `j/k`: navigate
-- `enter`: select/open
+- `enter`: select/open file or navigate directory
 - `d`: continue upload after selecting files
-- `s`: choose current directory for download target
+- `s`: upload flow = add current directory, download flow = choose output directory
 - `esc`: back/cancel
 - `?`: toggle help
 - `q` or `ctrl+c`: quit

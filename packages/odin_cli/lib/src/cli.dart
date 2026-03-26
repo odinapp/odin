@@ -129,21 +129,28 @@ Future<int> _runUpload(
     return 64;
   }
 
-  final files = <File>[];
-  var totalSize = 0;
-  for (final path in paths) {
-    final file = File(path);
-    if (!await file.exists()) {
-      stderr.writeln('File not found: $path');
-      return 66;
-    }
-    files.add(file);
-    totalSize += await file.length();
+  PreparedUpload prepared;
+  try {
+    prepared = await prepareUploadInputs(inputPaths: paths);
+  } on FileSystemException catch (e) {
+    stderr.writeln('Input error: ${e.path ?? ''} ${e.message}');
+    return 66;
+  } on ArgumentError catch (e) {
+    stderr.writeln('Input error: ${e.message}');
+    return 64;
   }
 
-  final result = await repo.uploadFilesAnonymous(
-    request: UploadFilesRequest(files: files, totalFileSize: totalSize),
-  );
+  late final Result<UploadFilesSuccess, UploadFilesFailure> result;
+  try {
+    result = await repo.uploadFilesAnonymous(
+      request: UploadFilesRequest(
+        files: prepared.filesToUpload,
+        totalFileSize: prepared.totalFileSize,
+      ),
+    );
+  } finally {
+    await prepared.cleanupTempArtifacts();
+  }
 
   return result.resolve(
     (success) {
@@ -152,6 +159,7 @@ Future<int> _runUpload(
           jsonEncode(<String, dynamic>{
             'token': success.token,
             'deleteToken': success.deleteToken,
+            if (prepared.usedCombinedZip) 'zipped': true,
           }),
         );
       } else {

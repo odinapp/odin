@@ -51,8 +51,5 @@ class DownloadFileRequest extends RepositoryGetRequest {
 }
 
 class FetchConfigRequest extends RepositoryGetRequest {
-  FetchConfigRequest({
-    super.onReceiveProgress,
-    super.cancelToken,
-  });
+  FetchConfigRequest({super.onReceiveProgress, super.cancelToken});
 }

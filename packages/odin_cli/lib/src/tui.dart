@@ -56,21 +56,13 @@ final class _TuiKeys implements KeyMap {
     keys: <String>['down', 'j'],
     help: (key: '↓/j', description: 'move down'),
   );
-  static const enter = KeyBinding(
-    keys: <String>['enter'],
-    help: (key: 'enter', description: 'select'),
-  );
-  static const add = KeyBinding(
-    keys: <String>['enter'],
-    help: (key: 'enter', description: 'add/open'),
-  );
   static const done = KeyBinding(
     keys: <String>['d'],
     help: (key: 'd', description: 'continue'),
   );
-  static const chooseDir = KeyBinding(
+  static const selectDir = KeyBinding(
     keys: <String>['s'],
-    help: (key: 's', description: 'save here'),
+    help: (key: 's', description: 'select directory'),
   );
   static const back = KeyBinding(
     keys: <String>['esc'],
@@ -89,10 +81,8 @@ final class _TuiKeys implements KeyMap {
   List<KeyBinding> get bindings => <KeyBinding>[
     up,
     down,
-    enter,
-    add,
     done,
-    chooseDir,
+    selectDir,
     back,
     helpKey,
     quit,
@@ -111,9 +101,8 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     this.tokenInput,
     this.metadataTable,
     this.metadataError,
-    this.selectedFiles = const <String>[],
+    this.selectedInputs = const <String>[],
     this.downloadToken = '',
-    this.outputDir = '',
     this.lastToken,
     this.lastPath,
     this.errorMessage,
@@ -150,9 +139,8 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
   final TextInputModel? tokenInput;
   final TableModel? metadataTable;
   final String? metadataError;
-  final List<String> selectedFiles;
+  final List<String> selectedInputs;
   final String downloadToken;
-  final String outputDir;
   final String? lastToken;
   final String? lastPath;
   final String? errorMessage;
@@ -173,9 +161,8 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     TextInputModel? tokenInput,
     TableModel? metadataTable,
     String? metadataError,
-    List<String>? selectedFiles,
+    List<String>? selectedInputs,
     String? downloadToken,
-    String? outputDir,
     String? lastToken,
     String? lastPath,
     String? errorMessage,
@@ -204,9 +191,8 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
       metadataError: clearMetadata
           ? null
           : (metadataError ?? this.metadataError),
-      selectedFiles: selectedFiles ?? this.selectedFiles,
+      selectedInputs: selectedInputs ?? this.selectedInputs,
       downloadToken: downloadToken ?? this.downloadToken,
-      outputDir: outputDir ?? this.outputDir,
       lastToken: lastToken ?? this.lastToken,
       lastPath: lastPath ?? this.lastPath,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
@@ -233,8 +219,8 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     }
 
     if (msg is TickMsg) {
-      final (updated, _) = spinner.update(msg);
-      return (copyWith(spinner: updated as SpinnerModel), null);
+      final (nextSpinner, _) = spinner.update(msg);
+      return (copyWith(spinner: nextSpinner as SpinnerModel), null);
     }
 
     switch (screen) {
@@ -263,43 +249,42 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
 
   (Model, Cmd?) _updateMenu(Msg msg) {
     if (msg is KeyMsg && msg.key == 'enter') {
-      switch (menu.cursor) {
-        case 0:
-          final picker = FilePickerModel(
-            currentDir: Directory.current.path,
-            allowedExtensions: const <String>[],
-            height: 12,
-          );
-          return (
-            copyWith(
-              screen: _Screen.uploadPick,
-              filePicker: picker,
-              selectedFiles: const <String>[],
-            ),
-            picker.init(),
-          );
-        case 1:
-          return (
-            copyWith(
-              screen: _Screen.downloadToken,
-              tokenInput: TextInputModel(
-                label: 'Token:',
-                placeholder: 'Paste token and press enter',
-                value: '',
-                cursorPos: 0,
-              ),
-              clearMetadata: true,
-              clearError: true,
-            ),
-            null,
-          );
-        default:
-          return (copyWith(outcome: 0), () => quit());
+      if (menu.cursor == 0) {
+        final picker = FilePickerModel(
+          currentDir: Directory.current.path,
+          allowedExtensions: const <String>[],
+          height: 12,
+        );
+        return (
+          copyWith(
+            screen: _Screen.uploadPick,
+            filePicker: picker,
+            selectedInputs: const <String>[],
+          ),
+          picker.init(),
+        );
       }
+      if (menu.cursor == 1) {
+        return (
+          copyWith(
+            screen: _Screen.downloadToken,
+            tokenInput: TextInputModel(
+              label: 'Token:',
+              placeholder: 'Paste token and press enter',
+              value: '',
+              cursorPos: 0,
+            ),
+            clearMetadata: true,
+            clearError: true,
+          ),
+          null,
+        );
+      }
+      return (copyWith(outcome: 0), () => quit());
     }
 
-    final (updated, cmd) = menu.update(msg);
-    return (copyWith(menu: updated as SelectListModel), cmd);
+    final (nextMenu, cmd) = menu.update(msg);
+    return (copyWith(menu: nextMenu as SelectListModel), cmd);
   }
 
   (Model, Cmd?) _updateUploadPick(Msg msg) {
@@ -316,18 +301,27 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
 
     if (msg is KeyMsg) {
       if (msg.key == 'esc') return (copyWith(screen: _Screen.menu), null);
-      if (msg.key == 'd' && selectedFiles.isNotEmpty) {
+      if (msg.key == 'd' && selectedInputs.isNotEmpty) {
         return (copyWith(screen: _Screen.uploadConfirm), null);
       }
+      if (msg.key == 's') {
+        final currentDir = picker.currentDir;
+        if (!selectedInputs.contains(currentDir)) {
+          return (
+            copyWith(selectedInputs: <String>[...selectedInputs, currentDir]),
+            null,
+          );
+        }
+      }
       if (msg.key == 'c') {
-        return (copyWith(selectedFiles: const <String>[]), null);
+        return (copyWith(selectedInputs: const <String>[]), null);
       }
     }
 
-    final (updated, cmd) = picker.update(msg);
-    final nextPicker = updated as FilePickerModel;
+    final (nextPickerModel, cmd) = picker.update(msg);
+    final nextPicker = nextPickerModel as FilePickerModel;
     final selected = nextPicker.selected;
-    if (selected != null && !selectedFiles.contains(selected)) {
+    if (selected != null && !selectedInputs.contains(selected)) {
       final resetPicker = FilePickerModel(
         currentDir: nextPicker.currentDir,
         entries: nextPicker.entries,
@@ -341,11 +335,12 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
       return (
         copyWith(
           filePicker: resetPicker,
-          selectedFiles: <String>[...selectedFiles, selected],
+          selectedInputs: <String>[...selectedInputs, selected],
         ),
         cmd,
       );
     }
+
     return (copyWith(filePicker: nextPicker), cmd);
   }
 
@@ -380,11 +375,13 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
         null,
       );
     }
+
     if (msg case _UploadProgressMsg(:final sent, :final total)) {
       if (total <= 0) return (this, null);
       final fraction = (sent / total).clamp(0, 1).toDouble();
       return (copyWith(uploadFraction: fraction), null);
     }
+
     if (msg case _UploadCompletedMsg(:final result)) {
       return result.resolve(
         (success) {
@@ -410,6 +407,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
         },
       );
     }
+
     return (this, null);
   }
 
@@ -450,15 +448,14 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
           screen: _Screen.downloadPickDir,
           downloadToken: token,
           filePicker: picker,
-          outputDir: Directory.current.path,
           clearMetadata: true,
         ),
         picker.init(),
       );
     }
 
-    final (updated, cmd) = input.update(msg);
-    return (copyWith(tokenInput: updated as TextInputModel), cmd);
+    final (updatedInput, cmd) = input.update(msg);
+    return (copyWith(tokenInput: updatedInput as TextInputModel), cmd);
   }
 
   (Model, Cmd?) _updateDownloadPickDir(Msg msg) {
@@ -497,9 +494,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
 
     if (msg is KeyMsg) {
       if (msg.key == 'esc') return (copyWith(screen: _Screen.menu), null);
-      if (msg.key == 's') {
-        return _beginDownloadFromDir(picker.currentDir);
-      }
+      if (msg.key == 's') return _beginDownloadFromDir(picker.currentDir);
       if (msg.key == 'enter' && picker.selected != null) {
         final selected = picker.selected!;
         final dir = FileSystemEntity.isDirectorySync(selected)
@@ -509,14 +504,14 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
       }
     }
 
-    final (updated, cmd) = picker.update(msg);
-    final nextPicker = updated as FilePickerModel;
+    final (nextPickerModel, cmd) = picker.update(msg);
+    final nextPicker = nextPickerModel as FilePickerModel;
 
     TableModel? nextTable = metadataTable;
     Cmd? nextCmd = cmd;
     if (msg is KeyMsg && metadataTable != null) {
-      final (updatedTable, tableCmd) = metadataTable!.update(msg);
-      nextTable = updatedTable as TableModel;
+      final (updatedTableModel, tableCmd) = metadataTable!.update(msg);
+      nextTable = updatedTableModel as TableModel;
       nextCmd = batch(<Cmd?>[cmd, tableCmd]);
     }
 
@@ -532,7 +527,6 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     return (
       copyWith(
         screen: _Screen.downloadRunning,
-        outputDir: dir,
         downloadFraction: 0,
         cancelToken: token,
         spinner: SpinnerModel(suffix: ' Downloading...'),
@@ -595,21 +589,38 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
 
   void _startUpload(CancelToken token) {
     Future<void>(() async {
-      final files = selectedFiles.map(File.new).toList(growable: false);
-      var totalSize = 0;
-      for (final file in files) {
-        totalSize += await file.length();
+      PreparedUpload? prepared;
+      try {
+        prepared = await prepareUploadInputs(inputPaths: selectedInputs);
+        final result = await repo.uploadFilesAnonymous(
+          request: UploadFilesRequest(
+            files: prepared.filesToUpload,
+            totalFileSize: prepared.totalFileSize,
+            cancelToken: token,
+            onSendProgress: (sent, total) =>
+                program.send(_UploadProgressMsg(sent, total)),
+          ),
+        );
+        program.send(_UploadCompletedMsg(result));
+      } on FileSystemException catch (e) {
+        program.send(
+          _UploadCompletedMsg(
+            Failure(
+              UploadFilesFailure(
+                message: 'Input error: ${e.path ?? ''} ${e.message}',
+              ),
+            ),
+          ),
+        );
+      } catch (e) {
+        program.send(
+          _UploadCompletedMsg(
+            Failure(UploadFilesFailure(message: e.toString())),
+          ),
+        );
+      } finally {
+        await prepared?.cleanupTempArtifacts();
       }
-      final result = await repo.uploadFilesAnonymous(
-        request: UploadFilesRequest(
-          files: files,
-          totalFileSize: totalSize,
-          cancelToken: token,
-          onSendProgress: (sent, total) =>
-              program.send(_UploadProgressMsg(sent, total)),
-        ),
-      );
-      program.send(_UploadCompletedMsg(result));
     });
   }
 
@@ -646,32 +657,45 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
       case _Screen.menu:
         b.write(menu.view().content);
       case _Screen.uploadPick:
-        b.writeln('Upload: pick files (enter to add, d to continue)');
+        b.writeln(
+          'Upload: pick files/dirs (enter add file, s add current dir, d continue)',
+        );
         b.writeln();
         b.write(filePicker?.view().content ?? '');
         b.writeln();
         b.writeln();
-        b.writeln('Selected files (${selectedFiles.length}):');
-        if (selectedFiles.isEmpty) {
+        b.writeln('Selected items (${selectedInputs.length}):');
+        if (selectedInputs.isEmpty) {
           b.writeln('  (none)');
         } else {
-          for (final file in selectedFiles.take(8)) {
-            b.writeln('  - ${p.basename(file)}');
+          for (final input in selectedInputs.take(8)) {
+            final isDir = FileSystemEntity.isDirectorySync(input);
+            b.writeln('  - ${p.basename(input)}${isDir ? '/' : ''}');
           }
-          if (selectedFiles.length > 8) {
-            b.writeln('  ... ${selectedFiles.length - 8} more');
+          if (selectedInputs.length > 8) {
+            b.writeln('  ... ${selectedInputs.length - 8} more');
           }
         }
-        b.writeln('Keys: enter add/open · d continue · c clear · esc back');
-      case _Screen.uploadConfirm:
-        final totalBytes = selectedFiles.fold<int>(
-          0,
-          (sum, path) =>
-              sum + (File(path).existsSync() ? File(path).lengthSync() : 0),
+        b.writeln(
+          'Keys: enter add/open · s add current dir · d continue · c clear · esc back',
         );
+      case _Screen.uploadConfirm:
+        final hasDirectory = selectedInputs.any(
+          FileSystemEntity.isDirectorySync,
+        );
+        final totalBytes = selectedInputs.fold<int>(0, (sum, path) {
+          if (File(path).existsSync()) return sum + File(path).lengthSync();
+          return sum;
+        });
         b.writeln('Upload confirm');
-        b.writeln('Files: ${selectedFiles.length}');
-        b.writeln('Total size: ${formatBytes(totalBytes)}');
+        b.writeln('Selected items: ${selectedInputs.length}');
+        if (hasDirectory) {
+          b.writeln(
+            'Packaging: combined .zip will be created before upload (root folders preserved)',
+          );
+        } else {
+          b.writeln('Total size: ${formatBytes(totalBytes)}');
+        }
         b.writeln();
         b.writeln('Press enter to start upload, esc to go back.');
       case _Screen.uploadRunning:
