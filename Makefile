@@ -106,7 +106,7 @@ build-web: get ## Release Web build
 	$(FLUTTER) build web --release
 
 deploy-web: ## Deploy `build/web` to Vercel (production)
-	npx vercel@latest build/web --prod
+	cd build/web && npx vercel@latest --prod
 
 # --- CI-style pipeline ---
 
