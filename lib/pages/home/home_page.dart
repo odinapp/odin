@@ -190,7 +190,7 @@ class _MobileBody extends StatelessWidget {
                 opacity: 0.36,
                 child: Image.asset(
                   oImage.odinBG,
-                  width: MediaQuery.sizeOf(context).width*0.85,
+                  width: MediaQuery.sizeOf(context).width * 0.85,
                   fit: BoxFit.contain,
                   excludeFromSemantics: true,
                 ),
@@ -238,10 +238,7 @@ class _MobileBody extends StatelessWidget {
                     onPressed: () => _onSend(context),
                   ),
                   const SizedBox(height: 12),
-                  _MobileSecondaryButton(
-                    color: color,
-                    onPressed: _onReceive,
-                  ),
+                  _MobileSecondaryButton(color: color, onPressed: _onReceive),
                   const SizedBox(height: 10),
                   _MobilePolicyStrip(color: color),
                   const SizedBox(height: 16),
@@ -362,9 +359,7 @@ class _MobilePendingUploadsAction extends StatelessWidget {
         );
         final button = mobileToolbarIconButton(
           context: context,
-          tooltip: n == 0
-              ? 'Your uploads'
-              : 'Your uploads, $n active',
+          tooltip: n == 0 ? 'Your uploads' : 'Your uploads, $n active',
           onPressed: () {
             showMobilePendingUploadsSheet(context, color: color);
           },
@@ -509,10 +504,7 @@ class _MobileSecondaryButton extends StatelessWidget {
               oImage.cloudDownload,
               width: 20,
               height: 20,
-              colorFilter: ColorFilter.mode(
-                color.secondary,
-                BlendMode.srcIn,
-              ),
+              colorFilter: ColorFilter.mode(color.secondary, BlendMode.srcIn),
             ),
           ],
         ),

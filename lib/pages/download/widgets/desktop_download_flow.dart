@@ -131,8 +131,8 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
                                     child: Text(
                                       oApp.currentConfig?.token.description ??
                                           'Enter the 8-character token someone '
-                                          'shared with you. We verify it before '
-                                          'you download.',
+                                              'shared with you. We verify it before '
+                                              'you download.',
                                       style: color.textStyle(
                                         color: color.secondaryOnBackground,
                                         fontSize: 22.toAutoScaledFont,
@@ -145,77 +145,77 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
                                   SizedBox(
                                     width: double.infinity,
                                     child: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      final token = SizedBox(
-                                        width: tokenRowWidth,
-                                        child: _TokenBoxInput(
+                                      builder: (context, constraints) {
+                                        final token = SizedBox(
+                                          width: tokenRowWidth,
+                                          child: _TokenBoxInput(
+                                            color: color,
+                                            controller: _controller,
+                                            focusNode: _focusNode,
+                                            miniStatus: miniStatus,
+                                            boxWidth: _kBoxW,
+                                            boxHeight: _kBoxH,
+                                            boxGap: _kGap,
+                                            glyphFontSize: 20,
+                                            boxRadius: 10,
+                                            onChanged: (value) {
+                                              setState(() => _token = value);
+                                              if (value.length >= 6) {
+                                                _debounce.call(_fetchMetadata);
+                                              } else {
+                                                locator<DioNotifier>()
+                                                        .miniApiStatus =
+                                                    ApiStatus.init;
+                                              }
+                                            },
+                                          ),
+                                        );
+                                        final cta = _DesktopDownloadCta(
                                           color: color,
-                                          controller: _controller,
-                                          focusNode: _focusNode,
-                                          miniStatus: miniStatus,
-                                          boxWidth: _kBoxW,
-                                          boxHeight: _kBoxH,
-                                          boxGap: _kGap,
-                                          glyphFontSize: 20,
-                                          boxRadius: 10,
-                                          onChanged: (value) {
-                                            setState(() => _token = value);
-                                            if (value.length >= 6) {
-                                              _debounce.call(_fetchMetadata);
-                                            } else {
-                                              locator<DioNotifier>()
-                                                      .miniApiStatus =
-                                                  ApiStatus.init;
-                                            }
-                                          },
-                                        ),
-                                      );
-                                      final cta = _DesktopDownloadCta(
-                                        color: color,
-                                        enabled: miniStatus ==
-                                            ApiStatus.success,
-                                        loading:
-                                            apiStatus == ApiStatus.loading,
-                                        onPressed: _download,
-                                      );
-                                      final gap = 32.toAutoScaledWidth;
-                                      if (constraints.maxWidth <
-                                          tokenRowWidth +
-                                              gap +
-                                              300.toAutoScaledWidth) {
-                                        return Column(
+                                          enabled:
+                                              miniStatus == ApiStatus.success,
+                                          loading:
+                                              apiStatus == ApiStatus.loading,
+                                          onPressed: _download,
+                                        );
+                                        final gap = 32.toAutoScaledWidth;
+                                        if (constraints.maxWidth <
+                                            tokenRowWidth +
+                                                gap +
+                                                300.toAutoScaledWidth) {
+                                          return Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Center(child: token),
+                                              SizedBox(
+                                                height: 24.toAutoScaledHeight,
+                                              ),
+                                              Center(child: cta),
+                                            ],
+                                          );
+                                        }
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           children: [
-                                            Center(child: token),
-                                            SizedBox(
-                                              height: 24.toAutoScaledHeight,
-                                            ),
-                                            Center(child: cta),
+                                            token,
+                                            SizedBox(width: gap),
+                                            cta,
                                           ],
                                         );
-                                      }
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          token,
-                                          SizedBox(width: gap),
-                                          cta,
-                                        ],
-                                      );
-                                    },
+                                      },
                                     ),
                                   ),
                                   SizedBox(height: 20.toAutoScaledHeight),
                                   _DesktopCardMetadataLine(
                                     color: color,
                                     miniStatus: miniStatus,
-                                    errorMessage:
-                                        notifier.fetchFilesMetadataFailure
-                                            ?.message,
+                                    errorMessage: notifier
+                                        .fetchFilesMetadataFailure
+                                        ?.message,
                                   ),
                                 ],
                               ),
@@ -296,27 +296,30 @@ class _DesktopDownloadCta extends StatelessWidget {
       height: 96.toAutoScaledHeight,
       child: ElevatedButton(
         onPressed: miniOk && !loading ? onPressed : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color.primary,
-          disabledBackgroundColor: color.secondaryContainerOnBackground,
-          foregroundColor: Colors.white,
-          disabledForegroundColor: color.secondaryOnBackground,
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.toAutoScaledWidth),
-          ),
-        ).copyWith(
-          overlayColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.hovered) && miniOk && !loading) {
-              return Colors.white.withValues(alpha: 0.14);
-            }
-            if (states.contains(MaterialState.focused) && miniOk) {
-              return Colors.white.withValues(alpha: 0.18);
-            }
-            return null;
-          }),
-        ),
+        style:
+            ElevatedButton.styleFrom(
+              backgroundColor: color.primary,
+              disabledBackgroundColor: color.secondaryContainerOnBackground,
+              foregroundColor: Colors.white,
+              disabledForegroundColor: color.secondaryOnBackground,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.toAutoScaledWidth),
+              ),
+            ).copyWith(
+              overlayColor: MaterialStateProperty.resolveWith((states) {
+                if (states.contains(MaterialState.hovered) &&
+                    miniOk &&
+                    !loading) {
+                  return Colors.white.withValues(alpha: 0.14);
+                }
+                if (states.contains(MaterialState.focused) && miniOk) {
+                  return Colors.white.withValues(alpha: 0.18);
+                }
+                return null;
+              }),
+            ),
         child: loading
             ? SizedBox(
                 width: 28.toAutoScaledWidth,
@@ -336,7 +339,9 @@ class _DesktopDownloadCta extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: color.textStyle(
-                        color: miniOk ? Colors.white : color.secondaryOnBackground,
+                        color: miniOk
+                            ? Colors.white
+                            : color.secondaryOnBackground,
                         fontSize: 28.toAutoScaledFont,
                         fontWeight: FontWeight.w800,
                         height: 1.1,
@@ -380,7 +385,7 @@ class _DesktopCardMetadataLine extends StatelessWidget {
       if (metadata == null) return SizedBox(height: 24.toAutoScaledHeight);
 
       final fileCount = metadata.files?.length ?? 0;
-      final totalSize = metadata.totalFileSize ?? '';
+      final totalSize = formatDownloadTotalFileSize(metadata.totalFileSize);
       final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
 
       return Row(
@@ -449,8 +454,9 @@ class _DesktopDownloadSuccessCard extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => locator<AppRouter>().popUntilRoot(),
                       style: ButtonStyle(
-                        overlayColor:
-                            MaterialStateProperty.all(Colors.transparent),
+                        overlayColor: MaterialStateProperty.all(
+                          Colors.transparent,
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -523,25 +529,32 @@ class _DesktopDownloadSuccessCard extends StatelessWidget {
                           child: ElevatedButton(
                             onPressed: () =>
                                 locator<AppRouter>().popUntilRoot(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: color.primary,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  20.toAutoScaledWidth,
+                            style:
+                                ElevatedButton.styleFrom(
+                                  backgroundColor: color.primary,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      20.toAutoScaledWidth,
+                                    ),
+                                  ),
+                                ).copyWith(
+                                  overlayColor:
+                                      MaterialStateProperty.resolveWith((
+                                        states,
+                                      ) {
+                                        if (states.contains(
+                                          MaterialState.hovered,
+                                        )) {
+                                          return Colors.white.withValues(
+                                            alpha: 0.14,
+                                          );
+                                        }
+                                        return null;
+                                      }),
                                 ),
-                              ),
-                            ).copyWith(
-                              overlayColor:
-                                  MaterialStateProperty.resolveWith((states) {
-                                if (states.contains(MaterialState.hovered)) {
-                                  return Colors.white.withValues(alpha: 0.14);
-                                }
-                                return null;
-                              }),
-                            ),
                             child: Text(
                               'Back to home',
                               style: color.textStyle(
@@ -593,10 +606,7 @@ class _SuccessMarkWithDelight extends StatelessWidget {
       builder: (context, t, _) {
         return Opacity(
           opacity: t,
-          child: Transform.scale(
-            scale: 0.92 + 0.08 * t,
-            child: child,
-          ),
+          child: Transform.scale(scale: 0.92 + 0.08 * t, child: child),
         );
       },
     );

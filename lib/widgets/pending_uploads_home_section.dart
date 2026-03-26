@@ -156,9 +156,7 @@ class _PendingUploadsHomeSectionState extends State<PendingUploadsHomeSection> {
                   color: color.cardOnBackground,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: color.secondaryOnBackground.withValues(
-                      alpha: 0.12,
-                    ),
+                    color: color.secondaryOnBackground.withValues(alpha: 0.12),
                   ),
                 ),
                 child: Row(
@@ -208,9 +206,7 @@ class _PendingUploadsHomeSectionState extends State<PendingUploadsHomeSection> {
                         tapTargetSize: MaterialTapTargetSize.padded,
                       ),
                       onPressed: () {
-                        Clipboard.setData(
-                          ClipboardData(text: u.shareToken),
-                        );
+                        Clipboard.setData(ClipboardData(text: u.shareToken));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(

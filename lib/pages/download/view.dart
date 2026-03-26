@@ -12,6 +12,7 @@ import 'package:odin/services/dio_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
 import 'package:odin/services/logger.dart';
+import 'package:odin/utilities/byte_formatter.dart';
 import 'package:odin/utilities/debounce.dart';
 import 'package:odin/utilities/networking.dart';
 import 'package:odin/utilities/mobile_a11y.dart';
@@ -33,6 +34,14 @@ String friendlyDownloadMetadataError(String? raw) {
     return 'No internet connection. Check your network and try again.';
   }
   return raw;
+}
+
+/// [totalFileSize] from the API is a byte count as a string; formats for display.
+String formatDownloadTotalFileSize(String? totalFileSize) {
+  if (totalFileSize == null || totalFileSize.isEmpty) return '';
+  final bytes = int.tryParse(totalFileSize);
+  if (bytes == null) return totalFileSize;
+  return formatBytes(bytes, bytes < 1024 ? 0 : 1);
 }
 
 @RoutePage()
@@ -177,7 +186,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
               Text(
                 oApp.currentConfig?.token.description ??
                     'Enter the 8-character token someone shared with you. '
-                    'We verify it before you download.',
+                        'We verify it before you download.',
                 style: GoogleFonts.inter(
                   color: color.secondaryOnBackground,
                   fontSize: 14,
@@ -262,7 +271,6 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
       ),
     );
   }
-
 }
 
 class _MobileMetadataHint extends StatelessWidget {
@@ -278,7 +286,7 @@ class _MobileMetadataHint extends StatelessWidget {
     if (metadata == null) return const SizedBox.shrink();
 
     final fileCount = metadata.files?.length ?? 0;
-    final totalSize = metadata.totalFileSize ?? '';
+    final totalSize = formatDownloadTotalFileSize(metadata.totalFileSize);
     final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
 
     return Row(
@@ -334,9 +342,7 @@ class _MobileDownloadSuccess extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              const Center(
-                child: _SuccessMarkWithDelight(),
-              ),
+              const Center(child: _SuccessMarkWithDelight()),
               const SizedBox(height: 24),
               Center(
                 child: Text(
