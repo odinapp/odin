@@ -185,7 +185,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
               const SizedBox(height: 10),
               Text(
                 oApp.currentConfig?.token.description ??
-                    'Enter the 8-character token someone shared with you. '
+                    'Paste the token someone sent you. '
                         'We verify it before you download.',
                 style: GoogleFonts.inter(
                   color: color.secondaryOnBackground,
@@ -288,19 +288,53 @@ class _MobileMetadataHint extends StatelessWidget {
     final fileCount = metadata.files?.length ?? 0;
     final totalSize = formatDownloadTotalFileSize(metadata.totalFileSize);
     final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
+    final names = (metadata.files ?? const [])
+        .map((file) => file.path ?? '')
+        .where((path) => path.isNotEmpty)
+        .take(3)
+        .toList(growable: false);
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.check_circle_rounded, color: color.primary, size: 14),
-        const SizedBox(width: 6),
-        Text(
-          '$fileLabel · $totalSize — ready to download',
-          style: GoogleFonts.inter(
-            color: color.primary,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+        Row(
+          children: [
+            Icon(Icons.check_circle_rounded, color: color.primary, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              '$fileLabel · $totalSize — ready to download',
+              style: GoogleFonts.inter(
+                color: color.primary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
+        if (names.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          ...names.map(
+            (name) => Text(
+              '• $name',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                color: color.secondaryOnBackground,
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          if (fileCount > names.length)
+            Text(
+              '+${fileCount - names.length} more',
+              style: GoogleFonts.inter(
+                color: color.secondaryOnBackground,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+        ],
       ],
     );
   }
@@ -571,7 +605,7 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
               child: Semantics(
                 textField: true,
                 label: oApp.currentConfig?.token.title ?? 'Share token',
-                hint: 'Eight letters or numbers',
+                hint: 'Paste token',
                 value: text,
                 child: ExcludeSemantics(
                   child: TextField(
@@ -587,8 +621,10 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
                     ),
                     decoration: const InputDecoration.collapsed(hintText: ''),
                     inputFormatters: [
-                      LengthLimitingTextInputFormatter(8),
-                      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+                      LengthLimitingTextInputFormatter(1024),
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'[a-zA-Z0-9:/?&=#._-]'),
+                      ),
                     ],
                     onChanged: widget.onChanged,
                   ),

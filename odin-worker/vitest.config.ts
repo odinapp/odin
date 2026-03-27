@@ -11,6 +11,8 @@ export default defineWorkersConfig({
           r2Buckets: ['R2_BUCKET'],
           bindings: {
             PUBLIC_URL: 'https://odin-worker.workers.dev',
+            ENCRYPTION_METADATA_KEY:
+              'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY',
           },
         },
       },

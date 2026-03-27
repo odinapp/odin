@@ -40,7 +40,7 @@ describe('POST /api/v1/file/upload/', () => {
     const res = await handleUpload(req, env);
     expect(res.status).toBe(200);
     const body = await res.json() as { token: string; deleteToken: string };
-    expect(body.token).toMatch(/\/d\/[A-Za-z0-9]{8}$/);
+    expect(body.token).toMatch(/^[A-Za-z0-9]{8}$/);
     expect(body.deleteToken).toMatch(/\/delete\/[A-Za-z0-9]{8}\?secret=[A-Za-z0-9]{16}$/);
   });
 
@@ -54,9 +54,7 @@ describe('POST /api/v1/file/upload/', () => {
     const req = makeUploadRequest([{ name: 'test.txt', content: 'r2 content' }]);
     const res = await handleUpload(req, env);
     const body = await res.json() as { token: string };
-    // Extract token code from URL
-    const code = body.token.split('/d/')[1];
-    const r2Object = await env.R2_BUCKET.get(`${code}/test.txt`);
+    const r2Object = await env.R2_BUCKET.get(`${body.token}/test.txt`);
     expect(r2Object).not.toBeNull();
   });
 
@@ -64,8 +62,7 @@ describe('POST /api/v1/file/upload/', () => {
     const req = makeUploadRequest([{ name: 'meta.txt', content: 'kv test' }]);
     const res = await handleUpload(req, env);
     const body = await res.json() as { token: string };
-    const code = body.token.split('/d/')[1];
-    const meta = await env.KV_METADATA.get(code);
+    const meta = await env.KV_METADATA.get(body.token);
     expect(meta).not.toBeNull();
     const parsed = JSON.parse(meta!);
     expect(parsed.filename).toBe('meta.txt');
@@ -79,8 +76,7 @@ describe('POST /api/v1/file/upload/', () => {
     ]);
     const res = await handleUpload(req, env);
     const body = await res.json() as { token: string };
-    const code = body.token.split('/d/')[1];
-    const meta = await env.KV_METADATA.get(code);
+    const meta = await env.KV_METADATA.get(body.token);
     expect(JSON.parse(meta!).filename).toBe('files.zip');
   });
 
@@ -92,5 +88,32 @@ describe('POST /api/v1/file/upload/', () => {
     const req = new Request('https://example.com/api/v1/file/upload/', { method: 'POST', body: form });
     const res = await handleUpload(req, env);
     expect(res.status).toBe(200);
+  });
+
+  it('stores encrypted manifest preview fields when provided', async () => {
+    const form = new FormData();
+    form.append('file', new File(['hello'], 'x.odin'));
+    form.append('directoryName', 'x');
+    form.append('totalFileSize', '5');
+    form.append(
+      'manifestPreview',
+      JSON.stringify({ files: [{ path: 'docs/a.txt', size: 10 }], fileCount: 1, size: 10, zipped: false }),
+    );
+    form.append('encryptionKey', 'AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA');
+    form.append('fileCount', '3');
+    form.append('originalTotalFileSize', '123');
+    form.append('isArchive', 'true');
+    const req = new Request('https://example.com/api/v1/file/upload/', { method: 'POST', body: form });
+
+    const res = await handleUpload(req, env);
+    const body = await res.json() as { token: string };
+    const meta = await env.KV_METADATA.get(body.token);
+    const parsed = JSON.parse(meta!);
+    expect(parsed.manifestPreview.fileCount).toBe(1);
+    expect(parsed.wrappedEncryptionKey).toMatch(/^ODK1\./);
+    expect(parsed.encrypted).toBe(true);
+    expect(parsed.fileCount).toBe(3);
+    expect(parsed.originalTotalFileSize).toBe(123);
+    expect(parsed.isArchive).toBe(true);
   });
 });

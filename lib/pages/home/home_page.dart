@@ -214,7 +214,7 @@ class _MobileBody extends StatelessWidget {
                             color: color.primary,
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 2,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),

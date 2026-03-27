@@ -2,6 +2,7 @@ library;
 
 export 'src/end_points.dart';
 export 'src/environment.dart';
+export 'src/share_token.dart';
 export 'src/models/file_metadata.dart';
 export 'src/models/files_metadata.dart';
 export 'src/odin_repository.dart';

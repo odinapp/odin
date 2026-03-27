@@ -92,12 +92,22 @@ ArgParser _buildParser() {
     ..addFlag('no-color', negatable: false, help: 'Disable ANSI colors');
 
   parser.addCommand('upload');
+  parser.commands['upload']!.addFlag(
+    'no-encrypt',
+    negatable: false,
+    help: 'Disable end-to-end encryption for upload',
+  );
   final download = parser.addCommand('download');
   download.addOption(
     'output',
     abbr: 'o',
     help: 'Output directory',
     defaultsTo: '.',
+  );
+  download.addFlag(
+    'require-encrypted',
+    negatable: false,
+    help: 'Fail when payload is not encrypted',
   );
   return parser;
 }
@@ -108,8 +118,8 @@ Odin CLI
 
 Usage:
   odin [global options]                # Start TUI (if terminal supports it)
-  odin upload [files...] [--json]
-  odin download <token> [-o dir] [--json]
+  odin upload [files...] [--no-encrypt] [--json]
+  odin download <token> [-o dir] [--require-encrypted] [--json]
 
 Global options:
 ${parser.usage}
@@ -129,9 +139,10 @@ Future<int> _runUpload(
     return 64;
   }
 
-  PreparedUpload prepared;
+  final encrypt = !(command['no-encrypt'] as bool);
+  late final bool zippedExpected;
   try {
-    prepared = await prepareUploadInputs(inputPaths: paths);
+    zippedExpected = await _shouldZip(paths);
   } on FileSystemException catch (e) {
     stderr.writeln('Input error: ${e.path ?? ''} ${e.message}');
     return 66;
@@ -140,17 +151,14 @@ Future<int> _runUpload(
     return 64;
   }
 
-  late final Result<UploadFilesSuccess, UploadFilesFailure> result;
-  try {
-    result = await repo.uploadFilesAnonymous(
-      request: UploadFilesRequest(
-        files: prepared.filesToUpload,
-        totalFileSize: prepared.totalFileSize,
-      ),
-    );
-  } finally {
-    await prepared.cleanupTempArtifacts();
-  }
+  final result = await repo.uploadFilesAnonymous(
+    request: UploadFilesRequest(
+      files: const <File>[],
+      totalFileSize: 0,
+      inputPaths: paths,
+      encrypt: encrypt,
+    ),
+  );
 
   return result.resolve(
     (success) {
@@ -158,8 +166,10 @@ Future<int> _runUpload(
         stdout.writeln(
           jsonEncode(<String, dynamic>{
             'token': success.token,
+            'fileCode': success.fileCode,
             'deleteToken': success.deleteToken,
-            if (prepared.usedCombinedZip) 'zipped': true,
+            'encrypted': success.encrypted,
+            if (zippedExpected) 'zipped': true,
           }),
         );
       } else {
@@ -179,6 +189,16 @@ Future<int> _runUpload(
   );
 }
 
+Future<bool> _shouldZip(List<String> paths) async {
+  if (paths.length > 1) return true;
+  if (paths.isEmpty) return false;
+  final firstType = await FileSystemEntity.type(paths.first, followLinks: true);
+  if (firstType == FileSystemEntityType.notFound) {
+    throw FileSystemException('Input path not found', paths.first);
+  }
+  return firstType == FileSystemEntityType.directory;
+}
+
 Future<int> _runDownload(
   ArgResults command, {
   required OdinRepository repo,
@@ -191,19 +211,29 @@ Future<int> _runDownload(
 
   final token = command.rest.first.trim();
   final outDir = p.normalize(command['output'] as String);
+  final requireEncrypted = command['require-encrypted'] as bool;
 
   final result = await repo.downloadFile(
-    request: DownloadFileRequest(token: token, savePath: outDir),
+    request: DownloadFileRequest(
+      token: token,
+      savePath: outDir,
+      requireEncrypted: requireEncrypted,
+    ),
   );
 
   return result.resolve(
     (success) {
       if (isJson) {
         stdout.writeln(
-          jsonEncode(<String, dynamic>{'path': success.file.path}),
+          jsonEncode(<String, dynamic>{
+            'path': success.outputPath,
+            'encrypted': success.encrypted,
+            if (success.extracted) 'extracted': true,
+            if (success.extracted) 'fileCount': success.extractedFiles.length,
+          }),
         );
       } else {
-        stdout.writeln(success.file.path);
+        stdout.writeln(success.outputPath);
       }
       return 0;
     },

@@ -30,13 +30,39 @@ describe('GET /api/v1/file/info/', () => {
     expect(Array.isArray(body.files)).toBe(true);
     expect((body.files as { path: string }[])[0].path).toBe('file.txt');
     expect(body.totalFileSize).toBe('42');
+    expect(body.fileCount).toBe(1);
+    expect(body.isArchive).toBe(false);
   });
 
-  it('accepts a full /d/ URL as the token query param', async () => {
+  it('returns manifest preview details for encrypted upload metadata', async () => {
+    await setMetadata(env.KV_METADATA, 'tok00001', {
+      ...SAMPLE,
+      filename: 'opaque.odin',
+      manifestPreview: {
+        files: [{ path: 'folder/a.txt', size: 12 }],
+        fileCount: 1,
+        size: 12,
+        zipped: true,
+      },
+      encrypted: true,
+      wrappedEncryptionKey: 'ODK1.fake',
+      isArchive: true,
+    });
+    const req = new Request('https://example.com/api/v1/file/info/?token=tok00001');
+    const res = await handleInfo(req, env);
+    expect(res.status).toBe(200);
+    const body = await res.json() as Record<string, unknown>;
+    expect((body.files as { path: string }[])[0].path).toBe('folder/a.txt');
+    expect(body.fileCount).toBe(1);
+    expect(body.totalFileSize).toBe('12');
+    expect(body.isArchive).toBe(true);
+  });
+
+  it('rejects URL-style token query param', async () => {
     await setMetadata(env.KV_METADATA, 'tok00001', SAMPLE);
     const tokenUrl = encodeURIComponent('https://odin-worker.workers.dev/d/tok00001');
     const req = new Request(`https://example.com/api/v1/file/info/?token=${tokenUrl}`);
     const res = await handleInfo(req, env);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(404);
   });
 });

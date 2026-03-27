@@ -26,21 +26,10 @@ export async function generateToken(
   throw new Error('Token collision after 3 retries');
 }
 
-/**
- * Extracts the 8-char token code from either:
- * - A full URL: https://odin-worker.workers.dev/d/aB3kR9mQ → aB3kR9mQ
- * - A bare code: aB3kR9mQ → aB3kR9mQ
- */
 export function extractTokenCode(tokenOrUrl: string): string {
-  try {
-    const url = new URL(tokenOrUrl);
-    const segments = url.pathname.split('/').filter(Boolean);
-    const dIndex = segments.indexOf('d');
-    if (dIndex !== -1 && segments[dIndex + 1]) {
-      return segments[dIndex + 1];
-    }
-  } catch {
-    // Not a URL — use as-is
+  const token = tokenOrUrl.trim();
+  if (!/^[A-Za-z0-9]{8}$/.test(token)) {
+    return '';
   }
-  return tokenOrUrl;
+  return token;
 }

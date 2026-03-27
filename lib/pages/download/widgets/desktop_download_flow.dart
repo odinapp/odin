@@ -130,8 +130,8 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
                                     ),
                                     child: Text(
                                       oApp.currentConfig?.token.description ??
-                                          'Enter the 8-character token someone '
-                                              'shared with you. We verify it before '
+                                          'Paste the token someone sent you. '
+                                              'We verify it before '
                                               'you download.',
                                       style: color.textStyle(
                                         color: color.secondaryOnBackground,
@@ -387,23 +387,65 @@ class _DesktopCardMetadataLine extends StatelessWidget {
       final fileCount = metadata.files?.length ?? 0;
       final totalSize = formatDownloadTotalFileSize(metadata.totalFileSize);
       final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
+      final names = (metadata.files ?? const [])
+          .map((file) => file.path ?? '')
+          .where((path) => path.isNotEmpty)
+          .take(5)
+          .toList(growable: false);
 
-      return Row(
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.check_circle_rounded, color: color.primary, size: 20),
-          SizedBox(width: 10.toAutoScaledWidth),
-          Expanded(
-            child: Text(
-              '$fileLabel · $totalSize — ready to download',
-              style: color.textStyle(
-                color: color.primary,
-                fontSize: 18.toAutoScaledFont,
-                fontWeight: FontWeight.w600,
-                height: 1.35,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.check_circle_rounded, color: color.primary, size: 20),
+              SizedBox(width: 10.toAutoScaledWidth),
+              Expanded(
+                child: Text(
+                  '$fileLabel · $totalSize — ready to download',
+                  style: color.textStyle(
+                    color: color.primary,
+                    fontSize: 18.toAutoScaledFont,
+                    fontWeight: FontWeight.w600,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (names.isNotEmpty) ...[
+            SizedBox(height: 8.toAutoScaledHeight),
+            ...names.map(
+              (name) => Padding(
+                padding: EdgeInsets.only(left: 30.toAutoScaledWidth),
+                child: Text(
+                  '• $name',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: color.textStyle(
+                    color: color.secondaryOnBackground,
+                    fontSize: 14.toAutoScaledFont,
+                    fontWeight: FontWeight.w400,
+                    height: 1.35,
+                  ),
+                ),
               ),
             ),
-          ),
+            if (fileCount > names.length)
+              Padding(
+                padding: EdgeInsets.only(left: 30.toAutoScaledWidth),
+                child: Text(
+                  '+${fileCount - names.length} more',
+                  style: color.textStyle(
+                    color: color.secondaryOnBackground,
+                    fontSize: 14.toAutoScaledFont,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                ),
+              ),
+          ],
         ],
       );
     }

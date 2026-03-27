@@ -33,6 +33,8 @@ void main() {
       ]);
       expect(prepared.totalFileSize, fileA.lengthSync() + fileB.lengthSync());
       expect(prepared.tempArtifacts, isEmpty);
+      expect(prepared.downloadFileName, 'a.txt');
+      expect(prepared.originalFiles.length, 2);
     });
 
     test(
@@ -58,6 +60,8 @@ void main() {
           prepared.totalFileSize,
           prepared.filesToUpload.first.lengthSync(),
         );
+        expect(prepared.downloadFileName, 'folder.zip');
+        expect(prepared.originalFiles.first.path, 'folder/nested/file.txt');
 
         await prepared.cleanupTempArtifacts();
         expect(prepared.filesToUpload.first.existsSync(), isFalse);

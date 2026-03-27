@@ -3,6 +3,7 @@ import { generateToken, randomString } from '../lib/token';
 import { setMetadata, setCleanupEntry } from '../lib/kv';
 import { zipFiles } from '../lib/zip';
 import { jsonError } from '../lib/response';
+import { wrapEncryptionKey } from '../lib/keywrap';
 
 const MAX_BYTES = 100 * 1024 * 1024;
 
@@ -27,6 +28,15 @@ export async function handleUpload(req: Request, env: Env): Promise<Response> {
 
   // Reject early on declared size before reading any bytes into memory
   const rawSize = formData.get('totalFileSize');
+  const manifestPreview = formData.get('manifestPreview');
+  const encryptionKey = formData.get('encryptionKey');
+  const fileCountField = formData.get('fileCount');
+  const originalTotalField = formData.get('originalTotalFileSize');
+  const isArchiveField = formData.get('isArchive');
+  const parsedFileCount =
+    typeof fileCountField === 'string' ? parseInt(fileCountField, 10) : NaN;
+  const parsedOriginalTotal =
+    typeof originalTotalField === 'string' ? parseInt(originalTotalField, 10) : NaN;
   if (rawSize !== null) {
     const declaredSize = parseInt(rawSize as string, 10);
     if (isNaN(declaredSize)) {
@@ -74,6 +84,30 @@ export async function handleUpload(req: Request, env: Env): Promise<Response> {
   const deleteToken = randomString(16);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 86400 * 1000);
+  let wrappedEncryptionKey: string | undefined;
+  let parsedManifestPreview: Record<string, unknown> | undefined;
+
+  if (typeof manifestPreview === 'string' && manifestPreview.trim().length > 0) {
+    try {
+      const parsed = JSON.parse(manifestPreview);
+      if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        parsedManifestPreview = parsed as Record<string, unknown>;
+      }
+    } catch {
+      return jsonError(400, 'invalid manifestPreview');
+    }
+  }
+
+  if (typeof encryptionKey === 'string' && encryptionKey.trim().length > 0) {
+    try {
+      wrappedEncryptionKey = await wrapEncryptionKey(
+        encryptionKey,
+        env.ENCRYPTION_METADATA_KEY,
+      );
+    } catch {
+      return jsonError(400, 'invalid encryptionKey');
+    }
+  }
 
   try {
     await env.R2_BUCKET.put(r2Key, finalData);
@@ -89,6 +123,12 @@ export async function handleUpload(req: Request, env: Env): Promise<Response> {
       uploadedAt: now.toISOString(),
       expiresAt: expiresAt.toISOString(),
       deleteToken,
+      manifestPreview: parsedManifestPreview,
+      wrappedEncryptionKey,
+      encrypted: wrappedEncryptionKey !== undefined,
+      fileCount: Number.isFinite(parsedFileCount) ? parsedFileCount : undefined,
+      originalTotalFileSize: Number.isFinite(parsedOriginalTotal) ? parsedOriginalTotal : undefined,
+      isArchive: typeof isArchiveField === 'string' ? isArchiveField === 'true' : undefined,
     });
     await setCleanupEntry(env.KV_METADATA, token, {
       token,
@@ -102,7 +142,7 @@ export async function handleUpload(req: Request, env: Env): Promise<Response> {
   }
 
   return Response.json({
-    token: `${env.PUBLIC_URL}/d/${token}`,
+    token,
     deleteToken: `${env.PUBLIC_URL}/delete/${token}?secret=${deleteToken}`,
   });
 }

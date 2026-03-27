@@ -5,6 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 PUBLIC_URL = "https://<your-worker>.workers.dev"
+ENCRYPTION_METADATA_KEY = "<base64url-encoded-32-byte-key>"
 
 [[r2_buckets]]
 binding = "R2_BUCKET"

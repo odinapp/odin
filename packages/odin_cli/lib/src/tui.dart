@@ -468,12 +468,17 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
           final rows = <List<String>>[
             for (final file
                 in success.filesMetadata.files ?? const <FileMetadata>[])
-              <String>[p.basename(file.path ?? ''), file.path ?? ''],
+              <String>[
+                p.basename(file.path ?? ''),
+                file.path ?? '',
+                file.size == null ? '' : formatBytes(file.size!),
+              ],
           ];
           final table = TableModel(
             columns: const <TableColumn>[
               TableColumn(title: 'Name', width: 24),
-              TableColumn(title: 'Path', width: 42),
+              TableColumn(title: 'Path', width: 36),
+              TableColumn(title: 'Size', width: 12),
             ],
             rows: rows,
             height: 6,
@@ -551,7 +556,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
           return (
             copyWith(
               screen: _Screen.downloadDone,
-              lastPath: success.file.path,
+              lastPath: success.outputPath,
               clearError: true,
             ),
             null,
@@ -589,13 +594,12 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
 
   void _startUpload(CancelToken token) {
     Future<void>(() async {
-      PreparedUpload? prepared;
       try {
-        prepared = await prepareUploadInputs(inputPaths: selectedInputs);
         final result = await repo.uploadFilesAnonymous(
           request: UploadFilesRequest(
-            files: prepared.filesToUpload,
-            totalFileSize: prepared.totalFileSize,
+            files: const <File>[],
+            totalFileSize: 0,
+            inputPaths: selectedInputs,
             cancelToken: token,
             onSendProgress: (sent, total) =>
                 program.send(_UploadProgressMsg(sent, total)),
@@ -618,8 +622,6 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
             Failure(UploadFilesFailure(message: e.toString())),
           ),
         );
-      } finally {
-        await prepared?.cleanupTempArtifacts();
       }
     });
   }

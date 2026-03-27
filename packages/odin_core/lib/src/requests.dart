@@ -20,12 +20,16 @@ class UploadFilesRequest extends RepositoryPostRequest {
   UploadFilesRequest({
     required this.files,
     required this.totalFileSize,
+    this.inputPaths,
+    this.encrypt = true,
     super.onSendProgress,
     super.cancelToken,
   });
 
   final List<File> files;
   final int totalFileSize;
+  final List<String>? inputPaths;
+  final bool encrypt;
 }
 
 class FetchFilesMetadataRequest extends RepositoryGetRequest {
@@ -42,12 +46,16 @@ class DownloadFileRequest extends RepositoryGetRequest {
   DownloadFileRequest({
     required this.token,
     required this.savePath,
+    this.requireEncrypted = false,
+    this.autoExtractArchives = true,
     super.onReceiveProgress,
     super.cancelToken,
   });
 
   final String token;
   final String savePath;
+  final bool requireEncrypted;
+  final bool autoExtractArchives;
 }
 
 class FetchConfigRequest extends RepositoryGetRequest {

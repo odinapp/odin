@@ -46,6 +46,13 @@ Max total size: **100 MB**.
 
 The `token` field is a full share URL. The Flutter client displays it and the recipient pastes it (or just the 8-char code) into the download field.
 
+## Encryption contract
+
+- The worker stores and serves opaque bytes; it does not decrypt payloads.
+- Clients may upload encrypted container files (for example `.odin`) and share URLs with key fragments (`#k=...`).
+- URL fragments are not transmitted in HTTP requests, so the worker only receives the file code (`?token=<code>`).
+- `file/info` metadata may describe stored artifacts (opaque filename/size when encrypted upload is used), not original plaintext manifest details.
+
 ## Development
 
 ```bash

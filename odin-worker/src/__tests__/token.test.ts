@@ -53,15 +53,15 @@ describe('generateToken', () => {
 });
 
 describe('extractTokenCode', () => {
-  it('extracts 8-char code from a full /d/ URL', () => {
-    expect(extractTokenCode('https://odin-worker.workers.dev/d/aB3kR9mQ')).toBe('aB3kR9mQ');
-  });
-
   it('returns the input unchanged when already a bare code', () => {
     expect(extractTokenCode('aB3kR9mQ')).toBe('aB3kR9mQ');
   });
 
-  it('handles URLs with trailing slash', () => {
-    expect(extractTokenCode('https://odin-worker.workers.dev/d/aB3kR9mQ/')).toBe('aB3kR9mQ');
+  it('returns empty string for URL-style token', () => {
+    expect(extractTokenCode('https://odin-worker.workers.dev/d/aB3kR9mQ')).toBe('');
+  });
+
+  it('returns empty string for invalid token format', () => {
+    expect(extractTokenCode('short')).toBe('');
   });
 });

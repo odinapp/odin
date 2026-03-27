@@ -5,6 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 PUBLIC_URL = "https://odin.prismwalls.workers.dev"
+ENCRYPTION_METADATA_KEY = "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
 
 [[r2_buckets]]
 binding = "R2_BUCKET"

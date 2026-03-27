@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   archive: ^4.0.9
+  cryptography: ^2.7.0
   dio: ^5.9.2
   dotenv: ^4.2.0
   path: ^1.9.1
