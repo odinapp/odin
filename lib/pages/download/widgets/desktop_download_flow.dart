@@ -244,7 +244,7 @@ class _DesktopCardBackLink extends StatelessWidget {
     return TextButton(
       onPressed: () => locator<AppRouter>().pop(),
       style: ButtonStyle(
-        overlayColor: MaterialStateProperty.all(Colors.transparent),
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -307,13 +307,13 @@ class _DesktopDownloadCta extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.toAutoScaledWidth),
               ),
             ).copyWith(
-              overlayColor: MaterialStateProperty.resolveWith((states) {
-                if (states.contains(MaterialState.hovered) &&
+              overlayColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.hovered) &&
                     miniOk &&
                     !loading) {
                   return Colors.white.withValues(alpha: 0.14);
                 }
-                if (states.contains(MaterialState.focused) && miniOk) {
+                if (states.contains(WidgetState.focused) && miniOk) {
                   return Colors.white.withValues(alpha: 0.18);
                 }
                 return null;
@@ -541,7 +541,7 @@ class _DesktopDownloadSuccessCardState
                     child: TextButton(
                       onPressed: () => locator<AppRouter>().popUntilRoot(),
                       style: ButtonStyle(
-                        overlayColor: MaterialStateProperty.all(
+                        overlayColor: WidgetStateProperty.all(
                           Colors.transparent,
                         ),
                       ),
@@ -646,11 +646,11 @@ class _DesktopDownloadSuccessCardState
                                     ),
                                   ).copyWith(
                                     overlayColor:
-                                        MaterialStateProperty.resolveWith((
+                                        WidgetStateProperty.resolveWith((
                                           states,
                                         ) {
                                           if (states.contains(
-                                            MaterialState.hovered,
+                                            WidgetState.hovered,
                                           )) {
                                             return Colors.white.withValues(
                                               alpha: 0.14,
@@ -748,11 +748,11 @@ class _DesktopDownloadSuccessCardState
                                     ),
                                   ).copyWith(
                                     overlayColor:
-                                        MaterialStateProperty.resolveWith((
+                                        WidgetStateProperty.resolveWith((
                                           states,
                                         ) {
                                           if (states.contains(
-                                            MaterialState.hovered,
+                                            WidgetState.hovered,
                                           )) {
                                             return Colors.white.withValues(
                                               alpha: 0.14,

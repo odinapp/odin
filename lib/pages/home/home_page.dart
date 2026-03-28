@@ -51,7 +51,7 @@ void showOdinHomeSnackBar(BuildContext context, String message) {
 
 @RoutePage()
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +79,7 @@ class HomePage extends StatelessWidget {
 // ── Desktop layout (unchanged) ──────────────────────────────────────────────
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key}) : super(key: key);
+  const _Body();
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +152,7 @@ class _DesktopPolicyStrip extends StatelessWidget {
 // ── Mobile layout ────────────────────────────────────────────────────────────
 
 class _MobileBody extends StatelessWidget {
-  const _MobileBody({Key? key, required this.color}) : super(key: key);
+  const _MobileBody({required this.color});
 
   final OColor color;
 
@@ -407,11 +407,7 @@ class _MobilePolicyStrip extends StatelessWidget {
 }
 
 class _MobilePrimaryButton extends StatelessWidget {
-  const _MobilePrimaryButton({
-    Key? key,
-    required this.color,
-    required this.onPressed,
-  }) : super(key: key);
+  const _MobilePrimaryButton({required this.color, required this.onPressed});
 
   final OColor color;
   final VoidCallback onPressed;
@@ -462,11 +458,7 @@ class _MobilePrimaryButton extends StatelessWidget {
 }
 
 class _MobileSecondaryButton extends StatelessWidget {
-  const _MobileSecondaryButton({
-    Key? key,
-    required this.color,
-    required this.onPressed,
-  }) : super(key: key);
+  const _MobileSecondaryButton({required this.color, required this.onPressed});
 
   final OColor color;
   final VoidCallback onPressed;

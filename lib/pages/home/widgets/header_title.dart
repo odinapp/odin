@@ -1,7 +1,7 @@
 part of '../home_page.dart';
 
 class HeaderTitle extends StatelessWidget {
-  const HeaderTitle({Key? key, required this.color}) : super(key: key);
+  const HeaderTitle({super.key, required this.color});
 
   final OColor color;
 

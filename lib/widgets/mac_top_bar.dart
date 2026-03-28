@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MacTopBar extends StatelessWidget {
-  const MacTopBar({Key? key}) : super(key: key);
+  const MacTopBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class MacTopBar extends StatelessWidget {
 }
 
 class TitleBar extends StatelessWidget {
-  const TitleBar({Key? key}) : super(key: key);
+  const TitleBar({super.key});
 
   @override
   Widget build(BuildContext context) {

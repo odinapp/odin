@@ -1,7 +1,7 @@
 part of '../home_page.dart';
 
 class OrDivider extends StatelessWidget {
-  const OrDivider({Key? key}) : super(key: key);
+  const OrDivider({super.key});
 
   @override
   Widget build(BuildContext context) {

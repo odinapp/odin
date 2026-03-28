@@ -1,7 +1,7 @@
 part of '../home_page.dart';
 
 class SecondaryButton extends StatelessWidget {
-  const SecondaryButton({Key? key, required this.color}) : super(key: key);
+  const SecondaryButton({super.key, required this.color});
 
   final OColor color;
 
@@ -27,14 +27,14 @@ class SecondaryButton extends StatelessWidget {
                   side: BorderSide(color: color.borderSubtleOnBackground),
                 ),
               ).copyWith(
-                overlayColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.hovered)) {
+                overlayColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.hovered)) {
                     return color.secondary.withValues(alpha: 0.06);
                   }
-                  if (states.contains(MaterialState.focused)) {
+                  if (states.contains(WidgetState.focused)) {
                     return color.secondary.withValues(alpha: 0.1);
                   }
-                  if (states.contains(MaterialState.pressed)) {
+                  if (states.contains(WidgetState.pressed)) {
                     return color.secondary.withValues(alpha: 0.12);
                   }
                   return null;

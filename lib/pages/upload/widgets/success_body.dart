@@ -2,10 +2,10 @@ part of '../view.dart';
 
 class SuccessBody extends StatelessWidget {
   const SuccessBody({
-    Key? key,
+    super.key,
     required this.color,
     required this.uploadFilesSuccess,
-  }) : super(key: key);
+  });
 
   final OColor color;
   final core.UploadFilesSuccess uploadFilesSuccess;
@@ -33,7 +33,7 @@ class SuccessBody extends StatelessWidget {
 }
 
 class _SuccessContent extends StatelessWidget {
-  const _SuccessContent({Key? key, required this.color}) : super(key: key);
+  const _SuccessContent({required this.color});
 
   final OColor color;
 
@@ -158,9 +158,7 @@ class _SuccessContent extends StatelessWidget {
                       );
                     },
                     style: ButtonStyle(
-                      overlayColor: MaterialStateProperty.all(
-                        Colors.transparent,
-                      ),
+                      overlayColor: WidgetStateProperty.all(Colors.transparent),
                     ),
                     child: SvgPicture.asset(
                       oImage.copy,
@@ -182,7 +180,7 @@ class _SuccessContent extends StatelessWidget {
 }
 
 class _QRButton extends StatelessWidget {
-  const _QRButton({Key? key, required this.color}) : super(key: key);
+  const _QRButton({required this.color});
 
   final OColor color;
 
@@ -191,7 +189,7 @@ class _QRButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(right: 60.0.toAutoScaledWidth),
       child: ElevatedButton(
-        style: ButtonStyle(elevation: MaterialStateProperty.all(0)).merge(
+        style: ButtonStyle(elevation: WidgetStateProperty.all(0)).merge(
           ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF242424),
             foregroundColor: color.primary.withOpacity(0.2),

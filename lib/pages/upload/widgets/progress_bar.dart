@@ -1,7 +1,7 @@
 part of '../view.dart';
 
 class _ProgressBar extends StatelessWidget {
-  const _ProgressBar({Key? key, required this.color}) : super(key: key);
+  const _ProgressBar({required this.color});
 
   final OColor color;
 
@@ -28,7 +28,7 @@ class _ProgressBar extends StatelessWidget {
 }
 
 class _FileIcon extends StatelessWidget {
-  const _FileIcon({Key? key, required this.color}) : super(key: key);
+  const _FileIcon({required this.color});
 
   final OColor color;
 
@@ -68,7 +68,7 @@ class _FileIcon extends StatelessWidget {
 }
 
 class _FileDataText extends StatelessWidget {
-  const _FileDataText({Key? key, required this.color}) : super(key: key);
+  const _FileDataText({required this.color});
 
   final OColor color;
 
@@ -88,7 +88,7 @@ class _FileDataText extends StatelessWidget {
 }
 
 class _FileSizeText extends StatelessWidget {
-  const _FileSizeText({Key? key, required this.color}) : super(key: key);
+  const _FileSizeText({required this.color});
 
   final OColor color;
 
@@ -109,7 +109,7 @@ class _FileSizeText extends StatelessWidget {
 }
 
 class _FileNameText extends StatelessWidget {
-  const _FileNameText({Key? key, required this.color}) : super(key: key);
+  const _FileNameText({required this.color});
 
   final OColor color;
 
@@ -134,7 +134,7 @@ class _FileNameText extends StatelessWidget {
 }
 
 class _ProgressBarBG extends StatelessWidget {
-  const _ProgressBarBG({Key? key, required this.color}) : super(key: key);
+  const _ProgressBarBG({required this.color});
 
   final OColor color;
 

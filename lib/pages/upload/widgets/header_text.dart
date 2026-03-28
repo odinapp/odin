@@ -1,7 +1,7 @@
 part of '../view.dart';
 
 class _HeaderText extends StatelessWidget {
-  const _HeaderText({Key? key, required this.color}) : super(key: key);
+  const _HeaderText({required this.color});
 
   final OColor color;
 

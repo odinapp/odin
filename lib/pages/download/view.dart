@@ -50,7 +50,7 @@ String formatDownloadTotalFileSize(String? totalFileSize) {
 
 @RoutePage()
 class DownloadPage extends StatefulWidget {
-  const DownloadPage({Key? key}) : super(key: key);
+  const DownloadPage({super.key});
 
   @override
   State<DownloadPage> createState() => _DownloadPageState();
@@ -83,7 +83,7 @@ class _DownloadPageState extends State<DownloadPage> {
 // ── Mobile: single stateful body handles all states ─────────────────────────
 
 class _MobileDownloadBody extends StatefulWidget {
-  const _MobileDownloadBody({Key? key, required this.color}) : super(key: key);
+  const _MobileDownloadBody({required this.color});
 
   final OColor color;
 
@@ -277,7 +277,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
 }
 
 class _MobileMetadataHint extends StatelessWidget {
-  const _MobileMetadataHint({Key? key, required this.color}) : super(key: key);
+  const _MobileMetadataHint({required this.color});
 
   final OColor color;
 
@@ -348,8 +348,7 @@ class _MobileMetadataHint extends StatelessWidget {
 // ── Mobile: Download success ─────────────────────────────────────────────────
 
 class _MobileDownloadSuccess extends StatefulWidget {
-  const _MobileDownloadSuccess({Key? key, required this.color})
-    : super(key: key);
+  const _MobileDownloadSuccess({required this.color});
 
   final OColor color;
 
@@ -773,7 +772,7 @@ class _BlinkingCursorState extends State<_BlinkingCursor>
     }
     return AnimatedBuilder(
       animation: _controller,
-      builder: (_, __) => Opacity(
+      builder: (_, _) => Opacity(
         opacity: _controller.value > 0.5 ? 1.0 : 0.0,
         child: Container(
           width: 2,

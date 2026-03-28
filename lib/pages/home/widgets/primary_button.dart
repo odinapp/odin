@@ -1,7 +1,7 @@
 part of '../home_page.dart';
 
 class PrimaryButton extends StatelessWidget {
-  const PrimaryButton({Key? key, required this.color}) : super(key: key);
+  const PrimaryButton({super.key, required this.color});
 
   final OColor color;
 
@@ -40,14 +40,14 @@ class PrimaryButton extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14.toAutoScaledWidth),
                 ),
               ).copyWith(
-                overlayColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.hovered)) {
+                overlayColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.hovered)) {
                     return color.primary.withValues(alpha: 0.07);
                   }
-                  if (states.contains(MaterialState.focused)) {
+                  if (states.contains(WidgetState.focused)) {
                     return color.primary.withValues(alpha: 0.12);
                   }
-                  if (states.contains(MaterialState.pressed)) {
+                  if (states.contains(WidgetState.pressed)) {
                     return color.primary.withValues(alpha: 0.14);
                   }
                   return null;

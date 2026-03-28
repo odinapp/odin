@@ -1,7 +1,7 @@
 part of '../view.dart';
 
 class MainContainer extends StatelessWidget {
-  const MainContainer({Key? key, required this.color}) : super(key: key);
+  const MainContainer({super.key, required this.color});
 
   final OColor color;
 
@@ -28,7 +28,7 @@ class MainContainer extends StatelessWidget {
 }
 
 class MainContent extends StatelessWidget {
-  const MainContent({Key? key, required this.color}) : super(key: key);
+  const MainContent({super.key, required this.color});
 
   final OColor color;
 
