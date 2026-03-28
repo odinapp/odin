@@ -383,10 +383,10 @@ class _DesktopCardMetadataLine extends StatelessWidget {
       ).fetchFilesMetadataSuccess?.filesMetadata;
       if (metadata == null) return SizedBox(height: 24.toAutoScaledHeight);
 
-      final fileCount = metadata.files?.length ?? 0;
-      final totalSize = formatDownloadTotalFileSize(metadata.totalFileSize);
+      final fileCount = metadata.fileCount ?? metadata.displayFiles?.length ?? 0;
+      final totalSize = formatDownloadTotalFileSize(metadata.displayTotalFileSize);
       final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
-      final names = (metadata.files ?? const [])
+      final names = (metadata.displayFiles ?? const [])
           .map((file) => file.path ?? '')
           .where((path) => path.isNotEmpty)
           .take(5)

@@ -19,7 +19,6 @@ abstract class RepositoryGetRequest {
 class UploadFilesRequest extends RepositoryPostRequest {
   UploadFilesRequest({
     required this.files,
-    required this.totalFileSize,
     this.inputPaths,
     this.encrypt = true,
     super.onSendProgress,
@@ -27,7 +26,6 @@ class UploadFilesRequest extends RepositoryPostRequest {
   });
 
   final List<File> files;
-  final int totalFileSize;
   final List<String>? inputPaths;
   final bool encrypt;
 }

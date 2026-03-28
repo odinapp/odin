@@ -598,7 +598,6 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
         final result = await repo.uploadFilesAnonymous(
           request: UploadFilesRequest(
             files: const <File>[],
-            totalFileSize: 0,
             inputPaths: selectedInputs,
             cancelToken: token,
             onSendProgress: (sent, total) =>

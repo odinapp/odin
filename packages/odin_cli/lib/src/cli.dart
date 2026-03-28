@@ -154,7 +154,6 @@ Future<int> _runUpload(
   final result = await repo.uploadFilesAnonymous(
     request: UploadFilesRequest(
       files: const <File>[],
-      totalFileSize: 0,
       inputPaths: paths,
       encrypt: encrypt,
     ),

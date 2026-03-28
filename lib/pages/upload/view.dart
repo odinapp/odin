@@ -43,7 +43,7 @@ class _UploadPageState extends State<UploadPage> {
   @override
   void initState() {
     super.initState();
-    _uploadFiles();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _uploadFiles());
   }
 
   Future<void> _uploadFiles() async {

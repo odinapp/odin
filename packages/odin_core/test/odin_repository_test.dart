@@ -58,7 +58,6 @@ void main() {
       final result = await repository.uploadFilesAnonymous(
         request: UploadFilesRequest(
           files: <File>[uploadFile],
-          totalFileSize: await uploadFile.length(),
           encrypt: false,
         ),
       );
@@ -95,7 +94,6 @@ void main() {
       final result = await repository.uploadFilesAnonymous(
         request: UploadFilesRequest(
           files: <File>[uploadFile],
-          totalFileSize: await uploadFile.length(),
           encrypt: true,
         ),
       );

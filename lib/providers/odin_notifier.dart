@@ -115,7 +115,6 @@ class OdinNotifier with ChangeNotifier {
     final result = await repo.uploadFilesAnonymous(
       request: core.UploadFilesRequest(
         files: files,
-        totalFileSize: selectedFilesSize,
         onSendProgress: (count, total) {
           if (total > 0) {
             _progress = count / total;

@@ -134,6 +134,24 @@ class OdinRepositoryImpl implements OdinRepository {
         )
         ..add(
           MapEntry<String, String>('totalFileSize', totalFileSize.toString()),
+        )
+        ..add(
+          MapEntry<String, String>(
+            'fileCount',
+            prepared.originalFiles.length.toString(),
+          ),
+        )
+        ..add(
+          MapEntry<String, String>(
+            'originalTotalFileSize',
+            prepared.originalTotalFileSize.toString(),
+          ),
+        )
+        ..add(
+          MapEntry<String, String>(
+            'isArchive',
+            prepared.usedCombinedZip.toString(),
+          ),
         );
       if (encryptedArtifact != null) {
         formData.fields
@@ -147,24 +165,6 @@ class OdinRepositoryImpl implements OdinRepository {
             MapEntry<String, String>(
               'encryptionKey',
               _encodeBase64UrlNoPadding(encryptedArtifact.key),
-            ),
-          )
-          ..add(
-            MapEntry<String, String>(
-              'fileCount',
-              prepared.originalFiles.length.toString(),
-            ),
-          )
-          ..add(
-            MapEntry<String, String>(
-              'originalTotalFileSize',
-              prepared.originalTotalFileSize.toString(),
-            ),
-          )
-          ..add(
-            MapEntry<String, String>(
-              'isArchive',
-              prepared.usedCombinedZip.toString(),
             ),
           );
       }
