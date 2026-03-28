@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:odin/constants/colors.dart';
-import 'package:odin/model/pending_upload.dart';
-import 'package:odin/providers/pending_uploads_notifier.dart';
+import 'package:odin/providers/odin_notifier.dart';
+import 'package:odin_core/odin_core.dart' as core;
 import 'package:provider/provider.dart';
 
 /// Reduces awkward line breaks in the middle of file extensions (e.g. `.jp` / `g`).
@@ -42,13 +42,13 @@ class _PendingUploadsHomeSectionState extends State<PendingUploadsHomeSection> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<PendingUploadsNotifier>().refresh();
+      context.read<OdinNotifier>().refreshPendingUploads();
     });
   }
 
   Future<void> _confirmDelete(
     BuildContext context,
-    PendingUpload upload,
+    core.PendingUpload upload,
   ) async {
     final color = widget.color;
     final ok = await showDialog<bool>(
@@ -97,7 +97,7 @@ class _PendingUploadsHomeSectionState extends State<PendingUploadsHomeSection> {
     );
     if (ok != true || !context.mounted) return;
 
-    final notifier = context.read<PendingUploadsNotifier>();
+    final notifier = context.read<OdinNotifier>();
     final success = await notifier.deleteUploadOnServer(upload);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -126,9 +126,9 @@ class _PendingUploadsHomeSectionState extends State<PendingUploadsHomeSection> {
     final bodySize = widget.compact ? 12.0 : 13.0;
     final tokenSize = widget.compact ? 11.0 : 12.0;
 
-    return Consumer<PendingUploadsNotifier>(
+    return Consumer<OdinNotifier>(
       builder: (context, pending, _) {
-        if (pending.items.isEmpty) {
+        if (pending.pendingItems.isEmpty) {
           if (!widget.showHeader) {
             return _PendingUploadsSheetEmpty(color: color);
           }
@@ -140,11 +140,11 @@ class _PendingUploadsHomeSectionState extends State<PendingUploadsHomeSection> {
           child: ListView.separated(
             shrinkWrap: true,
             physics: const ClampingScrollPhysics(),
-            itemCount: pending.items.length,
+            itemCount: pending.pendingItems.length,
             separatorBuilder: (context, index) =>
                 SizedBox(height: widget.compact ? 8 : 10),
             itemBuilder: (context, index) {
-              final u = pending.items[index];
+              final u = pending.pendingItems[index];
               final rawTitle = u.fileSummary ?? u.shareToken;
               final title = pendingUploadFileLabel(rawTitle);
               return Container(
@@ -187,7 +187,7 @@ class _PendingUploadsHomeSectionState extends State<PendingUploadsHomeSection> {
                             ),
                           ),
                           Text(
-                            PendingUploadsNotifier.timeRemainingLabel(u),
+                            OdinNotifier.timeRemainingLabel(u),
                             style: GoogleFonts.inter(
                               color: color.primary,
                               fontSize: tokenSize,

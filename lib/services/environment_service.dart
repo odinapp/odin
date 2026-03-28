@@ -1,18 +1,16 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:odin/model/environment_model.dart';
+import 'package:odin_core/odin_core.dart' as core;
 
 class EnvironmentService {
-  static final env = dotenv;
-  late final Environment environment;
+  late final core.OdinEnvironment environment;
 
-  /// Defaults when `.env` omits keys (avoids null cast in [Environment.fromJson]).
   static const _defaults = <String, String>{
     'API_URL': 'https://getodin.com/',
     'API_VERSION': 'v1',
     'SUCCESSFUL_STATUS_CODE': '200',
   };
 
-  Future<Environment> init() async {
+  Future<core.OdinEnvironment> init() async {
     await dotenv.load(fileName: '.env', isOptional: true);
 
     final resolved = Map<String, String>.from(dotenv.env);
@@ -23,7 +21,12 @@ class EnvironmentService {
       }
     }
 
-    environment = Environment.fromJson(resolved);
+    environment = core.OdinEnvironment(
+      apiUrl: resolved['API_URL']!,
+      apiVersion: resolved['API_VERSION']!,
+      successfulStatusCode:
+          int.tryParse(resolved['SUCCESSFUL_STATUS_CODE'] ?? '') ?? 200,
+    );
     return environment;
   }
 }

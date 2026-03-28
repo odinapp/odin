@@ -29,13 +29,13 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
     super.initState();
     _controller = TextEditingController();
     _focusNode = FocusNode();
-    final n = locator<DioNotifier>();
+    final n = locator<OdinNotifier>();
     n.downloadFileSuccess = null;
     n.downloadFileFailure = null;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        locator<DioNotifier>().apiStatus = ApiStatus.init;
-        locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+        locator<OdinNotifier>().apiStatus = ApiStatus.init;
+        locator<OdinNotifier>().miniApiStatus = ApiStatus.init;
         _focusNode.requestFocus();
       }
     });
@@ -50,20 +50,19 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
   }
 
   Future<void> _fetchMetadata() async {
-    await locator<DioNotifier>().fetchFilesMetadata(_token, (c, t) {});
+    await locator<OdinNotifier>().fetchFilesMetadata(_token, (c, t) {});
   }
 
   Future<void> _download() async {
-    final dioService = locator<DioService>();
-    final filePath = await dioService.getTempFilePath();
-    await locator<DioNotifier>().downloadFile(_token, filePath, (c, t) {
+    final filePath = await locator<OdinNotifier>().getTempFilePath();
+    await locator<OdinNotifier>().downloadFile(_token, filePath, (c, t) {
       logger.d('Downloaded $c/$t');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final notifier = Provider.of<DioNotifier>(context);
+    final notifier = Provider.of<OdinNotifier>(context);
     final miniStatus = notifier.miniApiStatus;
     final apiStatus = notifier.apiStatus;
 
@@ -163,7 +162,7 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
                                               if (value.length >= 6) {
                                                 _debounce.call(_fetchMetadata);
                                               } else {
-                                                locator<DioNotifier>()
+                                                locator<OdinNotifier>()
                                                         .miniApiStatus =
                                                     ApiStatus.init;
                                               }
@@ -379,7 +378,7 @@ class _DesktopCardMetadataLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (miniStatus == ApiStatus.success) {
-      final metadata = Provider.of<DioNotifier>(
+      final metadata = Provider.of<OdinNotifier>(
         context,
       ).fetchFilesMetadataSuccess?.filesMetadata;
       if (metadata == null) return SizedBox(height: 24.toAutoScaledHeight);
@@ -471,7 +470,7 @@ class _DesktopDownloadSuccessCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final file = Provider.of<DioNotifier>(context).downloadFileSuccess?.file;
+    final file = Provider.of<OdinNotifier>(context).downloadFileSuccess?.file;
 
     return desktopClampedTextScale(
       context,

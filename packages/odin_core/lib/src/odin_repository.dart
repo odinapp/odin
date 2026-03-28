@@ -180,13 +180,13 @@ class OdinRepositoryImpl implements OdinRepository {
         final data = (response.data is Map)
             ? (response.data as Map).cast<String, dynamic>()
             : <String, dynamic>{};
-        final shareToken = data['token']?.toString() ?? '';
-        final fileCode = parseShareToken(shareToken).fileCode;
+        final rawToken = data['token']?.toString() ?? '';
+        final shareToken = _extractTokenCode(rawToken);
 
         return Success(
           UploadFilesSuccess(
             token: shareToken,
-            fileCode: fileCode,
+            fileCode: shareToken,
             deleteToken: data['deleteToken'] as String?,
             encrypted: request.encrypt,
           ),
@@ -464,6 +464,24 @@ String _safeExtractDirectoryName(String tokenCode, String archiveName) {
   final raw = stem.isEmpty ? 'files_$tokenCode' : stem;
   final cleaned = raw.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
   return cleaned.isEmpty ? 'files_$tokenCode' : cleaned;
+}
+
+/// Extracts the bare token code from either a plain code or a full URL.
+/// e.g. "https://odin.example.com/d/WtkNajDg" → "WtkNajDg"
+///      "WtkNajDg" → "WtkNajDg"
+String _extractTokenCode(String raw) {
+  final trimmed = raw.trim();
+  final uri = Uri.tryParse(trimmed);
+  if (uri != null && uri.hasScheme) {
+    final segments = uri.pathSegments;
+    if (segments.length >= 2 && segments[segments.length - 2] == 'd') {
+      return segments.last;
+    }
+    if (segments.isNotEmpty) {
+      return segments.last;
+    }
+  }
+  return trimmed;
 }
 
 String _encodeBase64UrlNoPadding(List<int> bytes) {

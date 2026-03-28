@@ -9,8 +9,8 @@ import 'package:odin/constants/app.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/images.dart';
 import 'package:odin/constants/sharing_policy.dart';
-import 'package:odin/network/repository.dart';
-import 'package:odin/providers/dio_notifier.dart';
+import 'package:odin/providers/odin_notifier.dart';
+import 'package:odin_core/odin_core.dart' as core;
 import 'package:odin/router/router.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
@@ -47,7 +47,7 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   Future<void> _uploadFiles() async {
-    final dioNotifier = locator<DioNotifier>();
+    final dioNotifier = locator<OdinNotifier>();
     await dioNotifier.uploadFilesAnonymous(
       widget.uploadFiles,
       (count, total) {},
@@ -71,7 +71,7 @@ class _UploadPageState extends State<UploadPage> {
           ),
         ),
         child: () {
-          switch (Provider.of<DioNotifier>(context).apiStatus) {
+          switch (Provider.of<OdinNotifier>(context).apiStatus) {
             case ApiStatus.init:
             case ApiStatus.loading:
               return mobile ? _MobileLoadingBody(color: color) : const _Body();
@@ -109,7 +109,7 @@ class _FailedBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OColor color = OColor.withContext(context);
-    final failure = Provider.of<DioNotifier>(context).uploadFilesFailure;
+    final failure = Provider.of<OdinNotifier>(context).uploadFilesFailure;
     return Center(
       child: FailedBody(color: color, uploadFilesFailure: failure!),
     );
@@ -122,7 +122,7 @@ class _SuccessBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OColor color = OColor.withContext(context);
-    final success = Provider.of<DioNotifier>(context).uploadFilesSuccess;
+    final success = Provider.of<OdinNotifier>(context).uploadFilesSuccess;
     return Center(
       child: SuccessBody(color: color, uploadFilesSuccess: success!),
     );
@@ -138,7 +138,7 @@ class _MobileLoadingBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = Provider.of<DioNotifier>(context);
+    final notifier = Provider.of<OdinNotifier>(context);
     final fileName = notifier.selectedFiles.isNotEmpty
         ? (notifier.selectedFiles.length == 1
               ? notifier.selectedFiles.first.path.split('/').last
@@ -163,7 +163,7 @@ class _MobileLoadingBody extends StatelessWidget {
               mobileToolbarIconButton(
                 context: context,
                 onPressed: () {
-                  locator<DioNotifier>().cancelCurrentRequest();
+                  locator<OdinNotifier>().cancelCurrentRequest();
                   locator<AppRouter>().pop();
                 },
                 tooltip: oApp.currentConfig?.upload.backButtonText ?? 'Back',
@@ -263,7 +263,7 @@ class _MobileLoadingBody extends StatelessWidget {
                 height: 52,
                 child: OutlinedButton(
                   onPressed: () {
-                    locator<DioNotifier>().cancelCurrentRequest();
+                    locator<OdinNotifier>().cancelCurrentRequest();
                     locator<AppRouter>().pop();
                   },
                   style: OutlinedButton.styleFrom(
@@ -303,7 +303,7 @@ class _MobileSuccessBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final success = Provider.of<DioNotifier>(context).uploadFilesSuccess;
+    final success = Provider.of<OdinNotifier>(context).uploadFilesSuccess;
     final token = success?.token ?? '';
     final deleteToken = success?.deleteToken;
 
@@ -542,7 +542,7 @@ class _MobileFailedBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final message =
-        Provider.of<DioNotifier>(context).uploadFilesFailure?.message ??
+        Provider.of<OdinNotifier>(context).uploadFilesFailure?.message ??
         'Something went wrong.';
 
     return mobileClampedTextScale(

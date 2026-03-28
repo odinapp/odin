@@ -49,8 +49,8 @@ class _FileIcon extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            Provider.of<DioNotifier>(context).selectedFiles.isNotEmpty
-                ? Provider.of<DioNotifier>(
+            Provider.of<OdinNotifier>(context).selectedFiles.isNotEmpty
+                ? Provider.of<OdinNotifier>(
                     context,
                   ).selectedFiles.first.path.split('/').last[0].toUpperCase()
                 : '\$',
@@ -95,8 +95,8 @@ class _FileSizeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      Provider.of<DioNotifier>(context).selectedFiles.isNotEmpty
-          ? formatBytes(Provider.of<DioNotifier>(context).selectedFilesSize, 0)
+      Provider.of<OdinNotifier>(context).selectedFiles.isNotEmpty
+          ? formatBytes(Provider.of<OdinNotifier>(context).selectedFilesSize, 0)
           : '0 MB',
       style: color.textStyle(
         color: color.secondaryOnBackground,
@@ -116,12 +116,12 @@ class _FileNameText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      Provider.of<DioNotifier>(context).selectedFiles.isNotEmpty
-          ? Provider.of<DioNotifier>(context).selectedFiles.length == 1
-                ? Provider.of<DioNotifier>(
+      Provider.of<OdinNotifier>(context).selectedFiles.isNotEmpty
+          ? Provider.of<OdinNotifier>(context).selectedFiles.length == 1
+                ? Provider.of<OdinNotifier>(
                     context,
                   ).selectedFiles.first.path.split('/').last
-                : '${Provider.of<DioNotifier>(context).selectedFiles.first.path.split('/').last} + ${Provider.of<DioNotifier>(context).selectedFiles.length - 1} more'
+                : '${Provider.of<OdinNotifier>(context).selectedFiles.first.path.split('/').last} + ${Provider.of<OdinNotifier>(context).selectedFiles.length - 1} more'
           : 'File name does not exists.',
       style: color.textStyle(
         color: color.secondaryOnBackground,
@@ -155,7 +155,7 @@ class _ProgressBarBG extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 100),
             height: 96.toAutoScaledHeight,
-            width: (Provider.of<DioNotifier>(context).progress * 780)
+            width: (Provider.of<OdinNotifier>(context).progress * 780)
                 .toAutoScaledWidth,
             decoration: BoxDecoration(color: color.primary.withOpacity(0.2)),
           ),

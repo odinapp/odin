@@ -7,8 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:odin/constants/theme.dart';
 import 'package:odin/providers/booter_notifier.dart';
-import 'package:odin/providers/dio_notifier.dart';
-import 'package:odin/providers/pending_uploads_notifier.dart';
+import 'package:odin/providers/odin_notifier.dart';
 import 'package:odin/router/route_observer.dart';
 import 'package:odin/router/router.dart';
 import 'package:odin/services/environment_service.dart';
@@ -30,14 +29,11 @@ void main() {
         MultiProvider(
           providers: [
             // ChangeNotifierProvider<FileNotifier>(create: (_) => FileNotifier()),
-            ChangeNotifierProvider<DioNotifier>(
-              create: (_) => locator<DioNotifier>(),
+            ChangeNotifierProvider<OdinNotifier>(
+              create: (_) => locator<OdinNotifier>(),
             ),
             ChangeNotifierProvider<BooterNotifier>(
               create: (_) => locator<BooterNotifier>(),
-            ),
-            ChangeNotifierProvider<PendingUploadsNotifier>.value(
-              value: locator<PendingUploadsNotifier>(),
             ),
           ],
           child: const MyApp(),

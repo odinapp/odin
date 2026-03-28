@@ -6,9 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:odin/constants/app.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/images.dart';
-import 'package:odin/providers/dio_notifier.dart';
+import 'package:odin/providers/odin_notifier.dart';
 import 'package:odin/router/router.dart';
-import 'package:odin/services/dio_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
 import 'package:odin/services/logger.dart';
@@ -101,16 +100,16 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
     _controller = TextEditingController();
     _focusNode = FocusNode();
     // Clear download result immediately so the first frame never shows a stale
-    // success UI from a prior session on the same [DioNotifier].
-    final n = locator<DioNotifier>();
+    // success UI from a prior session on the same [OdinNotifier].
+    final n = locator<OdinNotifier>();
     n.downloadFileSuccess = null;
     n.downloadFileFailure = null;
     // Reset stale status from a previous upload/download — deferred to avoid
     // calling notifyListeners() during an ongoing build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        locator<DioNotifier>().apiStatus = ApiStatus.init;
-        locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+        locator<OdinNotifier>().apiStatus = ApiStatus.init;
+        locator<OdinNotifier>().miniApiStatus = ApiStatus.init;
         _focusNode.requestFocus();
       }
     });
@@ -125,20 +124,19 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   }
 
   Future<void> _fetchMetadata() async {
-    await locator<DioNotifier>().fetchFilesMetadata(_token, (c, t) {});
+    await locator<OdinNotifier>().fetchFilesMetadata(_token, (c, t) {});
   }
 
   Future<void> _download() async {
-    final dioService = locator<DioService>();
-    final filePath = await dioService.getTempFilePath();
-    await locator<DioNotifier>().downloadFile(_token, filePath, (c, t) {
+    final filePath = await locator<OdinNotifier>().getTempFilePath();
+    await locator<OdinNotifier>().downloadFile(_token, filePath, (c, t) {
       logger.d('Downloaded $c/$t');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final notifier = Provider.of<DioNotifier>(context);
+    final notifier = Provider.of<OdinNotifier>(context);
     final miniStatus = notifier.miniApiStatus;
     final apiStatus = notifier.apiStatus;
 
@@ -206,7 +204,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                   if (value.length >= 6) {
                     _debounce.call(_fetchMetadata);
                   } else {
-                    locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+                    locator<OdinNotifier>().miniApiStatus = ApiStatus.init;
                   }
                 },
               ),
@@ -280,7 +278,7 @@ class _MobileMetadataHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final metadata = Provider.of<DioNotifier>(
+    final metadata = Provider.of<OdinNotifier>(
       context,
     ).fetchFilesMetadataSuccess?.filesMetadata;
     if (metadata == null) return const SizedBox.shrink();
@@ -350,7 +348,7 @@ class _MobileDownloadSuccess extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final file = Provider.of<DioNotifier>(context).downloadFileSuccess?.file;
+    final file = Provider.of<OdinNotifier>(context).downloadFileSuccess?.file;
 
     return mobileClampedTextScale(
       context,

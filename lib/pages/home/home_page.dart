@@ -15,7 +15,7 @@ import 'package:odin/utilities/mobile_a11y.dart';
 import 'package:odin/utilities/responsive.dart';
 import 'package:odin/widgets/pending_uploads_home_section.dart';
 import 'package:provider/provider.dart';
-import 'package:odin/providers/pending_uploads_notifier.dart';
+import 'package:odin/providers/odin_notifier.dart';
 
 part 'widgets/main_container.dart';
 part 'widgets/bg_illustration.dart';
@@ -349,9 +349,9 @@ class _MobilePendingUploadsAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PendingUploadsNotifier>(
+    return Consumer<OdinNotifier>(
       builder: (context, pending, _) {
-        final n = pending.items.length;
+        final n = pending.pendingItems.length;
         final icon = Icon(
           Icons.upload_outlined,
           size: 24,
