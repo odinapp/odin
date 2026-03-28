@@ -63,7 +63,9 @@ class _SuccessContent extends StatelessWidget {
             ),
           ],
         ),
-        if (Provider.of<OdinNotifier>(context).uploadFilesSuccess?.deleteToken !=
+        if (Provider.of<OdinNotifier>(
+              context,
+            ).uploadFilesSuccess?.deleteToken !=
             null)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 60.0.toAutoScaledWidth),
