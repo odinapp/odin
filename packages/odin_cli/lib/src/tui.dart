@@ -5,12 +5,83 @@ import 'package:dio/dio.dart';
 import 'package:odin_core/odin_core.dart';
 import 'package:path/path.dart' as p;
 
+import 'cli_storage.dart';
+
+/// Turn clipboard text into an 8-char file code when possible (raw code, URL, or line paste).
+String _normalizeClipboardToToken(String raw) {
+  final line = raw.split(RegExp(r'[\r\n]+')).first.trim();
+  if (line.isEmpty) return '';
+  try {
+    return parseShareToken(line).fileCode;
+  } on FormatException {
+    final m = RegExp(r'[A-Za-z0-9]{8}').firstMatch(line);
+    if (m != null) return m.group(0)!;
+    return line;
+  }
+}
+
+String _pendingTimeLeft(PendingUpload u) {
+  final d = u.expiresAt.difference(DateTime.now());
+  if (d.isNegative) return 'expired';
+  final h = d.inHours;
+  final m = d.inMinutes.remainder(60);
+  if (h > 0) return '${h}h ${m}m left';
+  if (m > 0) return '${m}m left';
+  return 'soon';
+}
+
+String _fileSummaryFromPaths(List<String> paths) {
+  if (paths.isEmpty) return '';
+  final parts = paths.map((x) => p.basename(x)).join(', ');
+  const maxLen = 56;
+  if (parts.length <= maxLen) return parts;
+  return '${parts.substring(0, maxLen - 3)}...';
+}
+
+String _pendingLineLabel(PendingUpload u) {
+  final summary = u.fileSummary ?? '';
+  final short = summary.length > 40
+      ? '${summary.substring(0, 37)}...'
+      : summary;
+  final time = _pendingTimeLeft(u);
+  if (short.isEmpty) return '${u.shareToken}  ($time)';
+  return '${u.shareToken}  ($time)  $short';
+}
+
+/// Determinate bar matching [ProgressModel] glyphs, with a gradient on the filled segment.
+String _gradientProgressView({
+  required double fraction,
+  required int width,
+  required String label,
+  required bool plainUi,
+}) {
+  final f = fraction.clamp(0.0, 1.0);
+  final filled = (f * width).round().clamp(0, width);
+  final empty = width - filled;
+  final pct = (f * 100).round();
+  const emptyStyle = Style(foregroundRgb: RgbColor(88, 91, 112));
+  const labelStyle = Style(foregroundRgb: RgbColor(166, 173, 200));
+  const pctStyle = Style(foregroundRgb: RgbColor(205, 214, 244), isBold: true);
+  final filledStr = '█' * filled;
+  final filledRendered = plainUi || filled == 0
+      ? const Style(foregroundRgb: RgbColor(203, 166, 247)).render(filledStr)
+      : gradientText(filledStr, const <RgbColor>[
+          RgbColor(203, 166, 247),
+          RgbColor(137, 180, 250),
+          RgbColor(166, 227, 161),
+        ]);
+  final bar = '$filledRendered${emptyStyle.render('░' * empty)}';
+  final labelPart = label.isEmpty ? '' : '${labelStyle.render(label)} ';
+  return '$labelPart$bar ${pctStyle.render('$pct%')}';
+}
+
 enum _Screen {
   menu,
   uploadPick,
   uploadConfirm,
   uploadRunning,
   uploadDone,
+  pendingPick,
   downloadToken,
   downloadPickDir,
   downloadRunning,
@@ -45,6 +116,17 @@ final class _DownloadCompletedMsg extends Msg {
   final Result<DownloadFileSuccess, DownloadFileFailure> result;
 }
 
+final class _PendingUploadsUpdatedMsg extends Msg {
+  _PendingUploadsUpdatedMsg(this.items);
+  final List<PendingUpload> items;
+}
+
+final class _PendingDeleteResultMsg extends Msg {
+  _PendingDeleteResultMsg({required this.ok, this.message});
+  final bool ok;
+  final String? message;
+}
+
 final class _TuiKeys implements KeyMap {
   const _TuiKeys();
 
@@ -76,6 +158,22 @@ final class _TuiKeys implements KeyMap {
     keys: <String>['q', 'ctrl+c'],
     help: (key: 'q', description: 'quit'),
   );
+  static const copyToken = KeyBinding(
+    keys: <String>['c'],
+    help: (
+      key: 'c',
+      description:
+          'copy token (after upload / pending list) · clear pick (upload)',
+    ),
+  );
+  static const pasteToken = KeyBinding(
+    keys: <String>['right'],
+    help: (key: '→', description: 'paste clipboard at end of token field'),
+  );
+  static const pendingDelete = KeyBinding(
+    keys: <String>['d'],
+    help: (key: 'd', description: 'delete on server (pending list)'),
+  );
 
   @override
   List<KeyBinding> get bindings => <KeyBinding>[
@@ -83,6 +181,9 @@ final class _TuiKeys implements KeyMap {
     down,
     done,
     selectDir,
+    copyToken,
+    pasteToken,
+    pendingDelete,
     back,
     helpKey,
     quit,
@@ -111,20 +212,43 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     SpinnerModel? spinner,
     this.cancelToken,
     this.outcome,
+    this.plainUi = false,
+    this.statusBanner,
+    required this.storage,
+    this.pendingUploads = const <PendingUpload>[],
+    this.pendingList,
+    this.pendingNotice,
   }) : spinner = spinner ?? SpinnerModel(suffix: ' Working...');
+
+  /// Main menu rows: Upload, Download, optional Pending uploads (N), Quit.
+  static SelectListModel mainMenuFor({
+    required List<PendingUpload> pendingUploads,
+    int cursor = 0,
+  }) {
+    final items = <String>['Upload', 'Download'];
+    if (pendingUploads.isNotEmpty) {
+      items.add('Pending uploads (${pendingUploads.length})');
+    }
+    items.add('Quit');
+    final c = cursor.clamp(0, items.length - 1);
+    return SelectListModel(title: '', items: items, cursor: c);
+  }
 
   factory _OdinTuiModel.initial({
     required OdinRepository repo,
     required Program program,
+    required OdinStorage storage,
+    List<PendingUpload> pendingUploads = const <PendingUpload>[],
+    bool plainUi = false,
   }) {
     return _OdinTuiModel(
       repo: repo,
       program: program,
+      storage: storage,
+      pendingUploads: pendingUploads,
+      plainUi: plainUi,
       screen: _Screen.menu,
-      menu: SelectListModel(
-        title: 'Odin CLI',
-        items: const <String>['Upload', 'Download', 'Quit'],
-      ),
+      menu: mainMenuFor(pendingUploads: pendingUploads),
       help: HelpModel.fromKeyMap(const _TuiKeys()),
     );
   }
@@ -149,6 +273,23 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
   final SpinnerModel spinner;
   final CancelToken? cancelToken;
 
+  /// When true (e.g. `NO_COLOR`), skip RGB gradients in the view.
+  final bool plainUi;
+
+  /// Short-lived hint (e.g. after copying token to clipboard).
+  final String? statusBanner;
+
+  final OdinStorage storage;
+
+  /// Non-expired uploads persisted for this CLI (`~/.odin/pending_uploads.json`).
+  final List<PendingUpload> pendingUploads;
+
+  /// Set on [pendingPick] only; labels from [_pendingLineLabel].
+  final SelectListModel? pendingList;
+
+  /// Status line on the pending screen (copy/delete feedback).
+  final String? pendingNotice;
+
   @override
   final int? outcome;
 
@@ -171,10 +312,18 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     SpinnerModel? spinner,
     CancelToken? cancelToken,
     int? outcome,
+    bool? plainUi,
+    String? statusBanner,
     bool clearFilePicker = false,
     bool clearTokenInput = false,
     bool clearMetadata = false,
     bool clearError = false,
+    bool clearStatusBanner = false,
+    List<PendingUpload>? pendingUploads,
+    SelectListModel? pendingList,
+    String? pendingNotice,
+    bool clearPendingList = false,
+    bool clearPendingNotice = false,
   }) {
     return _OdinTuiModel(
       repo: repo,
@@ -201,6 +350,16 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
       spinner: spinner ?? this.spinner,
       cancelToken: cancelToken ?? this.cancelToken,
       outcome: outcome ?? this.outcome,
+      plainUi: plainUi ?? this.plainUi,
+      statusBanner: clearStatusBanner
+          ? null
+          : (statusBanner ?? this.statusBanner),
+      pendingUploads: pendingUploads ?? this.pendingUploads,
+      pendingList: clearPendingList ? null : (pendingList ?? this.pendingList),
+      pendingNotice: clearPendingNotice
+          ? null
+          : (pendingNotice ?? this.pendingNotice),
+      storage: storage,
     );
   }
 
@@ -223,6 +382,61 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
       return (copyWith(spinner: nextSpinner as SpinnerModel), null);
     }
 
+    if (msg is _PendingUploadsUpdatedMsg) {
+      final next = msg.items;
+      if (screen == _Screen.pendingPick) {
+        if (next.isEmpty) {
+          return (
+            copyWith(
+              pendingUploads: next,
+              screen: _Screen.menu,
+              clearPendingList: true,
+              clearPendingNotice: true,
+              menu: _OdinTuiModel.mainMenuFor(
+                pendingUploads: next,
+                cursor: menu.cursor,
+              ),
+            ),
+            null,
+          );
+        }
+        final pl = pendingList!;
+        var nc = pl.cursor;
+        if (nc >= next.length) {
+          nc = next.length - 1;
+        }
+        return (
+          copyWith(
+            pendingUploads: next,
+            pendingList: SelectListModel(
+              title: '',
+              items: next.map(_pendingLineLabel).toList(),
+              cursor: nc,
+            ),
+          ),
+          null,
+        );
+      }
+      if (screen == _Screen.menu) {
+        return (
+          copyWith(
+            pendingUploads: next,
+            menu: _OdinTuiModel.mainMenuFor(
+              pendingUploads: next,
+              cursor: menu.cursor,
+            ),
+          ),
+          null,
+        );
+      }
+      return (copyWith(pendingUploads: next), null);
+    }
+
+    if (msg is _PendingDeleteResultMsg) {
+      if (screen != _Screen.pendingPick) return (this, null);
+      return _updatePendingPick(msg);
+    }
+
     switch (screen) {
       case _Screen.menu:
         return _updateMenu(msg);
@@ -234,6 +448,8 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
         return _updateUploadRunning(msg);
       case _Screen.uploadDone:
         return _updateUploadDone(msg);
+      case _Screen.pendingPick:
+        return _updatePendingPick(msg);
       case _Screen.downloadToken:
         return _updateDownloadToken(msg);
       case _Screen.downloadPickDir:
@@ -247,8 +463,22 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     }
   }
 
+  _OdinTuiModel _withMainMenu() => copyWith(
+    screen: _Screen.menu,
+    clearPendingList: true,
+    clearPendingNotice: true,
+    menu: _OdinTuiModel.mainMenuFor(
+      pendingUploads: pendingUploads,
+      cursor: menu.cursor,
+    ),
+  );
+
   (Model, Cmd?) _updateMenu(Msg msg) {
     if (msg is KeyMsg && msg.key == 'enter') {
+      final quitIdx = menu.items.length - 1;
+      if (menu.cursor == quitIdx) {
+        return (copyWith(outcome: 0), () => quit());
+      }
       if (menu.cursor == 0) {
         final picker = FilePickerModel(
           currentDir: Directory.current.path,
@@ -280,6 +510,19 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
           null,
         );
       }
+      if (pendingUploads.isNotEmpty && menu.cursor == 2) {
+        return (
+          copyWith(
+            screen: _Screen.pendingPick,
+            pendingList: SelectListModel(
+              title: '',
+              items: pendingUploads.map(_pendingLineLabel).toList(),
+            ),
+            clearPendingNotice: true,
+          ),
+          null,
+        );
+      }
       return (copyWith(outcome: 0), () => quit());
     }
 
@@ -287,20 +530,130 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     return (copyWith(menu: nextMenu as SelectListModel), cmd);
   }
 
-  (Model, Cmd?) _updateUploadPick(Msg msg) {
-    final picker = filePicker;
-    if (picker == null) {
+  (Model, Cmd?) _updatePendingPick(Msg msg) {
+    final pl = pendingList;
+    if (pl == null || pendingUploads.isEmpty) {
       return (
         copyWith(
           screen: _Screen.menu,
-          errorMessage: 'File picker unavailable.',
+          clearPendingList: true,
+          clearPendingNotice: true,
+          menu: _OdinTuiModel.mainMenuFor(
+            pendingUploads: pendingUploads,
+            cursor: menu.cursor,
+          ),
         ),
         null,
       );
     }
 
+    if (msg is _PendingDeleteResultMsg) {
+      if (!msg.ok) {
+        return (copyWith(pendingNotice: msg.message ?? 'Delete failed'), null);
+      }
+      return (copyWith(pendingNotice: 'Deleted on server.'), null);
+    }
+
+    if (msg is KeyMsg && msg.key == 'esc') {
+      return (
+        copyWith(
+          screen: _Screen.menu,
+          clearPendingList: true,
+          clearPendingNotice: true,
+          menu: _OdinTuiModel.mainMenuFor(
+            pendingUploads: pendingUploads,
+            cursor: menu.cursor,
+          ),
+        ),
+        null,
+      );
+    }
+
+    if (msg is KeyMsg && msg.key == 'c') {
+      final i = pl.cursor.clamp(0, pendingUploads.length - 1);
+      final token = pendingUploads[i].shareToken;
+      return (
+        copyWith(pendingNotice: 'Copied token $token'),
+        setClipboard(token),
+      );
+    }
+
+    if (msg is KeyMsg && msg.key == 'd') {
+      _deletePendingAtCursor();
+      return (this, null);
+    }
+
+    final (nextList, cmd) = pl.update(msg);
+    return (copyWith(pendingList: nextList as SelectListModel), cmd);
+  }
+
+  void _deletePendingAtCursor() {
+    final pl = pendingList;
+    if (pl == null || pendingUploads.isEmpty) return;
+    final i = pl.cursor.clamp(0, pendingUploads.length - 1);
+    _deletePendingOnServer(pendingUploads[i]);
+  }
+
+  void _deletePendingOnServer(PendingUpload upload) {
+    Future<void>(() async {
+      try {
+        if (upload.deleteUrl.isEmpty) {
+          program.send(
+            _PendingDeleteResultMsg(
+              ok: false,
+              message: 'No delete URL stored for this upload.',
+            ),
+          );
+          return;
+        }
+        final dio = Dio(
+          BaseOptions(
+            connectTimeout: const Duration(seconds: 25),
+            receiveTimeout: const Duration(seconds: 25),
+            validateStatus: (code) => code != null && code < 500,
+            followRedirects: true,
+            responseType: ResponseType.plain,
+          ),
+        );
+        final response = await dio.get<dynamic>(upload.deleteUrl);
+        final code = response.statusCode ?? 0;
+        final ok = code >= 200 && code < 400;
+        if (ok) {
+          await storage.init();
+          final list = (await storage.loadPendingUploads())
+              .where((u) => u.id != upload.id)
+              .toList();
+          await storage.savePendingUploads(list);
+          final fresh = list
+              .where((u) => u.expiresAt.isAfter(DateTime.now()))
+              .toList();
+          program.send(_PendingUploadsUpdatedMsg(fresh));
+          program.send(_PendingDeleteResultMsg(ok: true));
+        } else {
+          program.send(
+            _PendingDeleteResultMsg(
+              ok: false,
+              message: 'Delete failed (HTTP $code)',
+            ),
+          );
+        }
+      } on Object catch (e) {
+        program.send(_PendingDeleteResultMsg(ok: false, message: '$e'));
+      }
+    });
+  }
+
+  (Model, Cmd?) _updateUploadPick(Msg msg) {
+    final picker = filePicker;
+    if (picker == null) {
+      return (
+        _withMainMenu().copyWith(errorMessage: 'File picker unavailable.'),
+        null,
+      );
+    }
+
     if (msg is KeyMsg) {
-      if (msg.key == 'esc') return (copyWith(screen: _Screen.menu), null);
+      if (msg.key == 'esc') return (_withMainMenu(), null);
       if (msg.key == 'd' && selectedInputs.isNotEmpty) {
         return (copyWith(screen: _Screen.uploadConfirm), null);
       }
@@ -367,11 +720,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     if (msg is KeyMsg && msg.key == 'esc') {
       cancelToken?.cancel('Cancelled by user');
       return (
-        copyWith(
-          screen: _Screen.menu,
-          clearError: true,
-          cancelToken: CancelToken(),
-        ),
+        _withMainMenu().copyWith(clearError: true, cancelToken: CancelToken()),
         null,
       );
     }
@@ -385,6 +734,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     if (msg case _UploadCompletedMsg(:final result)) {
       return result.resolve(
         (success) {
+          _persistPendingUpload(success);
           return (
             copyWith(
               screen: _Screen.uploadDone,
@@ -413,18 +763,39 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
 
   (Model, Cmd?) _updateUploadDone(Msg msg) {
     if (msg is! KeyMsg) return (this, null);
+    if (msg.key == 'c' && (lastToken?.isNotEmpty ?? false)) {
+      return (
+        copyWith(statusBanner: 'Token copied to clipboard.'),
+        setClipboard(lastToken!),
+      );
+    }
     if (msg.key == 'enter' || msg.key == 'esc') {
-      return (copyWith(screen: _Screen.menu), null);
+      return (_withMainMenu().copyWith(clearStatusBanner: true), null);
+    }
+    if (statusBanner != null) {
+      return (copyWith(clearStatusBanner: true), null);
     }
     return (this, null);
   }
 
   (Model, Cmd?) _updateDownloadToken(Msg msg) {
     final input = tokenInput;
-    if (input == null) return (copyWith(screen: _Screen.menu), null);
+    if (input == null) return (_withMainMenu(), null);
+
+    if (msg is ClipboardMsg) {
+      final fragment = _normalizeClipboardToToken(msg.content);
+      if (fragment.isEmpty) return (this, null);
+      final merged = _mergeIntoTextInput(input, fragment);
+      return (copyWith(tokenInput: merged), null);
+    }
 
     if (msg is KeyMsg && msg.key == 'esc') {
-      return (copyWith(screen: _Screen.menu), null);
+      return (_withMainMenu(), null);
+    }
+    if (msg is KeyMsg &&
+        msg.key == 'right' &&
+        input.cursorPos >= input.value.length) {
+      return (this, () => readClipboard());
     }
     if (msg is KeyMsg && msg.key == 'enter') {
       final token = input.value.trim();
@@ -460,7 +831,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
 
   (Model, Cmd?) _updateDownloadPickDir(Msg msg) {
     final picker = filePicker;
-    if (picker == null) return (copyWith(screen: _Screen.menu), null);
+    if (picker == null) return (_withMainMenu(), null);
 
     if (msg case _MetadataCompletedMsg(:final result)) {
       return result.resolve(
@@ -498,7 +869,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     }
 
     if (msg is KeyMsg) {
-      if (msg.key == 'esc') return (copyWith(screen: _Screen.menu), null);
+      if (msg.key == 'esc') return (_withMainMenu(), null);
       if (msg.key == 's') return _beginDownloadFromDir(picker.currentDir);
       if (msg.key == 'enter' && picker.selected != null) {
         final selected = picker.selected!;
@@ -543,7 +914,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
   (Model, Cmd?) _updateDownloadRunning(Msg msg) {
     if (msg is KeyMsg && msg.key == 'esc') {
       cancelToken?.cancel('Cancelled by user');
-      return (copyWith(screen: _Screen.menu), null);
+      return (_withMainMenu(), null);
     }
     if (msg case _DownloadProgressMsg(:final received, :final total)) {
       if (total <= 0) return (this, null);
@@ -579,7 +950,7 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
   (Model, Cmd?) _updateDownloadDone(Msg msg) {
     if (msg is! KeyMsg) return (this, null);
     if (msg.key == 'enter' || msg.key == 'esc') {
-      return (copyWith(screen: _Screen.menu), null);
+      return (_withMainMenu(), null);
     }
     return (this, null);
   }
@@ -587,9 +958,46 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
   (Model, Cmd?) _updateError(Msg msg) {
     if (msg is! KeyMsg) return (this, null);
     if (msg.key == 'enter' || msg.key == 'esc') {
-      return (copyWith(screen: _Screen.menu, clearError: true), null);
+      return (_withMainMenu().copyWith(clearError: true), null);
     }
     return (this, null);
+  }
+
+  void _persistPendingUpload(UploadFilesSuccess success) {
+    final paths = List<String>.from(selectedInputs);
+    Future<void>(() async {
+      try {
+        final deleteUrl = success.deleteToken ?? '';
+        await storage.init();
+        var list = await storage.loadPendingUploads();
+        list = list.where((u) => u.expiresAt.isAfter(DateTime.now())).toList();
+        if (deleteUrl.isNotEmpty) {
+          list = list.where((u) => u.deleteUrl != deleteUrl).toList();
+        }
+        final now = DateTime.now();
+        final summaryLabel = _fileSummaryFromPaths(paths);
+        list.insert(
+          0,
+          PendingUpload(
+            id: now.millisecondsSinceEpoch.toString(),
+            shareToken: success.token,
+            deleteUrl: deleteUrl,
+            expiresAt: now.add(Duration(hours: kPendingUploadTtlHours)),
+            createdAt: now,
+            fileSummary: summaryLabel.isEmpty ? null : summaryLabel,
+          ),
+        );
+        await storage.savePendingUploads(list);
+        final fresh = await storage.loadPendingUploads();
+        program.send(
+          _PendingUploadsUpdatedMsg(
+            fresh.where((u) => u.expiresAt.isAfter(DateTime.now())).toList(),
+          ),
+        );
+      } on Object {
+        // Ignore persistence failures (read-only home, etc.).
+      }
+    });
   }
 
   void _startUpload(CancelToken token) {
@@ -634,6 +1042,23 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     });
   }
 
+  /// Inserts [fragment] at [input]'s cursor (used after clipboard read).
+  TextInputModel _mergeIntoTextInput(TextInputModel input, String fragment) {
+    final limit = input.charLimit;
+    var insert = fragment;
+    if (limit > 0) {
+      final room = limit - input.value.length;
+      if (room <= 0) return input;
+      if (insert.length > room) insert = insert.substring(0, room);
+    }
+    final newValue =
+        input.value.substring(0, input.cursorPos) +
+        insert +
+        input.value.substring(input.cursorPos);
+    final newPos = input.cursorPos + insert.length;
+    return input.copyWith(value: newValue, cursorPos: newPos);
+  }
+
   void _startDownload(String dir, CancelToken token) {
     Future<void>(() async {
       final result = await repo.downloadFile(
@@ -649,36 +1074,94 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
     });
   }
 
+  String _brandTitle() {
+    if (plainUi) {
+      return const Style(isBold: true).render('ODIN CLI');
+    }
+    return gradientText('ODIN CLI', const <RgbColor>[
+      RgbColor(203, 166, 247),
+      RgbColor(137, 180, 250),
+      RgbColor(166, 227, 161),
+    ]);
+  }
+
+  String _sectionTitle(String text) {
+    if (plainUi) {
+      return const Style(
+        foregroundRgb: RgbColor(203, 166, 247),
+        isBold: true,
+      ).render(text);
+    }
+    return gradientText(text, const <RgbColor>[
+      RgbColor(203, 166, 247),
+      RgbColor(137, 180, 250),
+    ]);
+  }
+
   @override
   View view() {
-    final b = StringBuffer();
-    b.writeln(const Style(isBold: true).render('ODIN CLI'));
-    b.writeln();
+    final body = StringBuffer();
+
     switch (screen) {
       case _Screen.menu:
-        b.write(menu.view().content);
-      case _Screen.uploadPick:
-        b.writeln(
-          'Upload: pick files/dirs (enter add file, s add current dir, d continue)',
+        final tagline = const Style(
+          isDim: true,
+        ).render('Encrypted share · pick an action');
+        final listBlock = menu.view().content;
+        final navHint = const Style(isDim: true).render('↑/↓ j/k · enter');
+        body.writeln(
+          joinHorizontal(0.0, <String>[
+            joinVertical(0.0, <String>[tagline, '', listBlock]),
+            navHint,
+          ]),
         );
-        b.writeln();
-        b.write(filePicker?.view().content ?? '');
-        b.writeln();
-        b.writeln();
-        b.writeln('Selected items (${selectedInputs.length}):');
+        if (pendingUploads.isNotEmpty) {
+          body.writeln();
+          body.writeln(
+            const Style(isDim: true).render(
+              'Select "Pending uploads" to scroll, copy token (c), or delete on server (d).',
+            ),
+          );
+        }
+      case _Screen.uploadPick:
+        body.writeln(_sectionTitle('Upload'));
+        body.writeln(
+          const Style(isDim: true).render(
+            'Pick files or folders · enter add file · s add cwd · d continue',
+          ),
+        );
+        body.writeln();
+        body.write(filePicker?.view().content ?? '');
+        body.writeln();
+        body.writeln();
+        body.writeln(
+          const Style(
+            isBold: true,
+          ).render('Selected (${selectedInputs.length})'),
+        );
         if (selectedInputs.isEmpty) {
-          b.writeln('  (none)');
+          body.writeln(const Style(isDim: true).render('  (none)'));
         } else {
           for (final input in selectedInputs.take(8)) {
             final isDir = FileSystemEntity.isDirectorySync(input);
-            b.writeln('  - ${p.basename(input)}${isDir ? '/' : ''}');
+            body.writeln(
+              '  ${const Style(foregroundRgb: RgbColor(166, 227, 161)).render('-')} '
+              '${p.basename(input)}${isDir ? '/' : ''}',
+            );
           }
           if (selectedInputs.length > 8) {
-            b.writeln('  ... ${selectedInputs.length - 8} more');
+            body.writeln(
+              const Style(
+                isDim: true,
+              ).render('  ... ${selectedInputs.length - 8} more'),
+            );
           }
         }
-        b.writeln(
-          'Keys: enter add/open · s add current dir · d continue · c clear · esc back',
+        body.writeln();
+        body.writeln(
+          const Style(
+            isDim: true,
+          ).render('enter open · s dir · d done · c clear · esc back'),
         );
       case _Screen.uploadConfirm:
         final hasDirectory = selectedInputs.any(
@@ -688,95 +1171,159 @@ final class _OdinTuiModel extends TeaModel implements OutcomeModel<int> {
           if (File(path).existsSync()) return sum + File(path).lengthSync();
           return sum;
         });
-        b.writeln('Upload confirm');
-        b.writeln('Selected items: ${selectedInputs.length}');
+        body.writeln(_sectionTitle('Confirm upload'));
+        body.writeln('Items: ${selectedInputs.length}');
         if (hasDirectory) {
-          b.writeln(
-            'Packaging: combined .zip will be created before upload (root folders preserved)',
+          body.writeln(
+            const Style(
+              isDim: true,
+            ).render('Folders → combined .zip (roots preserved)'),
           );
         } else {
-          b.writeln('Total size: ${formatBytes(totalBytes)}');
+          body.writeln('Size: ${formatBytes(totalBytes)}');
         }
-        b.writeln();
-        b.writeln('Press enter to start upload, esc to go back.');
+        body.writeln();
+        body.writeln(
+          const Style(isDim: true).render('enter upload · esc back'),
+        );
       case _Screen.uploadRunning:
-        b.writeln('Uploading...');
-        b.writeln();
-        b.writeln(spinner.view().content);
-        b.writeln();
-        b.writeln(
-          ProgressModel(
+        body.writeln(_sectionTitle('Uploading'));
+        body.writeln();
+        body.writeln(spinner.view().content);
+        body.writeln();
+        body.writeln(
+          _gradientProgressView(
             fraction: uploadFraction,
-            label: 'Progress',
             width: 48,
-          ).view().content,
+            label: 'Progress',
+            plainUi: plainUi,
+          ),
         );
-        b.writeln('Press esc to cancel.');
+        body.writeln();
+        body.writeln(const Style(isDim: true).render('esc cancel'));
       case _Screen.uploadDone:
-        b.writeln('Upload complete.');
-        b.writeln();
-        b.writeln('Token: ${lastToken ?? ''}');
-        b.writeln();
-        b.writeln('Press enter to return to menu.');
-      case _Screen.downloadToken:
-        b.writeln('Download: enter token');
-        b.writeln();
-        b.write(tokenInput?.view().content ?? '');
-        b.writeln();
-        b.writeln();
-        b.writeln('Press enter to continue, esc to menu.');
-      case _Screen.downloadPickDir:
-        b.writeln('Download: choose output directory');
-        b.writeln();
-        b.write(filePicker?.view().content ?? '');
-        b.writeln();
-        b.writeln();
-        b.writeln('Metadata (optional):');
-        if (metadataTable != null) {
-          b.writeln(metadataTable!.view().content);
-        } else if (metadataError != null) {
-          b.writeln('  $metadataError');
-        } else {
-          b.writeln('  Loading metadata...');
+        body.writeln(_sectionTitle('Upload complete'));
+        body.writeln();
+        final tok = lastToken ?? '';
+        final tokenLine = joinHorizontal(0.0, <String>[
+          const Style(isBold: true).render('Token  '),
+          if (plainUi)
+            Style(foregroundRgb: const RgbColor(166, 227, 161)).render(tok)
+          else
+            gradientText(tok, const <RgbColor>[
+              RgbColor(166, 227, 161),
+              RgbColor(137, 180, 250),
+            ]),
+        ]);
+        body.writeln(tokenLine);
+        final banner = statusBanner;
+        if (banner != null) {
+          body.writeln();
+          body.writeln(
+            const Style(foregroundRgb: RgbColor(166, 227, 161)).render(banner),
+          );
         }
-        b.writeln();
-        b.writeln('Keys: s save here · enter choose selected · esc back');
-      case _Screen.downloadRunning:
-        b.writeln('Downloading...');
-        b.writeln();
-        b.writeln(spinner.view().content);
-        b.writeln();
-        b.writeln(
-          ProgressModel(
-            fraction: downloadFraction,
-            label: 'Progress',
-            width: 48,
-          ).view().content,
+        body.writeln();
+        body.writeln(
+          const Style(isDim: true).render('c copy · enter menu · esc menu'),
         );
-        b.writeln('Press esc to cancel.');
+      case _Screen.pendingPick:
+        body.writeln(_sectionTitle('Pending uploads'));
+        body.writeln(
+          const Style(isDim: true).render(
+            '↑/↓ j/k move · c copy token · d delete on server · esc back',
+          ),
+        );
+        body.writeln();
+        if (pendingList != null) {
+          body.write(pendingList!.view().content);
+        }
+        final notice = pendingNotice;
+        if (notice != null && notice.isNotEmpty) {
+          body.writeln();
+          body.writeln(
+            const Style(foregroundRgb: RgbColor(166, 227, 161)).render(notice),
+          );
+        }
+      case _Screen.downloadToken:
+        body.writeln(_sectionTitle('Download'));
+        body.writeln(
+          const Style(isDim: true).render(
+            'Paste or type an 8-character code · → at end reads clipboard',
+          ),
+        );
+        body.writeln();
+        body.write(tokenInput?.view().content ?? '');
+        body.writeln();
+        body.writeln();
+        body.writeln(
+          const Style(isDim: true).render('enter continue · esc menu'),
+        );
+      case _Screen.downloadPickDir:
+        body.writeln(_sectionTitle('Save to folder'));
+        body.writeln();
+        body.write(filePicker?.view().content ?? '');
+        body.writeln();
+        body.writeln();
+        body.writeln(const Style(isBold: true).render('Metadata'));
+        if (metadataTable != null) {
+          body.writeln(metadataTable!.view().content);
+        } else if (metadataError != null) {
+          body.writeln('  $metadataError');
+        } else {
+          body.writeln(const Style(isDim: true).render('  Loading...'));
+        }
+        body.writeln();
+        body.writeln(
+          const Style(isDim: true).render('s here · enter on file · esc back'),
+        );
+      case _Screen.downloadRunning:
+        body.writeln(_sectionTitle('Downloading'));
+        body.writeln();
+        body.writeln(spinner.view().content);
+        body.writeln();
+        body.writeln(
+          _gradientProgressView(
+            fraction: downloadFraction,
+            width: 48,
+            label: 'Progress',
+            plainUi: plainUi,
+          ),
+        );
+        body.writeln();
+        body.writeln(const Style(isDim: true).render('esc cancel'));
       case _Screen.downloadDone:
-        b.writeln('Download complete.');
-        b.writeln();
-        b.writeln('Saved to: ${lastPath ?? ''}');
-        b.writeln();
-        b.writeln('Press enter to return to menu.');
+        body.writeln(_sectionTitle('Download complete'));
+        body.writeln();
+        body.writeln('Saved to: ${lastPath ?? ''}');
+        body.writeln();
+        body.writeln(const Style(isDim: true).render('enter · esc → menu'));
       case _Screen.error:
-        b.writeln('Error');
-        b.writeln();
-        b.writeln(errorMessage ?? 'Unknown error');
-        b.writeln();
-        b.writeln('Press enter to return to menu.');
+        body.writeln(
+          const Style(
+            foregroundRgb: RgbColor(243, 139, 168),
+            isBold: true,
+          ).render('Error'),
+        );
+        body.writeln();
+        body.writeln(errorMessage ?? 'Unknown error');
+        body.writeln();
+        body.writeln(const Style(isDim: true).render('enter · esc → menu'));
     }
 
-    if (showHelp) {
-      b.writeln();
-      b.writeln(help.view().content);
-    } else {
-      b.writeln();
-      b.writeln(const Style(isDim: true).render('Press ? for key help.'));
-    }
+    final footer = showHelp
+        ? help.view().content
+        : const Style(isDim: true).render('Press ? for key help.');
 
-    return newView(b.toString());
+    final composed = joinVertical(0.0, <String>[
+      _brandTitle(),
+      '',
+      body.toString().trimRight(),
+      '',
+      footer,
+    ]);
+
+    return newView(composed);
   }
 }
 
@@ -798,7 +1345,20 @@ Future<int> runTui({
     ),
     programOptions: options,
   );
-  final model = _OdinTuiModel.initial(repo: repo, program: program);
+  final storage = CliOdinStorage();
+  await storage.init();
+  final loaded = await storage.loadPendingUploads();
+  final pending = loaded
+      .where((u) => u.expiresAt.isAfter(DateTime.now()))
+      .toList();
+
+  final model = _OdinTuiModel.initial(
+    repo: repo,
+    program: program,
+    storage: storage,
+    pendingUploads: pending,
+    plainUi: noColor,
+  );
   final code = await program.runForResult<int>(model);
   return code ?? 0;
 }

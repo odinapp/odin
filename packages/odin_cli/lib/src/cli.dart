@@ -26,7 +26,7 @@ Future<int> runCli(List<String> arguments) async {
 
   final noTui = root['no-tui'] as bool;
   final isJson = root['json'] as bool;
-  final envFile = root['env-file'] as String;
+  final envFile = root['env-file'] as String?;
   final apiUrl = root['api-url'] as String?;
   final apiVersion = root['api-version'] as String?;
   final verbose = root['verbose'] as bool;
@@ -37,12 +37,29 @@ Future<int> runCli(List<String> arguments) async {
   final shouldRunHeadless =
       noTui || command != null || !stdout.hasTerminal || !stdin.hasTerminal;
 
-  final env = OdinEnvironment.load(envFilePath: envFile);
-  final resolvedEnv = OdinEnvironment(
-    apiUrl: apiUrl ?? env.apiUrl,
-    apiVersion: apiVersion ?? env.apiVersion,
-    successfulStatusCode: env.successfulStatusCode,
+  final envResult = OdinEnvironment.resolveForCli(
+    envFilePath: envFile,
+    apiUrlOverride: apiUrl,
+    apiVersionOverride: apiVersion,
   );
+  late final OdinEnvironment resolvedEnv;
+  switch (envResult) {
+    case Failure(:final value):
+      if (isJson) {
+        stderr.writeln(
+          jsonEncode(<String, dynamic>{
+            'error': 'configuration',
+            'missing': value.missingVariables,
+            'message': value.message,
+          }),
+        );
+      } else {
+        stderr.writeln(value.message);
+      }
+      return 78;
+    case Success(:final value):
+      resolvedEnv = value;
+  }
   final config = OdinClientConfig(
     environment: resolvedEnv,
     appVersion: 'odin-cli/0.1.0',
@@ -86,7 +103,11 @@ ArgParser _buildParser() {
     )
     ..addOption('api-url', help: 'Override API_URL')
     ..addOption('api-version', help: 'Override API_VERSION')
-    ..addOption('env-file', defaultsTo: '.env', help: 'Environment file path')
+    ..addOption(
+      'env-file',
+      help:
+          'Optional .env path (merged first; process env and --api-* override)',
+    )
     ..addFlag('verbose', abbr: 'v', negatable: false, help: 'Verbose output')
     ..addFlag('json', negatable: false, help: 'JSON output for scripting')
     ..addFlag('no-color', negatable: false, help: 'Disable ANSI colors');
@@ -120,6 +141,11 @@ Usage:
   odin [global options]                # Start TUI (if terminal supports it)
   odin upload [files...] [--no-encrypt] [--json]
   odin download <token> [-o dir] [--require-encrypted] [--json]
+
+Configuration (required): API_URL and API_VERSION must be set, e.g. in your shell:
+  export API_URL=https://example.com/
+  export API_VERSION=v1
+Optional: SUCCESSFUL_STATUS_CODE (default 200). Optional file: --env-file (shell overrides file).
 
 Global options:
 ${parser.usage}

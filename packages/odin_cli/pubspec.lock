@@ -108,10 +108,11 @@ packages:
   dart_tui:
     dependency: "direct main"
     description:
-      name: dart_tui
-      sha256: "0c6b119c06fc82468b40ac34ab849979f369c1e96200d5ce4c42124bcff44ac4"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: main
+      resolved-ref: "85526b3c10382c8807c2c18de19b1e5f562d99cb"
+      url: "https://github.com/codenameakshay/dart_tui.git"
+    source: git
     version: "1.0.0+1"
   dio:
     dependency: "direct main"

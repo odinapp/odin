@@ -6,6 +6,14 @@ DART    := fvm dart
 DEVICE ?=
 ARGS   ?=
 
+# `make cli-run upload ./file.txt` — extra words are CLI args, not Make targets.
+ifneq (,$(filter cli-run,$(MAKECMDGOALS)))
+  CLI_RUN_POSITIONAL := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  ifneq (,$(strip $(CLI_RUN_POSITIONAL)))
+    $(eval $(CLI_RUN_POSITIONAL):;@:)
+  endif
+endif
+
 .PHONY: help
 .DEFAULT_GOAL := help
 
@@ -133,8 +141,8 @@ cli-analyze: cli-get ## Analyze odin_core + odin_cli
 cli-test: cli-get ## Run odin_core tests
 	cd packages/odin_core && $(DART) test
 
-cli-run: cli-get ## Run odin CLI (ARGS='upload ./file.txt' etc.)
-	cd packages/odin_cli && $(DART) run bin/odin.dart $(ARGS)
+cli-run: cli-get ## Run odin CLI: `make cli-run upload ./f` or `make cli-run ARGS='upload ./f'`
+	cd packages/odin_cli && $(DART) run bin/odin.dart --env-file ../../.env $(CLI_RUN_POSITIONAL) $(ARGS)
 
 cli-compile: cli-get ## Compile odin CLI executable
 	cd packages/odin_cli && $(DART) compile exe bin/odin.dart -o build/odin

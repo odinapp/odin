@@ -15,7 +15,10 @@ dependencies:
   odin_core:
     path: ../odin_core
   path: ^1.9.1
-  dart_tui: ^1.0.0+1
+  dart_tui:
+    git:
+      url: https://github.com/codenameakshay/dart_tui.git
+      ref: main
 
 dev_dependencies:
   lints: ^6.0.0
