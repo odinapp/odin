@@ -18,7 +18,7 @@ class _CrossButton extends StatelessWidget {
             fixedSize: Size(96.toAutoScaledWidth, 96.toAutoScaledHeight),
           ),
         ),
-        onPressed: () => locator<DioNotifier>().cancelCurrentRequest(),
+        onPressed: () => locator<OdinNotifier>().cancelCurrentRequest(),
         child: SvgPicture.asset(oImage.cross),
       ),
     );

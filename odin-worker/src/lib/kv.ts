@@ -5,6 +5,12 @@ export interface UploadMetadata {
   uploadedAt: string;
   expiresAt: string;
   deleteToken: string;
+  manifestPreview?: Record<string, unknown>;
+  wrappedEncryptionKey?: string;
+  encrypted?: boolean;
+  fileCount?: number;
+  originalTotalFileSize?: number;
+  isArchive?: boolean;
 }
 
 export interface CleanupEntry {

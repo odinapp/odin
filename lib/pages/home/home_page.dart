@@ -15,7 +15,7 @@ import 'package:odin/utilities/mobile_a11y.dart';
 import 'package:odin/utilities/responsive.dart';
 import 'package:odin/widgets/pending_uploads_home_section.dart';
 import 'package:provider/provider.dart';
-import 'package:odin/providers/pending_uploads_notifier.dart';
+import 'package:odin/providers/odin_notifier.dart';
 
 part 'widgets/main_container.dart';
 part 'widgets/bg_illustration.dart';
@@ -190,7 +190,7 @@ class _MobileBody extends StatelessWidget {
                 opacity: 0.36,
                 child: Image.asset(
                   oImage.odinBG,
-                  width: MediaQuery.sizeOf(context).width*0.85,
+                  width: MediaQuery.sizeOf(context).width * 0.85,
                   fit: BoxFit.contain,
                   excludeFromSemantics: true,
                 ),
@@ -214,7 +214,7 @@ class _MobileBody extends StatelessWidget {
                             color: color.primary,
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 2,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -238,10 +238,7 @@ class _MobileBody extends StatelessWidget {
                     onPressed: () => _onSend(context),
                   ),
                   const SizedBox(height: 12),
-                  _MobileSecondaryButton(
-                    color: color,
-                    onPressed: _onReceive,
-                  ),
+                  _MobileSecondaryButton(color: color, onPressed: _onReceive),
                   const SizedBox(height: 10),
                   _MobilePolicyStrip(color: color),
                   const SizedBox(height: 16),
@@ -352,9 +349,9 @@ class _MobilePendingUploadsAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PendingUploadsNotifier>(
+    return Consumer<OdinNotifier>(
       builder: (context, pending, _) {
-        final n = pending.items.length;
+        final n = pending.pendingItems.length;
         final icon = Icon(
           Icons.upload_outlined,
           size: 24,
@@ -362,9 +359,7 @@ class _MobilePendingUploadsAction extends StatelessWidget {
         );
         final button = mobileToolbarIconButton(
           context: context,
-          tooltip: n == 0
-              ? 'Your uploads'
-              : 'Your uploads, $n active',
+          tooltip: n == 0 ? 'Your uploads' : 'Your uploads, $n active',
           onPressed: () {
             showMobilePendingUploadsSheet(context, color: color);
           },
@@ -509,10 +504,7 @@ class _MobileSecondaryButton extends StatelessWidget {
               oImage.cloudDownload,
               width: 20,
               height: 20,
-              colorFilter: ColorFilter.mode(
-                color.secondary,
-                BlendMode.srcIn,
-              ),
+              colorFilter: ColorFilter.mode(color.secondary, BlendMode.srcIn),
             ),
           ],
         ),

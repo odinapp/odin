@@ -8,7 +8,7 @@ class SuccessBody extends StatelessWidget {
   }) : super(key: key);
 
   final OColor color;
-  final UploadFilesSuccess uploadFilesSuccess;
+  final core.UploadFilesSuccess uploadFilesSuccess;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class _SuccessContent extends StatelessWidget {
             ),
           ],
         ),
-        if (Provider.of<DioNotifier>(context).uploadFilesSuccess?.deleteToken !=
+        if (Provider.of<OdinNotifier>(context).uploadFilesSuccess?.deleteToken !=
             null)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 60.0.toAutoScaledWidth),
@@ -109,7 +109,7 @@ class _SuccessContent extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.only(left: 40.0.toAutoScaledWidth),
                       child: Text(
-                        Provider.of<DioNotifier>(
+                        Provider.of<OdinNotifier>(
                               context,
                             ).uploadFilesSuccess?.token ??
                             'Cannot fetch token',
@@ -127,7 +127,7 @@ class _SuccessContent extends StatelessWidget {
                       Clipboard.setData(
                         ClipboardData(
                           text:
-                              Provider.of<DioNotifier>(
+                              Provider.of<OdinNotifier>(
                                 context,
                                 listen: false,
                               ).uploadFilesSuccess?.token ??

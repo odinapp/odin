@@ -1,10 +1,9 @@
 import 'package:odin/booters/booter.dart';
 import 'package:odin/constants/app.dart';
-import 'package:odin/providers/dio_notifier.dart';
-import 'package:odin/providers/pending_uploads_notifier.dart';
+import 'package:odin/providers/odin_notifier.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/services/logger.dart';
-import 'package:odin/services/preferences_service.dart';
+import 'package:odin_core/odin_core.dart' as core;
 
 class ConfigBooter implements Booter<void> {
   static ConfigBooter instance = ConfigBooter._();
@@ -15,11 +14,11 @@ class ConfigBooter implements Booter<void> {
   Future<void> bootUp() async {
     logger.d('ConfigBooter.bootUp');
 
-    await locator<PreferencesService>().init();
-    await locator<PendingUploadsNotifier>().refresh();
+    await locator<core.OdinStorage>().init();
+    await locator<OdinNotifier>().refreshPendingUploads();
 
-    await locator<DioNotifier>().fetchConfig((p0, p1) {});
-    oApp.currentConfig = locator<DioNotifier>().fetchConfigSuccess?.config;
+    await locator<OdinNotifier>().fetchConfig((p0, p1) {});
+    oApp.currentConfig = locator<OdinNotifier>().fetchedConfig;
   }
 
   @override

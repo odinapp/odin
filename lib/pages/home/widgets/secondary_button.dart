@@ -16,29 +16,30 @@ class SecondaryButton extends StatelessWidget {
           onPressed: () {
             locator<AppRouter>().push(const DownloadRoute());
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color.cardOnBackground,
-            foregroundColor: color.secondaryOnBackground,
-            elevation: 0,
-            shadowColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14.toAutoScaledWidth),
-              side: BorderSide(color: color.borderSubtleOnBackground),
-            ),
-          ).copyWith(
-            overlayColor: MaterialStateProperty.resolveWith((states) {
-              if (states.contains(MaterialState.hovered)) {
-                return color.secondary.withValues(alpha: 0.06);
-              }
-              if (states.contains(MaterialState.focused)) {
-                return color.secondary.withValues(alpha: 0.1);
-              }
-              if (states.contains(MaterialState.pressed)) {
-                return color.secondary.withValues(alpha: 0.12);
-              }
-              return null;
-            }),
-          ),
+          style:
+              ElevatedButton.styleFrom(
+                backgroundColor: color.cardOnBackground,
+                foregroundColor: color.secondaryOnBackground,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14.toAutoScaledWidth),
+                  side: BorderSide(color: color.borderSubtleOnBackground),
+                ),
+              ).copyWith(
+                overlayColor: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.hovered)) {
+                    return color.secondary.withValues(alpha: 0.06);
+                  }
+                  if (states.contains(MaterialState.focused)) {
+                    return color.secondary.withValues(alpha: 0.1);
+                  }
+                  if (states.contains(MaterialState.pressed)) {
+                    return color.secondary.withValues(alpha: 0.12);
+                  }
+                  return null;
+                }),
+              ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,

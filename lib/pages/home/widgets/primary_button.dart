@@ -30,28 +30,29 @@ class PrimaryButton extends StatelessWidget {
               locator<AppRouter>().push(UploadRoute(uploadFiles: files));
             }
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color.secondary,
-            foregroundColor: color.primary,
-            elevation: 0,
-            shadowColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14.toAutoScaledWidth),
-            ),
-          ).copyWith(
-            overlayColor: MaterialStateProperty.resolveWith((states) {
-              if (states.contains(MaterialState.hovered)) {
-                return color.primary.withValues(alpha: 0.07);
-              }
-              if (states.contains(MaterialState.focused)) {
-                return color.primary.withValues(alpha: 0.12);
-              }
-              if (states.contains(MaterialState.pressed)) {
-                return color.primary.withValues(alpha: 0.14);
-              }
-              return null;
-            }),
-          ),
+          style:
+              ElevatedButton.styleFrom(
+                backgroundColor: color.secondary,
+                foregroundColor: color.primary,
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14.toAutoScaledWidth),
+                ),
+              ).copyWith(
+                overlayColor: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.hovered)) {
+                    return color.primary.withValues(alpha: 0.07);
+                  }
+                  if (states.contains(MaterialState.focused)) {
+                    return color.primary.withValues(alpha: 0.12);
+                  }
+                  if (states.contains(MaterialState.pressed)) {
+                    return color.primary.withValues(alpha: 0.14);
+                  }
+                  return null;
+                }),
+              ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -74,10 +75,7 @@ class PrimaryButton extends StatelessWidget {
                 oImage.arrowRight,
                 width: 28.toAutoScaledWidth,
                 height: 28.toAutoScaledHeight,
-                colorFilter: ColorFilter.mode(
-                  color.primary,
-                  BlendMode.srcIn,
-                ),
+                colorFilter: ColorFilter.mode(color.primary, BlendMode.srcIn),
               ),
             ],
           ),

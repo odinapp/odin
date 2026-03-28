@@ -6,12 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:odin/constants/app.dart';
 import 'package:odin/constants/colors.dart';
 import 'package:odin/constants/images.dart';
-import 'package:odin/providers/dio_notifier.dart';
+import 'package:odin/providers/odin_notifier.dart';
 import 'package:odin/router/router.dart';
-import 'package:odin/services/dio_service.dart';
 import 'package:odin/services/locator.dart';
 import 'package:odin/constants/size.dart';
 import 'package:odin/services/logger.dart';
+import 'package:odin/utilities/byte_formatter.dart';
 import 'package:odin/utilities/debounce.dart';
 import 'package:odin/utilities/networking.dart';
 import 'package:odin/utilities/mobile_a11y.dart';
@@ -33,6 +33,14 @@ String friendlyDownloadMetadataError(String? raw) {
     return 'No internet connection. Check your network and try again.';
   }
   return raw;
+}
+
+/// [totalFileSize] from the API is a byte count as a string; formats for display.
+String formatDownloadTotalFileSize(String? totalFileSize) {
+  if (totalFileSize == null || totalFileSize.isEmpty) return '';
+  final bytes = int.tryParse(totalFileSize);
+  if (bytes == null) return totalFileSize;
+  return formatBytes(bytes, bytes < 1024 ? 0 : 1);
 }
 
 @RoutePage()
@@ -92,16 +100,16 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
     _controller = TextEditingController();
     _focusNode = FocusNode();
     // Clear download result immediately so the first frame never shows a stale
-    // success UI from a prior session on the same [DioNotifier].
-    final n = locator<DioNotifier>();
+    // success UI from a prior session on the same [OdinNotifier].
+    final n = locator<OdinNotifier>();
     n.downloadFileSuccess = null;
     n.downloadFileFailure = null;
     // Reset stale status from a previous upload/download — deferred to avoid
     // calling notifyListeners() during an ongoing build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        locator<DioNotifier>().apiStatus = ApiStatus.init;
-        locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+        locator<OdinNotifier>().apiStatus = ApiStatus.init;
+        locator<OdinNotifier>().miniApiStatus = ApiStatus.init;
         _focusNode.requestFocus();
       }
     });
@@ -116,20 +124,19 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   }
 
   Future<void> _fetchMetadata() async {
-    await locator<DioNotifier>().fetchFilesMetadata(_token, (c, t) {});
+    await locator<OdinNotifier>().fetchFilesMetadata(_token, (c, t) {});
   }
 
   Future<void> _download() async {
-    final dioService = locator<DioService>();
-    final filePath = await dioService.getTempFilePath();
-    await locator<DioNotifier>().downloadFile(_token, filePath, (c, t) {
+    final filePath = await locator<OdinNotifier>().getTempFilePath();
+    await locator<OdinNotifier>().downloadFile(_token, filePath, (c, t) {
       logger.d('Downloaded $c/$t');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final notifier = Provider.of<DioNotifier>(context);
+    final notifier = Provider.of<OdinNotifier>(context);
     final miniStatus = notifier.miniApiStatus;
     final apiStatus = notifier.apiStatus;
 
@@ -176,8 +183,8 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
               const SizedBox(height: 10),
               Text(
                 oApp.currentConfig?.token.description ??
-                    'Enter the 8-character token someone shared with you. '
-                    'We verify it before you download.',
+                    'Paste the token someone sent you. '
+                        'We verify it before you download.',
                 style: GoogleFonts.inter(
                   color: color.secondaryOnBackground,
                   fontSize: 14,
@@ -197,7 +204,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                   if (value.length >= 6) {
                     _debounce.call(_fetchMetadata);
                   } else {
-                    locator<DioNotifier>().miniApiStatus = ApiStatus.init;
+                    locator<OdinNotifier>().miniApiStatus = ApiStatus.init;
                   }
                 },
               ),
@@ -262,7 +269,6 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
       ),
     );
   }
-
 }
 
 class _MobileMetadataHint extends StatelessWidget {
@@ -272,27 +278,61 @@ class _MobileMetadataHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final metadata = Provider.of<DioNotifier>(
+    final metadata = Provider.of<OdinNotifier>(
       context,
     ).fetchFilesMetadataSuccess?.filesMetadata;
     if (metadata == null) return const SizedBox.shrink();
 
-    final fileCount = metadata.files?.length ?? 0;
-    final totalSize = metadata.totalFileSize ?? '';
+    final fileCount = metadata.fileCount ?? metadata.displayFiles?.length ?? 0;
+    final totalSize = formatDownloadTotalFileSize(metadata.displayTotalFileSize);
     final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
+    final names = (metadata.displayFiles ?? const [])
+        .map((file) => file.path ?? '')
+        .where((path) => path.isNotEmpty)
+        .take(3)
+        .toList(growable: false);
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.check_circle_rounded, color: color.primary, size: 14),
-        const SizedBox(width: 6),
-        Text(
-          '$fileLabel · $totalSize — ready to download',
-          style: GoogleFonts.inter(
-            color: color.primary,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+        Row(
+          children: [
+            Icon(Icons.check_circle_rounded, color: color.primary, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              '$fileLabel · $totalSize — ready to download',
+              style: GoogleFonts.inter(
+                color: color.primary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
+        if (names.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          ...names.map(
+            (name) => Text(
+              '• $name',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                color: color.secondaryOnBackground,
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+          if (fileCount > names.length)
+            Text(
+              '+${fileCount - names.length} more',
+              style: GoogleFonts.inter(
+                color: color.secondaryOnBackground,
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+        ],
       ],
     );
   }
@@ -308,7 +348,7 @@ class _MobileDownloadSuccess extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final file = Provider.of<DioNotifier>(context).downloadFileSuccess?.file;
+    final file = Provider.of<OdinNotifier>(context).downloadFileSuccess?.file;
 
     return mobileClampedTextScale(
       context,
@@ -334,9 +374,7 @@ class _MobileDownloadSuccess extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              const Center(
-                child: _SuccessMarkWithDelight(),
-              ),
+              const Center(child: _SuccessMarkWithDelight()),
               const SizedBox(height: 24),
               Center(
                 child: Text(
@@ -565,7 +603,7 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
               child: Semantics(
                 textField: true,
                 label: oApp.currentConfig?.token.title ?? 'Share token',
-                hint: 'Eight letters or numbers',
+                hint: 'Paste token',
                 value: text,
                 child: ExcludeSemantics(
                   child: TextField(
@@ -581,8 +619,10 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
                     ),
                     decoration: const InputDecoration.collapsed(hintText: ''),
                     inputFormatters: [
-                      LengthLimitingTextInputFormatter(8),
-                      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+                      LengthLimitingTextInputFormatter(1024),
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'[a-zA-Z0-9:/?&=#._-]'),
+                      ),
                     ],
                     onChanged: widget.onChanged,
                   ),

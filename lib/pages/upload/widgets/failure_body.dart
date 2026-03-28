@@ -8,7 +8,7 @@ class FailedBody extends StatelessWidget {
   }) : super(key: key);
 
   final OColor color;
-  final UploadFilesFailure uploadFilesFailure;
+  final core.UploadFilesFailure uploadFilesFailure;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class _FailureContent extends StatelessWidget {
             _InfoText(
               color: color,
               text:
-                  Provider.of<DioNotifier>(
+                  Provider.of<OdinNotifier>(
                     context,
                   ).uploadFilesFailure?.message ??
                   'Oops! Something went wrong.',

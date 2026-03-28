@@ -18,7 +18,7 @@
 
 
 <p align="center">
-Cross-platform hassle-free file sharing with AES-256 encryption made with Flutter & Dart.
+Cross-platform, open-source file sharing with end-to-end encrypted share links built with Flutter & Dart.
 </p>
 
 
@@ -82,6 +82,24 @@ Short screen captures of the same flows live in [`docs/videos/`](docs/videos/) (
 * [Flutter](https://flutter.dev/)
 
 * [Dart](https://dart.dev/)
+
+* [Cloudflare Workers + R2 + KV](https://developers.cloudflare.com/workers/)
+
+* [`odin_core`](packages/odin_core) and [`odin_cli`](packages/odin_cli)
+
+## Current Features
+
+- Cross-platform Flutter app for send/receive flows
+- Cloudflare Workers backend with token-based upload/download APIs
+- `odin_cli` terminal client with TUI and headless modes
+- Upload from files and directories (directories are zipped before upload)
+- End-to-end encrypted uploads by default:
+  - Payloads are encrypted client-side before upload
+  - Share token contains decryption key in URL fragment (`#k=...`), which is not sent to the server
+  - Legacy plaintext tokens/downloads remain supported
+- Metadata pre-check on download flow
+- Upload/download progress indicators
+- Expiring uploads and delete-token support
 
 ## Getting Started
 
@@ -162,16 +180,27 @@ For Android: `fvm flutter build apk` (debug or release). For Linux desktop, inst
 
 ## Roadmap
 
-```
-Roadmap
-|-- AES-256 encryption
-|-- Online website
-|   |-- Upload and share files from any device
-|   |-- View encrypted files and download them safely
-|-- Upload / Download Progress
-|-- File Deletion within 15 hours
-|-- Same network direct sharing
-```
+### Done
+
+- [x] Flutter send/receive experience for mobile + desktop
+- [x] Cloudflare Worker backend (`upload`, `download`, `info`, `delete`)
+- [x] Upload/download progress in app and CLI
+- [x] `odin_core` package as shared upload/download logic
+- [x] `odin_cli` package with TUI + headless/script-friendly mode
+- [x] Directory upload support (zip-then-upload)
+- [x] End-to-end encrypted share tokens with key fragment support
+- [x] Backward-compatible plaintext token download support
+
+### Next
+
+- [ ] Streaming/chunked encryption for very large files
+- [ ] Optional auto-extract after encrypted zip download
+- [ ] Clipboard + QR improvements for encrypted share tokens in CLI/TUI
+- [ ] Optional web upload/download client that uses the same `odin_core` protocol
+- [ ] Better key rotation/revocation UX for shared links
+- [ ] Multi-recipient sharing with per-recipient key wrapping
+- [ ] LAN/direct local transfer mode (same network)
+- [ ] Signed releases for CLI binaries
 
 If you'd like to propose a feature, submit an issue [here](https://github.com/odinapp/odin/issues).
 

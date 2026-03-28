@@ -119,3 +119,22 @@ build-windows: get ## Release Windows app
 # --- CI-style pipeline ---
 
 check: format-check analyze test ## format (check only) + analyze + test
+
+# --- Odin CLI ---
+
+cli-get: ## Resolve packages for odin_core + odin_cli
+	cd packages/odin_core && $(DART) pub get
+	cd packages/odin_cli && $(DART) pub get
+
+cli-analyze: cli-get ## Analyze odin_core + odin_cli
+	cd packages/odin_core && $(DART) analyze
+	cd packages/odin_cli && $(DART) analyze
+
+cli-test: cli-get ## Run odin_core tests
+	cd packages/odin_core && $(DART) test
+
+cli-run: cli-get ## Run odin CLI (ARGS='upload ./file.txt' etc.)
+	cd packages/odin_cli && $(DART) run bin/odin.dart $(ARGS)
+
+cli-compile: cli-get ## Compile odin CLI executable
+	cd packages/odin_cli && $(DART) compile exe bin/odin.dart -o build/odin

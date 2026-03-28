@@ -49,6 +49,7 @@ class OColor {
   static const Color _dSecondaryOnBackground = Color(0xFF838383);
   static const Color _dSecondaryContainerOnBackground = Color(0xFF181818);
   static const Color _dCardOnBackground = Color(0xFF1E1E1E);
+
   /// Visible edge for controls on [background] / [backgroundContainer] (WCAG 1.4.11).
   static const Color _dBorderSubtleOnBackground = Color(0xFF3D3D3D);
 
