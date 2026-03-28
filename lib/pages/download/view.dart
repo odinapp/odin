@@ -659,7 +659,7 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
                     alignment: Alignment.center,
                     child: hasChar
                         ? Text(
-                            text[i].toUpperCase(),
+                            text[i],
                             style: GoogleFonts.inter(
                               color: isSuccess
                                   ? widget.color.primary
