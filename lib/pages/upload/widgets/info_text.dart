@@ -2,11 +2,10 @@ part of '../view.dart';
 
 class _InfoText extends StatelessWidget {
   const _InfoText({
-    Key? key,
     required this.color,
     required this.text,
     this.center = false,
-  }) : super(key: key);
+  });
 
   final OColor color;
   final String text;

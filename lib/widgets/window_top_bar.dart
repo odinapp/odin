@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:odin/widgets/window_buttons.dart';
 
 class WindowTopBar extends StatelessWidget {
-  const WindowTopBar({Key? key}) : super(key: key);
+  const WindowTopBar({super.key});
 
   @override
   Widget build(BuildContext context) {

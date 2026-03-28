@@ -50,8 +50,9 @@ class OdinNotifier with ChangeNotifier {
 
   // Status streams
   final _apiStatusSubject = BehaviorSubject<ApiStatus>.seeded(ApiStatus.init);
-  final _miniApiStatusSubject =
-      BehaviorSubject<ApiStatus>.seeded(ApiStatus.init);
+  final _miniApiStatusSubject = BehaviorSubject<ApiStatus>.seeded(
+    ApiStatus.init,
+  );
 
   Stream<ApiStatus> get apiStatusStream => _apiStatusSubject.stream;
   ApiStatus? get apiStatus => _apiStatusSubject.valueOrNull;
@@ -79,9 +80,18 @@ class OdinNotifier with ChangeNotifier {
     return core.OdinRepositoryImpl(config: config);
   }
 
-  Future<String> getTempFilePath() async {
-    final tempDir = await getTemporaryDirectory();
-    return tempDir.path;
+  Future<String> getSaveDirectory() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      final dir = await getApplicationDocumentsDirectory();
+      return dir.path;
+    }
+    // Desktop: prefer Downloads, fall back to Documents
+    try {
+      final downloads = await getDownloadsDirectory();
+      if (downloads != null) return downloads.path;
+    } catch (_) {}
+    final docs = await getApplicationDocumentsDirectory();
+    return docs.path;
   }
 
   Future<File> createDummyFile() async {
@@ -313,8 +323,9 @@ class OdinNotifier with ChangeNotifier {
       ),
     );
     await storage.savePendingUploads(list);
-    _pendingItems =
-        list.where((u) => u.expiresAt.isAfter(DateTime.now())).toList();
+    _pendingItems = list
+        .where((u) => u.expiresAt.isAfter(DateTime.now()))
+        .toList();
     notifyListeners();
   }
 
@@ -339,8 +350,9 @@ class OdinNotifier with ChangeNotifier {
             .where((u) => u.id != upload.id)
             .toList();
         await storage.savePendingUploads(list);
-        _pendingItems =
-            list.where((u) => u.expiresAt.isAfter(DateTime.now())).toList();
+        _pendingItems = list
+            .where((u) => u.expiresAt.isAfter(DateTime.now()))
+            .toList();
         notifyListeners();
       }
       return ok;

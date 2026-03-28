@@ -1,7 +1,7 @@
 part of '../home_page.dart';
 
 class MainContainer extends StatelessWidget {
-  const MainContainer({Key? key, required this.color}) : super(key: key);
+  const MainContainer({super.key, required this.color});
 
   final OColor color;
 

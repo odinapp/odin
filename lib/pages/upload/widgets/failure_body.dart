@@ -2,10 +2,10 @@ part of '../view.dart';
 
 class FailedBody extends StatelessWidget {
   const FailedBody({
-    Key? key,
+    super.key,
     required this.color,
     required this.uploadFilesFailure,
-  }) : super(key: key);
+  });
 
   final OColor color;
   final core.UploadFilesFailure uploadFilesFailure;
@@ -28,7 +28,7 @@ class FailedBody extends StatelessWidget {
 }
 
 class _FailureContent extends StatelessWidget {
-  const _FailureContent({Key? key, required this.color}) : super(key: key);
+  const _FailureContent({required this.color});
 
   final OColor color;
 
@@ -75,7 +75,7 @@ class _FailureContent extends StatelessWidget {
             child: TextButton(
               onPressed: () => locator<AppRouter>().pop(),
               style: ButtonStyle(
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
               ),
               child: Row(
                 children: [

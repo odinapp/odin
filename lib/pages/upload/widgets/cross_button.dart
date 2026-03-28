@@ -1,14 +1,14 @@
 part of '../view.dart';
 
 class _CrossButton extends StatelessWidget {
-  const _CrossButton({Key? key}) : super(key: key);
+  const _CrossButton();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(right: 60.0.toAutoScaledWidth),
       child: ElevatedButton(
-        style: ButtonStyle(elevation: MaterialStateProperty.all(0)).merge(
+        style: ButtonStyle(elevation: WidgetStateProperty.all(0)).merge(
           ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF242424),
             foregroundColor: Colors.red.withOpacity(0.2),

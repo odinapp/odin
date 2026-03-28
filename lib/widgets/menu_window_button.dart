@@ -2,19 +2,12 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 
 class MenuWindowButton extends WindowButton {
-  MenuWindowButton({
-    Key? key,
-    WindowButtonColors? colors,
-    VoidCallback? onPressed,
-    bool? animate,
-  }) : super(
-         key: key,
-         colors: colors,
-         animate: animate ?? false,
-         iconBuilder: (buttonContext) =>
-             MenuIcon(color: buttonContext.iconColor),
-         onPressed: onPressed,
-       );
+  MenuWindowButton({super.key, super.colors, super.onPressed, bool? animate})
+    : super(
+        animate: animate ?? false,
+        iconBuilder: (buttonContext) =>
+            MenuIcon(color: buttonContext.iconColor),
+      );
 }
 
 abstract class _IconPainter extends CustomPainter {
@@ -26,7 +19,7 @@ abstract class _IconPainter extends CustomPainter {
 }
 
 class _AlignedPaint extends StatelessWidget {
-  const _AlignedPaint(this.painter, {Key? key}) : super(key: key);
+  const _AlignedPaint(this.painter);
   final CustomPainter painter;
 
   @override
@@ -40,13 +33,13 @@ class _AlignedPaint extends StatelessWidget {
 
 class MenuIcon extends StatelessWidget {
   final Color color;
-  const MenuIcon({Key? key, required this.color}) : super(key: key);
+  const MenuIcon({super.key, required this.color});
   @override
   Widget build(BuildContext context) => _AlignedPaint(_MenuPainter(color));
 }
 
 class _MenuPainter extends _IconPainter {
-  _MenuPainter(Color color) : super(color);
+  _MenuPainter(super.color);
   @override
   void paint(Canvas canvas, Size size) {
     Paint p = getPaint(color);

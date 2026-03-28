@@ -31,7 +31,7 @@ part 'widgets/failure_body.dart';
 
 @RoutePage()
 class UploadPage extends StatefulWidget {
-  const UploadPage({Key? key, required this.uploadFiles}) : super(key: key);
+  const UploadPage({super.key, required this.uploadFiles});
 
   final List<File> uploadFiles;
 
@@ -94,7 +94,7 @@ class _UploadPageState extends State<UploadPage> {
 // ── Desktop bodies (unchanged) ───────────────────────────────────────────────
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key}) : super(key: key);
+  const _Body();
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +104,7 @@ class _Body extends StatelessWidget {
 }
 
 class _FailedBody extends StatelessWidget {
-  const _FailedBody({Key? key}) : super(key: key);
+  const _FailedBody();
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +117,7 @@ class _FailedBody extends StatelessWidget {
 }
 
 class _SuccessBody extends StatelessWidget {
-  const _SuccessBody({Key? key}) : super(key: key);
+  const _SuccessBody();
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +132,7 @@ class _SuccessBody extends StatelessWidget {
 // ── Mobile: Loading ──────────────────────────────────────────────────────────
 
 class _MobileLoadingBody extends StatelessWidget {
-  const _MobileLoadingBody({Key? key, required this.color}) : super(key: key);
+  const _MobileLoadingBody({required this.color});
 
   final OColor color;
 
@@ -297,7 +297,7 @@ class _MobileLoadingBody extends StatelessWidget {
 // ── Mobile: Success ──────────────────────────────────────────────────────────
 
 class _MobileSuccessBody extends StatelessWidget {
-  const _MobileSuccessBody({Key? key, required this.color}) : super(key: key);
+  const _MobileSuccessBody({required this.color});
 
   final OColor color;
 
@@ -535,7 +535,7 @@ class _MobileSuccessBody extends StatelessWidget {
 // ── Mobile: Failed ───────────────────────────────────────────────────────────
 
 class _MobileFailedBody extends StatelessWidget {
-  const _MobileFailedBody({Key? key, required this.color}) : super(key: key);
+  const _MobileFailedBody({required this.color});
 
   final OColor color;
 

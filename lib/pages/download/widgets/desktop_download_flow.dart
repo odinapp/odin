@@ -54,7 +54,7 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
   }
 
   Future<void> _download() async {
-    final filePath = await locator<OdinNotifier>().getTempFilePath();
+    final filePath = await locator<OdinNotifier>().getSaveDirectory();
     await locator<OdinNotifier>().downloadFile(_token, filePath, (c, t) {
       logger.d('Downloaded $c/$t');
     });
@@ -244,7 +244,7 @@ class _DesktopCardBackLink extends StatelessWidget {
     return TextButton(
       onPressed: () => locator<AppRouter>().pop(),
       style: ButtonStyle(
-        overlayColor: MaterialStateProperty.all(Colors.transparent),
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -307,13 +307,13 @@ class _DesktopDownloadCta extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.toAutoScaledWidth),
               ),
             ).copyWith(
-              overlayColor: MaterialStateProperty.resolveWith((states) {
-                if (states.contains(MaterialState.hovered) &&
+              overlayColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.hovered) &&
                     miniOk &&
                     !loading) {
                   return Colors.white.withValues(alpha: 0.14);
                 }
-                if (states.contains(MaterialState.focused) && miniOk) {
+                if (states.contains(WidgetState.focused) && miniOk) {
                   return Colors.white.withValues(alpha: 0.18);
                 }
                 return null;
@@ -383,8 +383,11 @@ class _DesktopCardMetadataLine extends StatelessWidget {
       ).fetchFilesMetadataSuccess?.filesMetadata;
       if (metadata == null) return SizedBox(height: 24.toAutoScaledHeight);
 
-      final fileCount = metadata.fileCount ?? metadata.displayFiles?.length ?? 0;
-      final totalSize = formatDownloadTotalFileSize(metadata.displayTotalFileSize);
+      final fileCount =
+          metadata.fileCount ?? metadata.displayFiles?.length ?? 0;
+      final totalSize = formatDownloadTotalFileSize(
+        metadata.displayTotalFileSize,
+      );
       final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
       final names = (metadata.displayFiles ?? const [])
           .map((file) => file.path ?? '')
@@ -463,14 +466,57 @@ class _DesktopCardMetadataLine extends StatelessWidget {
   }
 }
 
-class _DesktopDownloadSuccessCard extends StatelessWidget {
+class _DesktopDownloadSuccessCard extends StatefulWidget {
   const _DesktopDownloadSuccessCard({required this.color});
 
   final OColor color;
 
   @override
+  State<_DesktopDownloadSuccessCard> createState() =>
+      _DesktopDownloadSuccessCardState();
+}
+
+class _DesktopDownloadSuccessCardState
+    extends State<_DesktopDownloadSuccessCard> {
+  OColor get color => widget.color;
+
+  String _subtitle(core.DownloadFileSuccess success) {
+    if (success.extracted) {
+      final count = success.extractedFiles.length;
+      final dirName = success.directory!.path.split(RegExp(r'[/\\]')).last;
+      return count == 1
+          ? 'Extracted 1 file to $dirName'
+          : 'Extracted $count files to $dirName';
+    }
+    if (success.file != null) {
+      return 'Saved as ${success.file!.path.split(RegExp(r'[/\\]')).last}';
+    }
+    return 'Your files are saved on this device.';
+  }
+
+  Future<void> _openFile(core.DownloadFileSuccess success) async {
+    final path = success.extracted
+        ? success.directory!.path
+        : success.file!.path;
+    await OpenFilex.open(path);
+  }
+
+  Future<void> _showInFolder(core.DownloadFileSuccess success) async {
+    final path = success.extracted
+        ? success.directory!.path
+        : success.file!.path;
+    if (Platform.isMacOS) {
+      await Process.run('open', ['-R', path]);
+    } else if (Platform.isWindows) {
+      await Process.run('explorer', ['/select,', path]);
+    } else if (Platform.isLinux) {
+      await Process.run('xdg-open', [File(path).parent.path]);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final file = Provider.of<OdinNotifier>(context).downloadFileSuccess?.file;
+    final success = Provider.of<OdinNotifier>(context).downloadFileSuccess;
 
     return desktopClampedTextScale(
       context,
@@ -495,7 +541,7 @@ class _DesktopDownloadSuccessCard extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => locator<AppRouter>().popUntilRoot(),
                       style: ButtonStyle(
-                        overlayColor: MaterialStateProperty.all(
+                        overlayColor: WidgetStateProperty.all(
                           Colors.transparent,
                         ),
                       ),
@@ -550,8 +596,8 @@ class _DesktopDownloadSuccessCard extends StatelessWidget {
                         ),
                         SizedBox(height: 12.toAutoScaledHeight),
                         Text(
-                          file != null
-                              ? 'Saved as ${file.path.split(RegExp(r'[/\\]')).last}'
+                          success != null
+                              ? _subtitle(success)
                               : 'Your files are saved on this device.',
                           textAlign: TextAlign.center,
                           maxLines: 2,
@@ -563,50 +609,170 @@ class _DesktopDownloadSuccessCard extends StatelessWidget {
                             height: 1.45,
                           ),
                         ),
+                        if (success != null) ...[
+                          SizedBox(height: 6.toAutoScaledHeight),
+                          Text(
+                            success.outputPath,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: color.textStyle(
+                              color: color.secondaryOnBackground.withValues(
+                                alpha: 0.6,
+                              ),
+                              fontSize: 13.toAutoScaledFont,
+                              fontWeight: FontWeight.w400,
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
                         const Spacer(),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 96.toAutoScaledHeight,
-                          child: ElevatedButton(
-                            onPressed: () =>
-                                locator<AppRouter>().popUntilRoot(),
-                            style:
-                                ElevatedButton.styleFrom(
-                                  backgroundColor: color.primary,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      20.toAutoScaledWidth,
+                        if (success != null) ...[
+                          SizedBox(
+                            width: double.infinity,
+                            height: 96.toAutoScaledHeight,
+                            child: ElevatedButton(
+                              onPressed: () => _openFile(success),
+                              style:
+                                  ElevatedButton.styleFrom(
+                                    backgroundColor: color.primary,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        20.toAutoScaledWidth,
+                                      ),
                                     ),
+                                  ).copyWith(
+                                    overlayColor:
+                                        WidgetStateProperty.resolveWith((
+                                          states,
+                                        ) {
+                                          if (states.contains(
+                                            WidgetState.hovered,
+                                          )) {
+                                            return Colors.white.withValues(
+                                              alpha: 0.14,
+                                            );
+                                          }
+                                          return null;
+                                        }),
                                   ),
-                                ).copyWith(
-                                  overlayColor:
-                                      MaterialStateProperty.resolveWith((
-                                        states,
-                                      ) {
-                                        if (states.contains(
-                                          MaterialState.hovered,
-                                        )) {
-                                          return Colors.white.withValues(
-                                            alpha: 0.14,
-                                          );
-                                        }
-                                        return null;
-                                      }),
+                              child: Text(
+                                success.extracted ? 'Open folder' : 'Open file',
+                                style: color.textStyle(
+                                  color: Colors.white,
+                                  fontSize: 28.toAutoScaledFont,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.1,
                                 ),
-                            child: Text(
-                              'Back to home',
-                              style: color.textStyle(
-                                color: Colors.white,
-                                fontSize: 28.toAutoScaledFont,
-                                fontWeight: FontWeight.w800,
-                                height: 1.1,
                               ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 12.toAutoScaledHeight),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  height: 76.toAutoScaledHeight,
+                                  child: OutlinedButton(
+                                    onPressed: () => _showInFolder(success),
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                        color: color.borderSubtleOnBackground,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          20.toAutoScaledWidth,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Show in folder',
+                                      style: color.textStyle(
+                                        color: color.secondaryOnBackground,
+                                        fontSize: 20.toAutoScaledFont,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.1,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 12.toAutoScaledWidth),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 76.toAutoScaledHeight,
+                                  child: TextButton(
+                                    onPressed: () =>
+                                        locator<AppRouter>().popUntilRoot(),
+                                    style: TextButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          20.toAutoScaledWidth,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Back to home',
+                                      style: color.textStyle(
+                                        color: color.secondaryOnBackground,
+                                        fontSize: 20.toAutoScaledFont,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.1,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ] else ...[
+                          SizedBox(
+                            width: double.infinity,
+                            height: 96.toAutoScaledHeight,
+                            child: ElevatedButton(
+                              onPressed: () =>
+                                  locator<AppRouter>().popUntilRoot(),
+                              style:
+                                  ElevatedButton.styleFrom(
+                                    backgroundColor: color.primary,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        20.toAutoScaledWidth,
+                                      ),
+                                    ),
+                                  ).copyWith(
+                                    overlayColor:
+                                        WidgetStateProperty.resolveWith((
+                                          states,
+                                        ) {
+                                          if (states.contains(
+                                            WidgetState.hovered,
+                                          )) {
+                                            return Colors.white.withValues(
+                                              alpha: 0.14,
+                                            );
+                                          }
+                                          return null;
+                                        }),
+                                  ),
+                              child: Text(
+                                'Back to home',
+                                style: color.textStyle(
+                                  color: Colors.white,
+                                  fontSize: 28.toAutoScaledFont,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.1,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

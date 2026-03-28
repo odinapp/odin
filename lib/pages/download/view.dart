@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,7 +19,9 @@ import 'package:odin/utilities/debounce.dart';
 import 'package:odin/utilities/networking.dart';
 import 'package:odin/utilities/mobile_a11y.dart';
 import 'package:odin/utilities/responsive.dart';
+import 'package:odin_core/odin_core.dart' as core;
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart' as share_plus;
 
 part 'widgets/desktop_download_flow.dart';
 
@@ -45,7 +50,7 @@ String formatDownloadTotalFileSize(String? totalFileSize) {
 
 @RoutePage()
 class DownloadPage extends StatefulWidget {
-  const DownloadPage({Key? key}) : super(key: key);
+  const DownloadPage({super.key});
 
   @override
   State<DownloadPage> createState() => _DownloadPageState();
@@ -78,7 +83,7 @@ class _DownloadPageState extends State<DownloadPage> {
 // ── Mobile: single stateful body handles all states ─────────────────────────
 
 class _MobileDownloadBody extends StatefulWidget {
-  const _MobileDownloadBody({Key? key, required this.color}) : super(key: key);
+  const _MobileDownloadBody({required this.color});
 
   final OColor color;
 
@@ -128,7 +133,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
   }
 
   Future<void> _download() async {
-    final filePath = await locator<OdinNotifier>().getTempFilePath();
+    final filePath = await locator<OdinNotifier>().getSaveDirectory();
     await locator<OdinNotifier>().downloadFile(_token, filePath, (c, t) {
       logger.d('Downloaded $c/$t');
     });
@@ -272,7 +277,7 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
 }
 
 class _MobileMetadataHint extends StatelessWidget {
-  const _MobileMetadataHint({Key? key, required this.color}) : super(key: key);
+  const _MobileMetadataHint({required this.color});
 
   final OColor color;
 
@@ -284,7 +289,9 @@ class _MobileMetadataHint extends StatelessWidget {
     if (metadata == null) return const SizedBox.shrink();
 
     final fileCount = metadata.fileCount ?? metadata.displayFiles?.length ?? 0;
-    final totalSize = formatDownloadTotalFileSize(metadata.displayTotalFileSize);
+    final totalSize = formatDownloadTotalFileSize(
+      metadata.displayTotalFileSize,
+    );
     final fileLabel = fileCount == 1 ? '1 file' : '$fileCount files';
     final names = (metadata.displayFiles ?? const [])
         .map((file) => file.path ?? '')
@@ -340,15 +347,62 @@ class _MobileMetadataHint extends StatelessWidget {
 
 // ── Mobile: Download success ─────────────────────────────────────────────────
 
-class _MobileDownloadSuccess extends StatelessWidget {
-  const _MobileDownloadSuccess({Key? key, required this.color})
-    : super(key: key);
+class _MobileDownloadSuccess extends StatefulWidget {
+  const _MobileDownloadSuccess({required this.color});
 
   final OColor color;
 
   @override
+  State<_MobileDownloadSuccess> createState() => _MobileDownloadSuccessState();
+}
+
+class _MobileDownloadSuccessState extends State<_MobileDownloadSuccess> {
+  OColor get color => widget.color;
+
+  String _subtitle(core.DownloadFileSuccess success) {
+    if (success.extracted) {
+      final count = success.extractedFiles.length;
+      final dirName = success.directory!.path.split(RegExp(r'[/\\]')).last;
+      return count == 1
+          ? 'Extracted 1 file to $dirName'
+          : 'Extracted $count files to $dirName';
+    }
+    if (success.file != null) {
+      return 'Saved as ${success.file!.path.split(RegExp(r'[/\\]')).last}';
+    }
+    return 'Your files are saved on this device.';
+  }
+
+  Future<void> _share(
+    core.DownloadFileSuccess success,
+    BuildContext btnContext,
+  ) async {
+    final box = btnContext.findRenderObject() as RenderBox?;
+    final sharePositionOrigin = box == null
+        ? null
+        : box.localToGlobal(Offset.zero) & box.size;
+
+    final xfiles = success.extracted
+        ? success.extractedFiles.map((f) => share_plus.XFile(f.path)).toList()
+        : [share_plus.XFile(success.file!.path)];
+
+    final result = await share_plus.Share.shareXFiles(
+      xfiles,
+      sharePositionOrigin: sharePositionOrigin,
+    );
+
+    if (result.status == share_plus.ShareResultStatus.unavailable && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sharing is not available on this device.'),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final file = Provider.of<OdinNotifier>(context).downloadFileSuccess?.file;
+    final success = Provider.of<OdinNotifier>(context).downloadFileSuccess;
 
     return mobileClampedTextScale(
       context,
@@ -390,8 +444,8 @@ class _MobileDownloadSuccess extends StatelessWidget {
               const SizedBox(height: 8),
               Center(
                 child: Text(
-                  file != null
-                      ? 'Saved as ${file.path.split(RegExp(r'[/\\]')).last}'
+                  success != null
+                      ? _subtitle(success)
                       : 'Your files are saved on this device.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
@@ -405,6 +459,37 @@ class _MobileDownloadSuccess extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+              if (success != null) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: Builder(
+                    builder: (btnContext) => OutlinedButton.icon(
+                      onPressed: () => _share(success, btnContext),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: color.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.share_rounded,
+                        color: color.primary,
+                        size: 18,
+                      ),
+                      label: Text(
+                        'Share',
+                        style: GoogleFonts.inter(
+                          color: color.primary,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
               SizedBox(
                 width: double.infinity,
                 height: 52,
@@ -574,7 +659,7 @@ class _TokenBoxInputState extends State<_TokenBoxInput>
                     alignment: Alignment.center,
                     child: hasChar
                         ? Text(
-                            text[i].toUpperCase(),
+                            text[i],
                             style: GoogleFonts.inter(
                               color: isSuccess
                                   ? widget.color.primary
@@ -687,7 +772,7 @@ class _BlinkingCursorState extends State<_BlinkingCursor>
     }
     return AnimatedBuilder(
       animation: _controller,
-      builder: (_, __) => Opacity(
+      builder: (_, _) => Opacity(
         opacity: _controller.value > 0.5 ? 1.0 : 0.0,
         child: Container(
           width: 2,

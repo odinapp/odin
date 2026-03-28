@@ -1,7 +1,7 @@
 part of '../view.dart';
 
 class _BackButton extends StatelessWidget {
-  const _BackButton({Key? key, required this.color}) : super(key: key);
+  const _BackButton({required this.color});
 
   final OColor color;
 
@@ -13,7 +13,7 @@ class _BackButton extends StatelessWidget {
       child: TextButton(
         onPressed: () => locator<AppRouter>().pop(),
         style: ButtonStyle(
-          overlayColor: MaterialStateProperty.all(Colors.transparent),
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
         ),
         child: Row(
           children: [

@@ -22,9 +22,8 @@ class OdinStorageImpl implements core.OdinStorage {
     final decoded = jsonDecode(raw) as List<dynamic>;
     return decoded
         .map(
-          (e) => core.PendingUpload.fromJson(
-            Map<String, dynamic>.from(e as Map),
-          ),
+          (e) =>
+              core.PendingUpload.fromJson(Map<String, dynamic>.from(e as Map)),
         )
         .toList();
   }
