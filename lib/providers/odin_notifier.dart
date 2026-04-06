@@ -236,6 +236,8 @@ class OdinNotifier with ChangeNotifier {
   ) async {
     _progress = 0;
     _progressPercentage = 0;
+    downloadFileSuccess = null;
+    downloadFileFailure = null;
     apiStatus = ApiStatus.loading;
     notifyListeners();
 

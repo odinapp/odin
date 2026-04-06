@@ -367,10 +367,13 @@ class OdinRepositoryImpl implements OdinRepository {
         );
       }
 
+      final bodyMessage = response.data is List
+          ? utf8.decode((response.data as List).cast<int>(), allowMalformed: true)
+          : response.data?.toString();
       return Failure(
         DownloadFileFailure(
           statusCode: response.statusCode,
-          message: response.data?.toString(),
+          message: bodyMessage,
           data: response.data,
         ),
       );

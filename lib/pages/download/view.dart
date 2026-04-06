@@ -25,6 +25,32 @@ import 'package:share_plus/share_plus.dart' as share_plus;
 
 part 'widgets/desktop_download_flow.dart';
 
+/// Plain-language hint for download failures (mobile + desktop).
+String friendlyDownloadError(String? raw) {
+  if (raw == null || raw.isEmpty) {
+    return 'Download failed. Please try again.';
+  }
+  final lower = raw.toLowerCase();
+  if (lower.contains('1102') ||
+      lower.contains('not found') ||
+      lower.contains('expired')) {
+    return 'This file is no longer available. It may have expired.';
+  }
+  if (lower.contains('503') ||
+      lower.contains('502') ||
+      lower.contains('unavailable') ||
+      lower.contains('service')) {
+    return 'Server is temporarily unavailable. Please try again later.';
+  }
+  if (lower.contains('network') || lower.contains('connection')) {
+    return 'No internet connection. Check your network and try again.';
+  }
+  if (lower.contains('cancel')) {
+    return 'Download was cancelled.';
+  }
+  return 'Download failed. Please try again.';
+}
+
 /// Plain-language hint for token lookup failures (mobile + desktop).
 String friendlyDownloadMetadataError(String? raw) {
   if (raw == null || raw.isEmpty) {
@@ -267,6 +293,17 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                         ),
                 ),
               ),
+              if (notifier.downloadFileFailure != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  friendlyDownloadError(notifier.downloadFileFailure?.message),
+                  style: GoogleFonts.inter(
+                    color: color.error,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
               const SizedBox(height: 24),
             ],
           ),

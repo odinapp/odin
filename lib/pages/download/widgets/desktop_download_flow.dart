@@ -216,6 +216,20 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
                                         .fetchFilesMetadataFailure
                                         ?.message,
                                   ),
+                                  if (notifier.downloadFileFailure != null) ...[
+                                    SizedBox(height: 12.toAutoScaledHeight),
+                                    Text(
+                                      friendlyDownloadError(
+                                        notifier.downloadFileFailure?.message,
+                                      ),
+                                      style: color.textStyle(
+                                        color: color.error,
+                                        fontSize: 16.toAutoScaledFont,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
