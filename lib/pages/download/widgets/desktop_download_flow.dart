@@ -209,6 +209,14 @@ class _DesktopDownloadBodyState extends State<_DesktopDownloadBody> {
                                     ),
                                   ),
                                   SizedBox(height: 20.toAutoScaledHeight),
+                                  if (apiStatus == ApiStatus.loading) ...[
+                                    _DesktopDownloadProgress(
+                                      color: color,
+                                      progress: notifier.progress,
+                                      percentage: notifier.progressPercentage,
+                                    ),
+                                    SizedBox(height: 16.toAutoScaledHeight),
+                                  ],
                                   _DesktopCardMetadataLine(
                                     color: color,
                                     miniStatus: miniStatus,
@@ -374,6 +382,62 @@ class _DesktopDownloadCta extends StatelessWidget {
                 ],
               ),
       ),
+    );
+  }
+}
+
+class _DesktopDownloadProgress extends StatelessWidget {
+  const _DesktopDownloadProgress({
+    required this.color,
+    required this.progress,
+    required this.percentage,
+  });
+
+  final OColor color;
+  final double progress;
+  final int percentage;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasProgress = progress > 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Downloading',
+              style: color.textStyle(
+                color: color.secondaryOnBackground,
+                fontSize: 14.toAutoScaledFont,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
+            ),
+            if (hasProgress)
+              Text(
+                '$percentage%',
+                style: color.textStyle(
+                  color: color.primary,
+                  fontSize: 14.toAutoScaledFont,
+                  fontWeight: FontWeight.w600,
+                  height: 1.4,
+                ),
+              ),
+          ],
+        ),
+        SizedBox(height: 8.toAutoScaledHeight),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4.toAutoScaledWidth),
+          child: LinearProgressIndicator(
+            value: hasProgress ? progress : null,
+            minHeight: 4.toAutoScaledHeight,
+            backgroundColor: color.borderSubtleOnBackground,
+            valueColor: AlwaysStoppedAnimation(color.primary),
+          ),
+        ),
+      ],
     );
   }
 }

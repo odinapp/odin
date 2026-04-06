@@ -257,6 +257,15 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
                 ),
               ],
               const Spacer(),
+              // Download progress
+              if (apiStatus == ApiStatus.loading) ...[
+                _MobileDownloadProgress(
+                  color: color,
+                  progress: notifier.progress,
+                  percentage: notifier.progressPercentage,
+                ),
+                const SizedBox(height: 12),
+              ],
               // Download button
               SizedBox(
                 width: double.infinity,
@@ -312,6 +321,64 @@ class _MobileDownloadBodyState extends State<_MobileDownloadBody> {
     );
   }
 }
+
+// ── Mobile: Download progress ─────────────────────────────────────────────────
+
+class _MobileDownloadProgress extends StatelessWidget {
+  const _MobileDownloadProgress({
+    required this.color,
+    required this.progress,
+    required this.percentage,
+  });
+
+  final OColor color;
+  final double progress;
+  final int percentage;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasProgress = progress > 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Downloading',
+              style: GoogleFonts.inter(
+                color: color.secondaryOnBackground,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            if (hasProgress)
+              Text(
+                '$percentage%',
+                style: GoogleFonts.inter(
+                  color: color.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: hasProgress ? progress : null,
+            minHeight: 4,
+            backgroundColor: color.borderSubtleOnBackground,
+            valueColor: AlwaysStoppedAnimation(color.primary),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Mobile: Metadata hint ─────────────────────────────────────────────────────
 
 class _MobileMetadataHint extends StatelessWidget {
   const _MobileMetadataHint({required this.color});
