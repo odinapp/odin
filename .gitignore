@@ -72,3 +72,4 @@ macos/GoogleService-Info.plist
 !.dev.vars.example
 .env*
 !.env.example
+AuthKey.p8

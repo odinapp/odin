@@ -4,6 +4,12 @@
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
+# Odin only uses file/document picking on iOS. Disable the file_picker
+# media/audio picker code paths so the app binary doesn't reference
+# Photos / media-library APIs that would force unrelated privacy strings.
+Pod::PICKER_MEDIA = false
+Pod::PICKER_AUDIO = false
+
 project 'Runner', {
   'Debug' => :debug,
   'Profile' => :release,

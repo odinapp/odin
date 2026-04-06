@@ -124,6 +124,21 @@ build-macos: get ## Release macOS app
 build-windows: get ## Release Windows app
 	$(FLUTTER) build windows --release
 
+fix-ios-archive-dsyms: ## Generate missing framework dSYMs inside build/ios/archive/Runner.xcarchive
+	./scripts/fix_ios_archive_dsyms.sh build/ios/archive/Runner.xcarchive
+
+build-ios-ipa-unsigned: get ## Build unsigned iOS archive+IPA from pubspec version and patch missing framework dSYMs
+	@version=$$(sed -n 's/^version: //p' pubspec.yaml | head -n 1); \
+	build_name=$${version%%+*}; \
+	build_number=$${version##*+}; \
+	$(FLUTTER) build ipa --release --build-name $$build_name --build-number $$build_number --no-codesign; \
+	./scripts/fix_ios_archive_dsyms.sh build/ios/archive/Runner.xcarchive; \
+	mkdir -p build/ios/ipa build/ios/unsigned-ipa/Payload; \
+	rm -rf build/ios/unsigned-ipa/Payload/Runner.app; \
+	cp -R build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app build/ios/unsigned-ipa/Payload/Runner.app; \
+	(cd build/ios/unsigned-ipa && zip -qry ../ipa/Odin-$$build_name+$$build_number-unsigned.ipa Payload); \
+	echo "Built build/ios/ipa/Odin-$$build_name+$$build_number-unsigned.ipa"
+
 # --- CI-style pipeline ---
 
 check: format-check analyze test ## format (check only) + analyze + test
