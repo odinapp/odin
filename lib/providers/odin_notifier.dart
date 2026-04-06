@@ -81,7 +81,17 @@ class OdinNotifier with ChangeNotifier {
   }
 
   Future<String> getSaveDirectory() async {
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isAndroid) {
+      // External app-specific storage is visible to file managers and
+      // openable by other apps, unlike internal app documents storage.
+      // No special permissions required for the app's own external directory.
+      final extDir = await getExternalStorageDirectory();
+      if (extDir != null) return extDir.path;
+      // Fallback if external storage is unavailable (e.g. emulated device
+      // without an SD card partition).
+      return (await getApplicationDocumentsDirectory()).path;
+    }
+    if (Platform.isIOS) {
       final dir = await getApplicationDocumentsDirectory();
       return dir.path;
     }

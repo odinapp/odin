@@ -477,6 +477,18 @@ class _MobileDownloadSuccessState extends State<_MobileDownloadSuccess> {
     return 'Your files are saved on this device.';
   }
 
+  Future<void> _openFile(core.DownloadFileSuccess success) async {
+    final path = success.extracted
+        ? success.directory!.path
+        : success.file!.path;
+    final result = await OpenFilex.open(path);
+    if (result.type != ResultType.done && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open: ${result.message}')),
+      );
+    }
+  }
+
   Future<void> _share(
     core.DownloadFileSuccess success,
     BuildContext btnContext,
@@ -564,6 +576,34 @@ class _MobileDownloadSuccessState extends State<_MobileDownloadSuccess> {
               ),
               const Spacer(),
               if (success != null) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _openFile(success),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: color.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    icon: const Icon(
+                      Icons.folder_open_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    label: Text(
+                      success.extracted ? 'Open folder' : 'Open file',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
                   height: 52,
