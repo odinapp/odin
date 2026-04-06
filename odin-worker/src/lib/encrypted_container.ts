@@ -17,7 +17,7 @@ export function isEncryptedContainer(bytes: Uint8Array): boolean {
   if (bytes.length < MAGIC.length + 1) {
     return false;
   }
-  return utf8(bytes.slice(0, MAGIC.length)) === MAGIC;
+  return utf8(bytes.subarray(0, MAGIC.length)) === MAGIC;
 }
 
 export async function decryptContainerPayload(
@@ -35,6 +35,7 @@ export async function decryptContainerPayload(
     throw new Error(`Unsupported container version: ${version}`);
   }
 
+  // Keep nonce as a small copy (12 bytes) — WebCrypto requires a stable buffer for the IV.
   const nonce = bytes.slice(offset, offset + 12);
   offset += 12;
   const cipherLen = readUint32(bytes, offset);
@@ -43,9 +44,9 @@ export async function decryptContainerPayload(
     throw new Error('Corrupted encrypted payload');
   }
 
-  const cipher = bytes.slice(offset, offset + cipherLen);
-  offset += cipherLen;
-  const tag = bytes.slice(offset, offset + 16);
+  // cipher and tag are contiguous in `bytes`; pass a zero-copy subarray view
+  // directly to WebCrypto instead of allocating two intermediate copies.
+  const cipherWithTag = bytes.subarray(offset, offset + cipherLen + 16);
 
   const aesKey = await crypto.subtle.importKey(
     'raw',
@@ -54,9 +55,6 @@ export async function decryptContainerPayload(
     false,
     ['decrypt'],
   );
-  const cipherWithTag = new Uint8Array(cipher.length + tag.length);
-  cipherWithTag.set(cipher, 0);
-  cipherWithTag.set(tag, cipher.length);
   const plainBuffer = await crypto.subtle.decrypt(
     { name: 'AES-GCM', iv: nonce },
     aesKey,
@@ -71,8 +69,10 @@ export async function decryptContainerPayload(
   if (manifestLen <= 0 || plain.length < 4 + manifestLen) {
     throw new Error('Corrupted decrypted manifest');
   }
-  const manifestRaw = utf8(plain.slice(4, 4 + manifestLen));
+  // manifest JSON is small — a copy here is negligible.
+  const manifestRaw = utf8(plain.subarray(4, 4 + manifestLen));
   const manifest = JSON.parse(manifestRaw) as Record<string, unknown>;
-  const payload = plain.slice(4 + manifestLen);
+  // Return a zero-copy view of the decrypted plainBuffer for the payload.
+  const payload = plain.subarray(4 + manifestLen);
   return { payload, manifest };
 }
